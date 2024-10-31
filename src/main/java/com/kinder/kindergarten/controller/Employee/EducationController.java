@@ -1,9 +1,9 @@
 package com.kinder.kindergarten.controller.Employee;
 
 import com.kinder.kindergarten.config.PrincipalDetails;
-import com.kinder.kindergarten.dto.Employee.EducationDTO;
+import com.kinder.kindergarten.DTO.Employee.EducationDTO;
 import com.kinder.kindergarten.service.Employee.EducationService;
-import com.kinder.kindergarten.service.Employee.FileService;
+import com.kinder.kindergarten.service.FileService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -28,7 +28,7 @@ public class EducationController {
                                   @AuthenticationPrincipal PrincipalDetails principalDetails) {
         String certificatePath = null;
         if (file != null && !file.isEmpty()) {
-            certificatePath = fileService.uploadFile(file);
+            certificatePath = fileService.uploadFile_employee(file);
         }
         educationService.saveEducation(educationDTO, certificatePath, principalDetails.getEmployee());
         return "redirect:/education/history";

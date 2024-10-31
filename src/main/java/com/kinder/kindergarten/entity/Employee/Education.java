@@ -1,5 +1,6 @@
-package com.kinder.kindergarten.entity;
+package com.kinder.kindergarten.entity.Employee;
 
+import com.kinder.kindergarten.entity.Employee.Employee;
 import jakarta.persistence.*;
 import lombok.*;
 

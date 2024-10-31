@@ -1,4 +1,4 @@
-package com.kinder.kindergarten.entity;
+package com.kinder.kindergarten.entity.Employee;
 
 import com.kinder.kindergarten.constant.Employee.Status;
 import jakarta.persistence.*;

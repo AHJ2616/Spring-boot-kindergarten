@@ -1,4 +1,4 @@
-package com.kinder.kindergarten.dto.Employee;
+package com.kinder.kindergarten.DTO.Employee;
 
 import jakarta.validation.constraints.*;
 import lombok.*;
