@@ -1,17 +1,18 @@
-package com.kinder.kindergarten.entity;
+package com.kinder.kindergarten.entity.Employee;
 
+import com.kinder.kindergarten.entity.Employee.Employee;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
-@Table(name = "approval")
+@Table(name = "evaluation")
 @Getter @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Approval {
+public class Evaluation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,8 +21,8 @@ public class Approval {
     @JoinColumn(name = "employee_id")
     private Employee employee;
 
-    private String title;
+    private LocalDate evaluationDate;
+    private String evaluator;
     private String content;
-    private LocalDateTime requestDate;
-    private String status;
+    private Integer score;
 }

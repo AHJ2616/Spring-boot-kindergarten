@@ -78,6 +78,12 @@ dependencies {
     //implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     // 카카오톡 참고 https://developers.kakao.com/docs/latest/ko/kakaologin/common
 
+    // ULID사용
+    implementation group: 'com.github.f4b6a3', name: 'ulid-creator', version: '5.1.0'
+
+    //google 의 Guava 사용(캐시 관리)
+    implementation group: 'com.google.guava', name: 'guava', version: '33.3.1-jre'
+
 }
 
 tasks.named('test') {

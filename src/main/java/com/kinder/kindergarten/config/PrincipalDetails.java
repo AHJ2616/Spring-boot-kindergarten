@@ -1,6 +1,6 @@
 package com.kinder.kindergarten.config;
 
-import com.kinder.kindergarten.entity.Employee;
+import com.kinder.kindergarten.entity.Employee.Employee;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

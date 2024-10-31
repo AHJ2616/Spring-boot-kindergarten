@@ -1,9 +1,9 @@
 package com.kinder.kindergarten.service.Employee;
 
-import com.kinder.kindergarten.dto.Employee.CertificateDTO;
-import com.kinder.kindergarten.entity.Certificate;
-import com.kinder.kindergarten.entity.Employee;
-import com.kinder.kindergarten.entity.Employee_File;
+import com.kinder.kindergarten.DTO.Employee.CertificateDTO;
+import com.kinder.kindergarten.entity.Employee.Certificate;
+import com.kinder.kindergarten.entity.Employee.Employee;
+import com.kinder.kindergarten.entity.Employee.Employee_File;
 import com.kinder.kindergarten.repository.Employee.CertificateRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

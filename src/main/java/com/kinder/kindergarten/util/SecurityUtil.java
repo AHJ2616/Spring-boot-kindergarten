@@ -1,7 +1,7 @@
 package com.kinder.kindergarten.util;
 
 import com.kinder.kindergarten.config.PrincipalDetails;
-import com.kinder.kindergarten.entity.Employee;
+import com.kinder.kindergarten.entity.Employee.Employee;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;

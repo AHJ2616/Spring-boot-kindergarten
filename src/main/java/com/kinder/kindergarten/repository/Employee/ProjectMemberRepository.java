@@ -1,8 +1,8 @@
 package com.kinder.kindergarten.repository.Employee;
 
-import com.kinder.kindergarten.entity.Employee;
-import com.kinder.kindergarten.entity.Project;
-import com.kinder.kindergarten.entity.ProjectMember;
+import com.kinder.kindergarten.entity.Employee.Employee;
+import com.kinder.kindergarten.entity.Employee.Project;
+import com.kinder.kindergarten.entity.Employee.ProjectMember;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

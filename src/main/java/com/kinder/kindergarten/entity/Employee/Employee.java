@@ -1,8 +1,8 @@
-package com.kinder.kindergarten.entity;
+package com.kinder.kindergarten.entity.Employee;
 
 import com.kinder.kindergarten.constant.Employee.Position;
 import com.kinder.kindergarten.constant.Employee.Role;
-import com.kinder.kindergarten.dto.Employee.EmployeeDTO;
+import com.kinder.kindergarten.DTO.Employee.EmployeeDTO;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,7 +12,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 
 @Table(name = "Employee")

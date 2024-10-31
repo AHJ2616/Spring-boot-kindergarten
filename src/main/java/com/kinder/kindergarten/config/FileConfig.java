@@ -12,7 +12,7 @@ import java.nio.file.Paths;
 @Configuration
 public class FileConfig {
 
-    @Value("${file.upload.path}")
+    @Value("${uploadPath1}")
     private String uploadPath;
 
     @PostConstruct
