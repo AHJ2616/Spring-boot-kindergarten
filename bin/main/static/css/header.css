@@ -1,0 +1,18 @@
+.container{
+    display: grid;
+    height: 80px;
+    background: beige;
+    padding-bottom: 20px;
+    border-bottom: black 1px solid;
+}
+.container a:link{
+    color: black;
+}
+.container a:visited{
+    color: black;
+}
+
+.container a:hover{
+    color: cornflowerblue;
+    text-decoration-line: none;
+}

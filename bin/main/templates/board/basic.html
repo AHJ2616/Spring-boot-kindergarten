@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/header}">
+<head>
+  <meta charset="UTF-8">
+  <title>자유게시판</title>
+  <link rel="stylesheet" th:href="@{/css/board.css}">
+  <script th:src="@{/js/board.js}"></script>
+</head>
+<body>
+<div class="board-container">
+  <div class="board-header">
+    <div class="left-section">
+      <select class="sort-select">
+        <option value="전체">전체</option>
+        <option value="regiDate">최신순</option>
+        <option value="views">조회수순</option>
+        <option value="likes">좋아요순</option>
+      </select>
+      <div class="search-container">
+        <input type="text" id="searchInput" name="keyword" placeholder="search">
+        <button type="submit" id="search-button">검색</button>
+      </div>
+    </div>
+    <div class="right-section">
+      <button type="button" onclick="location.href='/board/write'" class="write-button">글쓰기</button>
+    </div>
+  </div>
+
+  <div id="boardList">
+    <table class="board-table">
+      <thead>
+      <tr>
+        <th>제목</th>
+        <th>작성자</th>
+        <th>작성일</th>
+        <th>조회</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="board, status : ${boards.content}">
+        <td class="title">
+          <a th:href="@{/board/{id}(id=${board.boardId})}" th:text="${board.boardTitle}">제목</a>
+        </td>
+        <td th:text="${board.boardWriter}">작성자</td>
+        <td th:text="${#temporals.format(board.regiDate,'yyyy년MM월dd일 HH:mm')}">작성일</td>
+        <td th:text="${board.views}">조회수</td>
+      </tr>
+      </tbody>
+    </table>
+    <div class="no-result" th:if="${#lists.isEmpty(boards.content)}">
+      검색과 일치하는 결과가 없습니다.
+    </div>
+  </div>
+
+  <div class="pagination" th:if="${boards.totalPages > 0}">
+        <span th:each="pageNum : ${#numbers.sequence(0, boards.totalPages - 1)}">
+            <a th:href="@{${keyword != null ? '/board/search' : '/board/basic'}(page=${pageNum + 1}, keyword=${keyword})}"
+               th:text="${pageNum + 1}"
+               th:class="${pageNum == currentPage} ? 'active' : ''">
+            </a>
+        </span>
+  </div>
+</div>
+</body>
+</html>
