@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>직원 목록</title>
+</head>
+<body>
+<div class="container">
+  <h2>직원 목록</h2>
+  <table>
+    <thead>
+    <tr>
+      <th>사번</th>
+      <th>이름</th>
+      <th>이메일</th>
+      <th>직위</th>
+      <th>부서</th>
+      <th>상태</th>
+      <th>관리</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="emp : ${employees}">
+      <td th:text="${emp.cleanup}"></td>
+      <td th:text="${emp.name}"></td>
+      <td th:text="${emp.email}"></td>
+      <td th:text="${emp.position}"></td>
+      <td th:text="${emp.department}"></td>
+      <td th:text="${emp.status}"></td>
+      <td>
+        <a th:href="@{/employee/edit/{id}(id=${emp.id})}">수정</a>
+        <a th:href="@{/employee/delete/{id}(id=${emp.id})}"
+           onclick="return confirm('정말 삭제하시겠습니까?')">삭제</a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+</body>
+</html>

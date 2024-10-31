@@ -76,11 +76,11 @@
     });
 
     function uploadSummernoteImage(file, editor) {
-        const formData = new FormData();
-        formData.append("file", file);
+        const data = new FormData();
+        data.append("file", file);
 
         $.ajax({
-            data: formData,
+            data: data,
             type: "POST",
             url: "/rest/board/uploadImage",
             contentType: false,

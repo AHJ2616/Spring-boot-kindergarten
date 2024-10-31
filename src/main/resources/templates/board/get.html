@@ -11,7 +11,7 @@
 <div class="view-container">
   <div class="board-header">
     <div class="title-section">
-      <h1 class="title" th:text="${boardDTO.boardTitle}"></h1>
+      <span class="title" th:text="${boardDTO.boardTitle}"></span>
     </div>
     <div class="info-section">
       <div class="left-info">
@@ -52,17 +52,7 @@
   <h3>첨부파일</h3>
   <div class="file-list">
     <div th:each="file : ${boardDTO.BoardFileList}" class="file-item">
-      <!-- 이미지 파일인 경우 미리보기 표시 -->
-      <div th:if="${#strings.toLowerCase(file.orignalName).endsWith('.jpg') or
-                    #strings.toLowerCase(file.orignalName).endsWith('.jpeg') or
-                    #strings.toLowerCase(file.orignalName).endsWith('.png') or
-                    #strings.toLowerCase(file.orignalName).endsWith('.PNG') or
-                    #strings.toLowerCase(file.orignalName).endsWith('.gif')}"
-           class="image-preview">
-        <!-- 이미지 경로를 /images/로 시작하도록 수정 -->
-        <img th:src="@{'/images/' + ${#strings.substringAfter(file.filePath, 'upload/')}}"
-             alt="이미지 미리보기">
-      </div>
+
       <!-- 파일 다운로드 링크 -->
       <a th:href="@{/board/download/{fileId}(fileId=${file.fileId})}"
          th:text="${file.orignalName}"

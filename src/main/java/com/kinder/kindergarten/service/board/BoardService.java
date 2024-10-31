@@ -56,6 +56,9 @@ public class BoardService {
   @Value("${uploadPath1}")
   private String uploadPath;
 
+  @Value("${summerImage}")
+  private String summerImage;
+
   public Page<BoardDTO> getCommonBoards(Pageable pageable) {
     log.info("페이지 불러오기 - BoardService.getCommonBoards()실행. pageable 정보 : " +pageable);
 
@@ -178,7 +181,9 @@ public class BoardService {
   public String uploadSummernoteImage(MultipartFile file) throws Exception {
     String originalFileName = file.getOriginalFilename();
     String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
-    String savedFileName = UUID.randomUUID().toString() + extension;
+    Ulid ulid = UlidCreator.getUlid(); //ULID 사용
+    
+    String savedFileName = ulid.toString() + extension;
 
     String uploadDir = uploadPath + "/summernote/";
     File uploadPath = new File(uploadDir);
@@ -254,53 +259,53 @@ public class BoardService {
     board.setBoardType(boardFormDTO.getBoardType());
   }
 
-//게시글 삭제
+  //게시글 삭제
   public void deleteBoard(String boardId){
     boardRepository.deleteByBoardId(boardId);
   }
-//게시글 검색
-public Page<BoardDTO> searchBoards(String keyword, Pageable pageable) {
-  try {
-    // 캐시 키 생성 (검색어와 페이지 정보 조합)
-    String cacheKey = keyword + "_" + pageable.getPageNumber();
+  //게시글 검색
+  public Page<BoardDTO> searchBoards(String keyword, Pageable pageable) {
+    try {
+      // 캐시 키 생성 (검색어와 페이지 정보 조합)
+      String cacheKey = keyword + "_" + pageable.getPageNumber();
 
-    // 캐시에서 결과 조회 시도
-    return searchCache.get(cacheKey, () -> {
-      // 초성 검색인지 확인
-      boolean isChosung = keyword.matches("^[ㄱ-ㅎ]+$");
+      // 캐시에서 결과 조회 시도
+      return searchCache.get(cacheKey, () -> {
+        // 초성 검색인지 확인
+        boolean isChosung = keyword.matches("^[ㄱ-ㅎ]+$");
 
-      if (isChosung) {
-        // 초성 검색 로직
-        List<BoardEntity> allBoards = boardRepository.findAll();
-        List<BoardDTO> matchedBoards = allBoards.stream()
-                .filter(entity ->
-                        Hangul.matchesChosung(entity.getBoardTitle(), keyword) ||
-                                Hangul.matchesChosung(entity.getBoardContents(), keyword) ||
-                                Hangul.matchesChosung(entity.getBoardWriter(), keyword))
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
+        if (isChosung) {
+          // 초성 검색 로직
+          List<BoardEntity> allBoards = boardRepository.findAll();
+          List<BoardDTO> matchedBoards = allBoards.stream()
+                  .filter(entity ->
+                          Hangul.matchesChosung(entity.getBoardTitle(), keyword) ||
+                                  Hangul.matchesChosung(entity.getBoardContents(), keyword) ||
+                                  Hangul.matchesChosung(entity.getBoardWriter(), keyword))
+                  .map(this::convertToDTO)
+                  .collect(Collectors.toList());
 
-        // List를 Page로 변환
-        int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), matchedBoards.size());
+          // List를 Page로 변환
+          int start = (int) pageable.getOffset();
+          int end = Math.min((start + pageable.getPageSize()), matchedBoards.size());
 
-        return new PageImpl<>(
-                matchedBoards.subList(start, end),
-                pageable,
-                matchedBoards.size()
-        );
-      } else {
-        // 일반 검색 로직
-        return boardRepository
-                .findByBoardTitleContainingOrBoardContentsContainingOrBoardWriterContaining(
-                        keyword, keyword, keyword, pageable)
-                .map(this::convertToDTO);
-      }
-    });
-  } catch (Exception e) {
-    throw new RuntimeException("검색 중 오류가 발생했습니다.", e);
+          return new PageImpl<>(
+                  matchedBoards.subList(start, end),
+                  pageable,
+                  matchedBoards.size()
+          );
+        } else {
+          // 일반 검색 로직
+          return boardRepository
+                  .findByBoardTitleContainingOrBoardContentsContainingOrBoardWriterContaining(
+                          keyword, keyword, keyword, pageable)
+                  .map(this::convertToDTO);
+        }
+      });
+    } catch (Exception e) {
+      throw new RuntimeException("검색 중 오류가 발생했습니다.", e);
+    }
   }
-}
 
   private BoardDTO convertToDTO(BoardEntity entity) {
     BoardDTO dto = new BoardDTO();
