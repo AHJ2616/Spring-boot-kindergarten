@@ -1,7 +1,7 @@
 package com.kinder.kindergarten.service.Employee;
 
 import com.kinder.kindergarten.constant.Employee.Status;
-import com.kinder.kindergarten.dto.Employee.AttendanceDTO;
+import com.kinder.kindergarten.DTO.Employee.AttendanceDTO;
 import com.kinder.kindergarten.entity.Attendance;
 import com.kinder.kindergarten.entity.Employee;
 import com.kinder.kindergarten.repository.Employee.AttendanceRepository;

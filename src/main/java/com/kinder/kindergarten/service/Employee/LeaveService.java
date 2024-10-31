@@ -1,7 +1,7 @@
 package com.kinder.kindergarten.service.Employee;
 
 import com.kinder.kindergarten.constant.Employee.DayOff;
-import com.kinder.kindergarten.dto.Employee.LeaveDTO;
+import com.kinder.kindergarten.DTO.Employee.LeaveDTO;
 import com.kinder.kindergarten.entity.Employee;
 import com.kinder.kindergarten.entity.Leave;
 import com.kinder.kindergarten.repository.Employee.EmployeeRepository;

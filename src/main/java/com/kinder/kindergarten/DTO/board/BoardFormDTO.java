@@ -1,7 +1,7 @@
-package com.kinder.kindergarten.DTO;
+package com.kinder.kindergarten.DTO.board;
 
 import com.kinder.kindergarten.constant.BoardType;
-import com.kinder.kindergarten.entity.BoardEntity;
+import com.kinder.kindergarten.entity.board.BoardEntity;
 import lombok.Data;
 import org.modelmapper.ModelMapper;
 

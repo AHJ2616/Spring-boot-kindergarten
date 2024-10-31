@@ -1,13 +1,10 @@
-package com.kinder.kindergarten.DTO;
+package com.kinder.kindergarten.DTO.board;
 
 import com.kinder.kindergarten.constant.BoardType;
-import com.kinder.kindergarten.entity.BoardEntity;
 import lombok.Data;
-import org.modelmapper.ModelMapper;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Data
@@ -29,8 +26,6 @@ public class BoardDTO {
   private String boardWriter;
 
   private int views;
-
-  private int likes;
 
   private LocalDateTime regiDate;
 

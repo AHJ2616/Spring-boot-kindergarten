@@ -1,6 +1,5 @@
-package com.kinder.kindergarten.DTO;
+package com.kinder.kindergarten.DTO.board;
 
-import com.kinder.kindergarten.entity.BoardEntity;
 import lombok.Data;
 
 @Data

@@ -1,7 +1,7 @@
 package com.kinder.kindergarten.controller.Employee;
 
 import com.kinder.kindergarten.config.PrincipalDetails;
-import com.kinder.kindergarten.dto.Employee.EducationDTO;
+import com.kinder.kindergarten.DTO.Employee.EducationDTO;
 import com.kinder.kindergarten.service.Employee.EducationService;
 import com.kinder.kindergarten.service.FileService;
 import jakarta.validation.Valid;

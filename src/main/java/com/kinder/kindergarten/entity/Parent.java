@@ -1,8 +1,8 @@
 package com.kinder.kindergarten.entity;
 
 import com.kinder.kindergarten.constant.Children_Role;
-import com.kinder.kindergarten.dto.ParentFormDTO;
-import com.kinder.kindergarten.dto.ParentUpdateFormDTO;
+import com.kinder.kindergarten.DTO.ParentFormDTO;
+import com.kinder.kindergarten.DTO.ParentUpdateFormDTO;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;

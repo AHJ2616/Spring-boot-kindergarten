@@ -1,7 +1,7 @@
-package com.kinder.kindergarten.repository;
+package com.kinder.kindergarten.repository.board;
 
-import com.kinder.kindergarten.entity.BoardEntity;
-import com.kinder.kindergarten.entity.BoardFileEntity;
+import com.kinder.kindergarten.entity.board.BoardEntity;
+import com.kinder.kindergarten.entity.board.BoardFileEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

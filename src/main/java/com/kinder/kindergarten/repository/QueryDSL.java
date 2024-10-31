@@ -2,7 +2,8 @@ package com.kinder.kindergarten.repository;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.kinder.kindergarten.entity.QBoardEntity;
+import com.kinder.kindergarten.entity.board.QBoardEntity;
+import com.kinder.kindergarten.repository.board.BoardRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;

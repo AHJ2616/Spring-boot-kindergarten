@@ -1,4 +1,4 @@
-package com.kinder.kindergarten.entity;
+package com.kinder.kindergarten.entity.board;
 
 import jakarta.persistence.*;
 import lombok.Getter;

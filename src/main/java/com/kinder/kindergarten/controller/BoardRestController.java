@@ -1,9 +1,8 @@
 package com.kinder.kindergarten.controller;
 
-import com.kinder.kindergarten.DTO.BoardDTO;
-import com.kinder.kindergarten.service.BoardService;
+import com.kinder.kindergarten.DTO.board.BoardDTO;
+import com.kinder.kindergarten.service.board.BoardService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.Map;
-@Log4j2
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/rest/board")
@@ -61,6 +60,28 @@ public class BoardRestController {
     }
   }
 
+  @GetMapping("/search")
+  public ResponseEntity<Page<BoardDTO>> searchAndSortBoards(
+          @RequestParam String keyword,
+          @RequestParam(defaultValue = "0") int page,
+          @RequestParam(required = false) String sortBy) {
 
+    Sort sort;
+    if (sortBy != null) {
+      sort = switch (sortBy) {
+        case "regiDate" -> Sort.by(Sort.Direction.DESC, "regiDate");
+        case "views" -> Sort.by(Sort.Direction.DESC, "views");
+        case "likes" -> Sort.by(Sort.Direction.DESC, "likes");
+        default -> Sort.by(Sort.Direction.DESC, "regiDate");
+      };
+    } else {
+      sort = Sort.by(Sort.Direction.DESC, "regiDate");
+    }
+
+    Pageable pageable = PageRequest.of(page, 10, sort);
+    Page<BoardDTO> searchResults = boardService.searchBoards(keyword, pageable);
+
+    return ResponseEntity.ok(searchResults);
+  }
 
 }

@@ -1,18 +1,19 @@
-package com.kinder.kindergarten.service;
+package com.kinder.kindergarten.service.board;
 
 
 import com.github.f4b6a3.ulid.Ulid;
 import com.github.f4b6a3.ulid.UlidCreator;
 import com.google.common.cache.LoadingCache;
-import com.kinder.kindergarten.DTO.BoardDTO;
-import com.kinder.kindergarten.DTO.BoardFileDTO;
-import com.kinder.kindergarten.DTO.BoardFormDTO;
+import com.kinder.kindergarten.DTO.board.BoardDTO;
+import com.kinder.kindergarten.DTO.board.BoardFileDTO;
+import com.kinder.kindergarten.DTO.board.BoardFormDTO;
 import com.kinder.kindergarten.constant.BoardType;
-import com.kinder.kindergarten.entity.BoardEntity;
-import com.kinder.kindergarten.entity.BoardFileEntity;
-import com.kinder.kindergarten.repository.BoardFileRepository;
-import com.kinder.kindergarten.repository.BoardRepository;
+import com.kinder.kindergarten.entity.board.BoardEntity;
+import com.kinder.kindergarten.entity.board.BoardFileEntity;
+import com.kinder.kindergarten.repository.board.BoardFileRepository;
+import com.kinder.kindergarten.repository.board.BoardRepository;
 import com.kinder.kindergarten.repository.QueryDSL;
+import com.kinder.kindergarten.service.FileService;
 import com.kinder.kindergarten.util.Hangul;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -309,7 +310,6 @@ public Page<BoardDTO> searchBoards(String keyword, Pageable pageable) {
     dto.setBoardType(entity.getBoardType());
     dto.setBoardWriter(entity.getBoardWriter());
     dto.setViews(entity.getViews());
-    dto.setLikes(entity.getLikes());
     dto.setRegiDate(entity.getRegiDate());
     dto.setModiDate(entity.getModiDate());
     return dto;

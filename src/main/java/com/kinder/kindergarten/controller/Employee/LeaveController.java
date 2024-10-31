@@ -1,7 +1,7 @@
 package com.kinder.kindergarten.controller.Employee;
 
 import com.kinder.kindergarten.config.PrincipalDetails;
-import com.kinder.kindergarten.dto.Employee.LeaveDTO;
+import com.kinder.kindergarten.DTO.Employee.LeaveDTO;
 import com.kinder.kindergarten.service.Employee.LeaveService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
