@@ -1,4 +1,4 @@
-package com.kinder.kindergarten.DTO;
+package com.kinder.kindergarten.DTO.board;
 
 import lombok.Getter;
 import lombok.Setter;

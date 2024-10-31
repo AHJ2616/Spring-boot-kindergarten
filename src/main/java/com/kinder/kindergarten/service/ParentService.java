@@ -1,7 +1,7 @@
 package com.kinder.kindergarten.service;
 
-import com.kinder.kindergarten.dto.EmailFindDTO;
-import com.kinder.kindergarten.dto.ParentUpdateFormDTO;
+import com.kinder.kindergarten.DTO.EmailFindDTO;
+import com.kinder.kindergarten.DTO.ParentUpdateFormDTO;
 import com.kinder.kindergarten.entity.Parent;
 import com.kinder.kindergarten.repository.ParentRepository;
 import lombok.RequiredArgsConstructor;

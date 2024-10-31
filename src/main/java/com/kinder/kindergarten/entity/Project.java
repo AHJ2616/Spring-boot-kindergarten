@@ -29,6 +29,7 @@ public class Project {
     private Employee manager;
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<ProjectMember> members = new ArrayList<>();
 
     // 프로젝트 멤버 추가 메서드

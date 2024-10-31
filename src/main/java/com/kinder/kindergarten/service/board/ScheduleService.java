@@ -1,8 +1,8 @@
-package com.kinder.kindergarten.service;
+package com.kinder.kindergarten.service.board;
 
-import com.kinder.kindergarten.DTO.ScheduleDTO;
-import com.kinder.kindergarten.entity.ScheduleEntity;
-import com.kinder.kindergarten.repository.ScheduleRepository;
+import com.kinder.kindergarten.DTO.board.ScheduleDTO;
+import com.kinder.kindergarten.entity.board.ScheduleEntity;
+import com.kinder.kindergarten.repository.board.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;

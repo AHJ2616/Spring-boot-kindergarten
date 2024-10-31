@@ -1,7 +1,7 @@
 package com.kinder.kindergarten.controller;
 
-import com.kinder.kindergarten.DTO.ScheduleDTO;
-import com.kinder.kindergarten.service.ScheduleService;
+import com.kinder.kindergarten.DTO.board.ScheduleDTO;
+import com.kinder.kindergarten.service.board.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

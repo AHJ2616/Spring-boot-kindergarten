@@ -1,4 +1,4 @@
-package com.kinder.kindergarten.dto;
+package com.kinder.kindergarten.DTO;
 
 
 import com.kinder.kindergarten.entity.Parent;

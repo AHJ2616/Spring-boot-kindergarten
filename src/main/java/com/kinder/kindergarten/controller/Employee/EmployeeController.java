@@ -2,10 +2,10 @@ package com.kinder.kindergarten.controller.Employee;
 
 
 import com.kinder.kindergarten.config.PrincipalDetails;
-import com.kinder.kindergarten.dto.Employee.AttendanceDTO;
-import com.kinder.kindergarten.dto.Employee.CertificateDTO;
-import com.kinder.kindergarten.dto.Employee.EmployeeDTO;
-import com.kinder.kindergarten.dto.Employee.LeaveDTO;
+import com.kinder.kindergarten.DTO.Employee.AttendanceDTO;
+import com.kinder.kindergarten.DTO.Employee.CertificateDTO;
+import com.kinder.kindergarten.DTO.Employee.EmployeeDTO;
+import com.kinder.kindergarten.DTO.Employee.LeaveDTO;
 import com.kinder.kindergarten.entity.Employee;
 import com.kinder.kindergarten.service.Employee.AttendanceService;
 import com.kinder.kindergarten.service.Employee.CertificateService;

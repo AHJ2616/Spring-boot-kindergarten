@@ -1,7 +1,7 @@
-package com.kinder.kindergarten.repository;
+package com.kinder.kindergarten.repository.board;
 
 import com.kinder.kindergarten.constant.BoardType;
-import com.kinder.kindergarten.entity.BoardEntity;
+import com.kinder.kindergarten.entity.board.BoardEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

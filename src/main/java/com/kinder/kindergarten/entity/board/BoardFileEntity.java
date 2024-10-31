@@ -1,12 +1,11 @@
-package com.kinder.kindergarten.entity;
+package com.kinder.kindergarten.entity.board;
 
+import com.kinder.kindergarten.entity.TimeEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.sql.Time;
 
 @Entity
 @Table(name = "board_file")

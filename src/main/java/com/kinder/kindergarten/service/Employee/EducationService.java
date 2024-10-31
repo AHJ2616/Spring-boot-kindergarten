@@ -1,6 +1,6 @@
 package com.kinder.kindergarten.service.Employee;
 
-import com.kinder.kindergarten.dto.Employee.EducationDTO;
+import com.kinder.kindergarten.DTO.Employee.EducationDTO;
 import com.kinder.kindergarten.entity.Education;
 import com.kinder.kindergarten.entity.Employee;
 import com.kinder.kindergarten.repository.Employee.EducationRepository;

@@ -3,7 +3,7 @@ package com.kinder.kindergarten.config;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.kinder.kindergarten.DTO.BoardDTO;
+import com.kinder.kindergarten.DTO.board.BoardDTO;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Page;

@@ -1,7 +1,7 @@
 package com.kinder.kindergarten.controller.Employee;
 
 import com.kinder.kindergarten.config.PrincipalDetails;
-import com.kinder.kindergarten.dto.Employee.AttendanceDTO;
+import com.kinder.kindergarten.DTO.Employee.AttendanceDTO;
 import com.kinder.kindergarten.service.Employee.AttendanceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

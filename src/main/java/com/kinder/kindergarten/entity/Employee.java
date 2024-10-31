@@ -2,7 +2,7 @@ package com.kinder.kindergarten.entity;
 
 import com.kinder.kindergarten.constant.Employee.Position;
 import com.kinder.kindergarten.constant.Employee.Role;
-import com.kinder.kindergarten.dto.Employee.EmployeeDTO;
+import com.kinder.kindergarten.DTO.Employee.EmployeeDTO;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -66,15 +66,19 @@ public class Employee {
 
     @Column(name = "employee_role")
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private Role role = Role.ROLE_MANAGER; // 기본값은 직원
 
     @OneToMany(mappedBy = "manager", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<Project> projects = new ArrayList<>(); // 프로젝트 목록
 
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<Evaluation> evaluations = new ArrayList<>(); // 인사평가 목록
 
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<Approval> approvals = new ArrayList<>(); // 결재 문서 목록
 
     // 사번의 자동번호 생성자
