@@ -76,15 +76,19 @@ public class Employee {
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     private List<Approval> approvals = new ArrayList<>(); // 결재 문서 목록
 
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
+    private List<Leave> leaves = new ArrayList<>();
+
     // 사번의 자동번호 생성자
     public static String generateAutoNumber() {
         long currentTimeMillis = System.currentTimeMillis();
-        return String.valueOf(currentTimeMillis).substring(5); // 현재 시간을 기반으로 8자리
+        return String.valueOf(currentTimeMillis).substring(5);
     }
 
     public static Employee createEmployee(EmployeeDTO employeeDTO, PasswordEncoder passwordEncoder) {
         // 사번 작성
         String currentDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        // 현재 시간을 기반으로 8자리
         String timeNum = generateAutoNumber().substring(5);
         String cleanup = currentDate + timeNum;
         // 직급별 연차 지정 ENUM
@@ -103,6 +107,26 @@ public class Employee {
                 .salary(employeeDTO.getSalary())
                 .hireDate(employeeDTO.getHireDate())
                 .build();
+    }
+
+    // 연차 사용
+    public boolean useAnnualLeave(double days) {
+        if (this.annualLeave >= days) {
+            this.annualLeave -= days;
+            return true;
+        }
+        return false;
+    }
+
+    // 연차 반환 (휴가 취소/반려 시)
+    public void returnAnnualLeave(double days) {
+        this.annualLeave += days;
+    }
+
+    // 연차 초기화 (매년 초기화)
+    public void resetAnnualLeave() {
+        Position pos = Position.valueOf(this.position.toUpperCase());
+        this.annualLeave = pos.getAnnualLeave();
     }
 
 }

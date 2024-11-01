@@ -49,6 +49,6 @@ public class EmployeeDTO {
     private LocalDate hireDate;
 
     // 잔여 연차
-    private int annualLeave;
+    private double annualLeave;
 
 }

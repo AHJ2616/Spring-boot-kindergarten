@@ -1,5 +1,7 @@
 package com.kinder.kindergarten.controller.Employee;
 
+import com.kinder.kindergarten.DTO.Employee.EmployeeDTO;
+import com.kinder.kindergarten.DTO.Employee.LeaveDTO;
 import com.kinder.kindergarten.config.PrincipalDetails;
 import com.kinder.kindergarten.DTO.Employee.EducationDTO;
 import com.kinder.kindergarten.service.Employee.EducationService;
@@ -22,6 +24,11 @@ public class EducationController {
     private final EducationService educationService;
     private final FileService fileService;
 
+    @GetMapping("/record")
+    public String leaveRequestForm() {
+        return "employee/record";
+    }
+
     @PostMapping("/record")
     public String recordEducation(@Valid EducationDTO educationDTO,
                                   @RequestParam(value = "file", required = false) MultipartFile file,
@@ -34,11 +41,11 @@ public class EducationController {
         return "redirect:/education/history";
     }
 
-    @GetMapping("/history")
-    public String getEducationHistory(@AuthenticationPrincipal PrincipalDetails principalDetails,
-                                      Model model) {
-        List<EducationDTO> history = educationService.getEducationHistory(principalDetails.getEmployee());
-        model.addAttribute("history", history);
-        return "education/history";
-    }
+//    @GetMapping("/history")
+//    public String getEducationHistory(@AuthenticationPrincipal PrincipalDetails principalDetails,
+//                                      Model model) {
+//        List<EducationDTO> history = educationService.getEducationHistory(principalDetails.getEmployee());
+//        model.addAttribute("history", history);
+//        return "employee/history";
+//    }
 }

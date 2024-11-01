@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 @Table(name = "Employee_Leave")
 @Entity
@@ -38,5 +39,12 @@ public class Leave {
     private String status; // 승인여부
 
     @Column(name = "leave_total")
-    private double total;
+    private double total; // 사용연차
+
+    @Column(name = "leave_reason")
+    private String le_reason; // 휴가 사유
+
+    @Column(name = "leave_rejectReason")
+    private String rejectReason; // 반려 사유
+
 }

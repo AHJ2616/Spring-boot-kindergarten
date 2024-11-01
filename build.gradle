@@ -84,6 +84,16 @@ dependencies {
     //google 의 Guava 사용(캐시 관리)
     implementation group: 'com.google.guava', name: 'guava', version: '33.3.1-jre'
 
+    // 날짜/시간 계산을 위한 라이브러리
+    implementation 'org.threeten:threeten-extra:1.7.2'
+
+    // 스케줄링을 위한 라이브러리 (연차 자동 초기화 등)
+    implementation 'org.springframework.boot:spring-boot-starter-quartz'
+
+    // 캐시 처리를 위한 라이브러리
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'com.github.ben-manes.caffeine:caffeine'
+
 }
 
 tasks.named('test') {

@@ -12,7 +12,7 @@
         <a th:href="@{/employee/new}" class="btn">직원등록(완료)</a>
         <a th:href="@{/employee/edit/{id}(id=${employeeDTO.id})}" class="btn">정보 수정(완료)</a>
         <a th:href="@{/attendance/my-records}" class="btn">근태 기록(완료)</a>
-        <a th:href="@{/leave/my-leaves}" class="btn">휴가 현황(개발중)</a>
+        <a th:href="@{/leave/my-leaves}" class="btn">휴가 현황(완료)</a>
         <a th:href="@{/certificate/my-certificates}" class="btn">자격증 관리(개발중)</a>
         <a th:href="@{/education/history}" class="btn">교육이력(개발중)</a>
     </div>
@@ -58,6 +58,7 @@
             <th>유형</th>
             <th>상태</th>
             <th>사용휴가</th>
+            <th>잔여휴가</th>
         </tr>
         </thead>
         <tbody>
@@ -67,12 +68,35 @@
             <td th:text="${leave.le_type}"></td>
             <td th:text="${leave.le_status}"></td>
             <td th:text="${leave.le_total}"></td>
+            <td th:text="${employeeDTO.annualLeave}"></td>
         </tr>
         </tbody>
     </table>
-    <a th:href="@{/leave/request}" class="btn">휴가 신청</a>
+    <a th:href="@{/leave/request/{id}(id=${#authentication.principal.employee.id})}" class="btn">휴가 신청</a>
+        <H2>교육이력현황</H2>
+    <a th:href="@{/education/record}" class="btn">교육이력 등록</a>
+    <table>
+        <thead>
+        <tr>
+            <th>교육이름</th>
+            <th>교육시작 날짜</th>
+            <th>교육종료 날짜</th>
+            <th>수료증 여부</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="history : ${history}">
+            <td th:text="${history.ed_name}"></td>
+            <td th:text="${history.ed_start}"></td>
+            <td th:text="${history.ed_end}"></td>
+            <td th:text="${history.ed_certificate}"></td>
+        </tr>
+        </tbody>
+    </table>
+        <H2>자격증현황</H2>
+
+    </div>
 </div>
-</div>
-<script src="/Employee/Attendance.js"></script>
+<script src="/js/Employee/Attendance.js"></script>
 </body>
 </html>
