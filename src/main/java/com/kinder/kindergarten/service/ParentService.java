@@ -1,7 +1,5 @@
 package com.kinder.kindergarten.service;
 
-import com.kinder.kindergarten.DTO.EmailFindDTO;
-import com.kinder.kindergarten.repository.ParentRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.core.userdetails.User;
