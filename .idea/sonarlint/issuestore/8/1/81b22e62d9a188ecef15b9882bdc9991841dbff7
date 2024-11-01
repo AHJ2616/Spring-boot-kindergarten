@@ -1,12 +1,12 @@
 
-g	java:S112~"FDefine and throw a dedicated exception instead of using a generic one.(îÒ†Áùÿÿÿÿ8¬é—ß­2
-h	java:S112"FDefine and throw a dedicated exception instead of using a generic one.(üœ»üøÿÿÿÿ8­é—ß­2
+g	java:S112|"FDefine and throw a dedicated exception instead of using a generic one.(îÒ†Áùÿÿÿÿ8Ãž¼‚®2
+g	java:S112"FDefine and throw a dedicated exception instead of using a generic one.(üœ»üøÿÿÿÿ8Ãž¼‚®2
 i
-java:S1192>"LDefine a constant instead of duplicating this literal "board/write" 6 times.(÷åþå8°é—ß­2
+java:S1192<"LDefine a constant instead of duplicating this literal "board/write" 6 times.(÷åþå8Èž¼‚®2
 j
-java:S1192b"MDefine a constant instead of duplicating this literal "errorMessage" 3 times.(Åø›8±é—ß­2
+java:S1192`"MDefine a constant instead of duplicating this literal "errorMessage" 3 times.(Åø›8Èž¼‚®2
 n
-java:S1192^"QDefine a constant instead of duplicating this literal "redirect:/board/" 3 times.(µ¼Ù¸8±é—ß­2
-r	java:S117h"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ˆÆëÛüÿÿÿÿ8²é—ß­2
+java:S1192\"QDefine a constant instead of duplicating this literal "redirect:/board/" 3 times.(µ¼Ù¸8Èž¼‚®2
+r	java:S117f"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ˆÆëÛüÿÿÿÿ8Èž¼‚®2
 I
-java:S1452±"&Remove usage of generic wildcard type.(²æâ™þÿÿÿÿ8Ìùêá­2
+java:S1452¯"&Remove usage of generic wildcard type.(²æâ™þÿÿÿÿ8Â¡¼‚®2

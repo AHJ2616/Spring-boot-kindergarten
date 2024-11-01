@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,7 +50,7 @@ public class BoardRestController {
   }
 
   @PostMapping("/uploadImage")
-  public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile file) {
+  public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile file)throws IllegalStateException, IOException {
     try {
       String imageUrl = boardService.uploadSummernoteImage(file);
       Map<String, String> response = new HashMap<>();

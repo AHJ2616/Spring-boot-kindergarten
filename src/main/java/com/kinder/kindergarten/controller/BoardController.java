@@ -54,6 +54,21 @@ public class BoardController {
     return "board/basic";
   }
 
+  @GetMapping(value="/diary")
+  public String getDiaryList(@RequestParam(required = false, defaultValue = "1", value = "page")int pageNum,
+                              Model model) {
+    pageNum = pageNum == 0 ? 0 : (pageNum - 1);
+    Pageable pageable = PageRequest.of(pageNum, 10); // 한 페이지당 10개의 게시글
+
+    Page<BoardDTO> boardDtoPage = boardService.getDiaryBoards(pageable);
+
+    model.addAttribute("boards", boardDtoPage);
+    model.addAttribute("currentPage", pageNum);
+    model.addAttribute("totalPages", boardDtoPage.getTotalPages());
+
+    return "board/diary";
+  }
+
   @GetMapping(value="/write")
   public String writeBoard(Model model){
     model.addAttribute("boardFormDTO",new BoardFormDTO());

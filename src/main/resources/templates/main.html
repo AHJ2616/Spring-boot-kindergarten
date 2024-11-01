@@ -2,13 +2,14 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{common/header}">
+      layout:decorate="~{common/layout}">
 <head>
     <meta charset="UTF-8">
-    <title>Main</title>
+    <title>메인페이지</title>
 </head>
 <body>
-<div class="container-empl">
+<div layout:fragment="content">
+<div class="container-empl" >
     <div sec:authorize="isAuthenticated()">
         <h2>환영합니다, <span sec:authentication="name"></span>님!</h2>
         <div class="menu-section">
@@ -27,6 +28,7 @@
             <a th:href="@{/employee/new}" class="btn">직원등록</a>
         </div>
     </div>
+</div>
 </div>
 </body>
 </html>

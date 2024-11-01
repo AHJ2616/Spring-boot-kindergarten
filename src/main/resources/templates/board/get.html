@@ -11,7 +11,7 @@
 <div class="view-container">
   <div class="board-header">
     <div class="title-section">
-      <h1 class="title" th:text="${boardDTO.boardTitle}"></h1>
+      <span class="title" th:text="${boardDTO.boardTitle}"></span>
     </div>
     <div class="info-section">
       <div class="left-info">
@@ -27,7 +27,31 @@
       </div>
     </div>
   </div>
+  <!-- 이미지 갤러리 섹션 -->
+  <div class="image-gallery-container" th:if="${boardDTO.BoardFileList != null}">
+    <!-- 썸네일 목록 -->
+    <div class="thumbnail-list">
+      <div th:each="file : ${boardDTO.BoardFileList}"
+           th:if="${#strings.toLowerCase(file.orignalName).endsWith('.jpg') or
+                 #strings.toLowerCase(file.orignalName).endsWith('.jpeg') or
+                 #strings.toLowerCase(file.orignalName).endsWith('.png') or
+                 #strings.toLowerCase(file.orignalName).endsWith('.PNG') or
+                 #strings.toLowerCase(file.orignalName).endsWith('.gif')}"
+           class="thumbnail-item">
+        <img th:src="@{'/images/' +${file.modifiedName}}"
+             alt="썸네일 이미지"
+             class="thumbnail">
+      </div>
+    </div>
 
+    <!-- 큰 이미지 프리뷰 -->
+    <div class="preview-container">
+      <img id="preview-image"
+           th:if="${boardDTO.BoardFileList != null and not #lists.isEmpty(boardDTO.BoardFileList)}"
+           th:src="@{'/upload/' + ${boardDTO.BoardFileList[0].filePath}}"
+           alt="이미지 프리뷰">
+    </div>
+  </div>
   <!-- 게시글 내용 부분은 유지 -->
   <div class="board-content">
     <div th:utext="${boardDTO.boardContents}" class="content-area"></div>
@@ -52,17 +76,7 @@
   <h3>첨부파일</h3>
   <div class="file-list">
     <div th:each="file : ${boardDTO.BoardFileList}" class="file-item">
-      <!-- 이미지 파일인 경우 미리보기 표시 -->
-      <div th:if="${#strings.toLowerCase(file.orignalName).endsWith('.jpg') or
-                    #strings.toLowerCase(file.orignalName).endsWith('.jpeg') or
-                    #strings.toLowerCase(file.orignalName).endsWith('.png') or
-                    #strings.toLowerCase(file.orignalName).endsWith('.PNG') or
-                    #strings.toLowerCase(file.orignalName).endsWith('.gif')}"
-           class="image-preview">
-        <!-- 이미지 경로를 /images/로 시작하도록 수정 -->
-        <img th:src="@{'/images/' + ${#strings.substringAfter(file.filePath, 'upload/')}}"
-             alt="이미지 미리보기">
-      </div>
+
       <!-- 파일 다운로드 링크 -->
       <a th:href="@{/board/download/{fileId}(fileId=${file.fileId})}"
          th:text="${file.orignalName}"
@@ -97,6 +111,17 @@
                 });
         }
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const thumbnails = document.querySelectorAll('.thumbnail-item img');
+        const previewImage = document.getElementById('preview-image');
+
+        thumbnails.forEach(thumbnail => {
+            thumbnail.addEventListener('mouseover', function() {
+                previewImage.src = this.src;
+            });
+        });
+    });
 </script>
 
 <!-- CSRF 토큰을 위한 meta 태그 추가 -->
