@@ -31,8 +31,6 @@ public class ClassRoom {
 
   private String classRoomDescription; // 반 설명 및 비고
 
-  @OneToMany(mappedBy = "classRoom", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<Parent> children;  // 반에 배정된 원아들
 
 }
 
