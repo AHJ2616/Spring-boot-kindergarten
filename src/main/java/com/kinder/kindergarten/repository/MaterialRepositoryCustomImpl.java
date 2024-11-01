@@ -4,7 +4,6 @@ import com.kinder.kindergarten.DTO.MaterialSearchDTO;
 import com.kinder.kindergarten.constant.MaterialStatus;
 import com.kinder.kindergarten.entity.MaterialEntity;
 import com.kinder.kindergarten.entity.QMaterialEntity;
-import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Wildcard;
 import com.querydsl.jpa.impl.JPAQueryFactory;

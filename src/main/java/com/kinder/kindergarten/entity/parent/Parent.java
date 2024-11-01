@@ -1,16 +1,12 @@
-package com.kinder.kindergarten.entity;
+package com.kinder.kindergarten.entity.parent;
 
 import com.kinder.kindergarten.constant.Children_Role;
-import com.kinder.kindergarten.dto.ParentFormDTO;
-import com.kinder.kindergarten.dto.ParentUpdateFormDTO;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
-import java.util.List;
 
-@Entity // 테이블 담당한다.
+@Entity
 @Getter
 @Setter
 @ToString
@@ -18,50 +14,63 @@ import java.util.List;
 public class Parent {
 
     /*
-    학부모의 정보를 관리하는데 테이블, 회원가입 할 때 받는 정보
+    학부모와 원아의 정보를 관리하는데 테이블
      */
 
+    // 학부모 정보
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long parent_id; //학부모 고유 ID
+    private Long parentId; //학부모 고유 ID (PK)
 
     @Column(nullable = false)
-    private String parent_name; // 학부모 이름
+    private String parentName; // 학부모 이름
 
     @Column(unique = true, nullable = false)
-    private String parent_email;    // 학부모 이메일(학부모 구분을 위해 유니크 설정)
+    private String  parentEmail;    // 학부모 이메일(학부모 구분을 위해 유니크 설정)
 
     @Column(nullable = false)
-    private String parent_pw;   // 학부모 비밀번호
+    private String parentPassword;   // 학부모 비밀번호
 
     @Column(nullable = false)
-    private String parent_phone;    // 학부모 핸드폰 번호
+    private String parentPhone;    // 학부모 핸드폰 번호
 
     @Column(nullable = false)
-    private String parent_address;  // 학부모 주소
+    private String parentAddress;  // 학부모 주소
 
     @Column(nullable = false)
-    private String parent_birthDate;    // 학부모 생년월일(yyyy-MM-dd)  10.30 추가(아이디 찾기 기능 구현)
+    private LocalDate parentBirthDate;    // 학부모 생년월일(yyyy-MM-dd)
 
     @Enumerated(EnumType.STRING)
-    private Children_Role children_role; // 권한
+    private Children_Role parentRole; // 권한
 
     @Column(nullable = false)
-    private LocalDate parent_createDate = LocalDate.now();    // 생성 날짜
+    private LocalDate parentCreateDate = LocalDate.now();    // 생성 날짜
 
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Children> children;
+
+    // 원아 정보
+
+    @Column(nullable = false)
+    private String childrenName;    // 원아 이름
+
+    @Column(nullable = false)
+    private LocalDate childrenBirthDate;    // 원아 생년월일
+
+    private String childrenEmergencyPhone;  // 긴급 연락처(학부모)
+
+    private String childrenAllergies;   // 알레르기 정보
+
+    private String childrenMedicalHistory;  // 병력 정보
+
+    private String childrenNotes;   // 기타 사항
+
+    // 반 ID와 연관관계 설정
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assignedClassId")
+    private ClassRoom classRoom;    // 원아 반
+
+
     /*
-    하나의 학부모는 여러 자식이 있을 수 있기 때문에 @OneToMany 관계로 설정
-
-    여기서, cascade = CascadeType.ALL -> 부모를 통해 자녀의 데이터를 함께 관리할 수 있도록 설정, ex) 부모 데이터 저장, 삭제 시 자식 데이터도 저장, 삭제
-    orphanRemoval = true : 자녀가 부모와의 관계에서 제거 될 경우 해당 된 자녀 데이터도 자동으로 삭제 한다.
-
-     */
-
-    /*
-
-    Hibernate:
+      Hibernate:
     create table parent (
         parent_id bigint not null auto_increment,
         children_role enum ('PARENT','TEACHER'),
@@ -86,15 +95,22 @@ Hibernate:
         alter table if exists parent
            add column parent_birth_date varchar(255) not null
 
+    11.01 추가 - **
+    Hibernate:
+    alter table if exists parent
+       modify column parent_birth_date date not null
      */
+
+
+    /*
     public static Parent createParent(ParentFormDTO parentFormDTO, PasswordEncoder passwordEncoder) {
         // Parent 엔티티 생성하는 메서드
 
         Parent parent = new Parent();
 
-        parent.setParent_name(parentFormDTO.getParent_name());
-        parent.setParent_email(parentFormDTO.getParent_email());
-        parent.setParent_birthDate(parentFormDTO.getParent_birthDate());
+        parent.setParentName(parentFormDTO.getParent_name());
+        parent.setParentEmail(parentFormDTO.getParent_email());
+        parent.setParentBirthDate(parentFormDTO.getParent_birthDate());
         String password = passwordEncoder.encode(parentFormDTO.getParent_pw());
         parent.setParent_pw(password);
         parent.setParent_phone(parentFormDTO.getParent_phone());
@@ -118,6 +134,8 @@ Hibernate:
 
         return parent;
     }
+
+     */
 
 
 
