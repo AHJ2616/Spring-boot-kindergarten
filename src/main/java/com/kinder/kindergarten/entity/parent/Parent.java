@@ -55,6 +55,10 @@ public class Parent {
 
   private String childrenNotes;   // 기타 사항
 
+  // 반 ID와 연관관계 설정
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "assignedClassId")
+  private ClassRoom classRoom;    // 원아 반
 
     /*
       Hibernate:
