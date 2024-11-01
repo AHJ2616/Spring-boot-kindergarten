@@ -8,9 +8,6 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 @Entity
 @Table(name = "board")

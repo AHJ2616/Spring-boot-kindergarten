@@ -30,7 +30,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 
@@ -64,6 +63,15 @@ public class BoardService {
 
     //페이징 처리
     Page<BoardEntity> boardPage = boardRepository.findByBoardType(BoardType.COMMON, pageable);
+
+    return boardPage.map(boardEntity -> modelMapper.map(boardEntity, BoardDTO.class));
+  }
+
+  public Page<BoardDTO> getDiaryBoards(Pageable pageable) {
+    log.info("페이지 불러오기 - BoardService.getDiaryBoard()실행. pageable 정보 : " +pageable);
+
+    //페이징 처리
+    Page<BoardEntity> boardPage = boardRepository.findByBoardType(BoardType.DIARY, pageable);
 
     return boardPage.map(boardEntity -> modelMapper.map(boardEntity, BoardDTO.class));
   }
@@ -242,7 +250,8 @@ public class BoardService {
         }
 
         // BoardFileEntity 설정
-        boardFile.setFileId(UUID.randomUUID().toString());
+        Ulid ulid = UlidCreator.getUlid();
+        boardFile.setFileId(ulid.toString());
         boardFile.setOriginalName(originalFilename);
         boardFile.setModifiedName(savedFileName);
         boardFile.setFilePath(filePath);

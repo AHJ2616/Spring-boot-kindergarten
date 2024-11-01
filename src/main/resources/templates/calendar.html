@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
-      layout:decorate="~{common/header}">
+      layout:decorate="~{common/layout}">
 <head>
   <meta charset="UTF-8">
   <title>유치원 일정표</title>
@@ -14,6 +14,7 @@
   <script src="/js/calendar.js"></script>
 </head>
 <body>
+<div layout:fragment="content">
 <input type="hidden" id="isAdmin" th:value="${#authorization.expression('hasRole(''ADMIN'')')}"/>
 <input type="hidden" id="currentEventId"/>
 
@@ -72,6 +73,7 @@
       <button id="deleteEvent" class="btn btn-danger">삭제</button>
     </div>
   </div>
+</div>
 </div>
 </body>
 </html>

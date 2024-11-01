@@ -1,5 +1,7 @@
 package com.kinder.kindergarten.service.board;
 
+import com.github.f4b6a3.ulid.Ulid;
+import com.github.f4b6a3.ulid.UlidCreator;
 import com.kinder.kindergarten.DTO.board.ScheduleDTO;
 import com.kinder.kindergarten.entity.board.ScheduleEntity;
 import com.kinder.kindergarten.repository.board.ScheduleRepository;
@@ -9,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,7 +41,8 @@ public class ScheduleService {
   // 일정 생성
   public ScheduleDTO createSchedule(ScheduleDTO scheduleDTO) {
     ScheduleEntity schedule = modelMapper.map(scheduleDTO, ScheduleEntity.class);
-    schedule.setScheduleId(UUID.randomUUID().toString());
+    Ulid ulid = UlidCreator.getUlid();
+    schedule.setScheduleId(ulid.toString());
 
     ScheduleEntity savedSchedule = scheduleRepository.save(schedule);
     return modelMapper.map(savedSchedule, ScheduleDTO.class);

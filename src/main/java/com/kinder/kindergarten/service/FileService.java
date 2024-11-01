@@ -1,5 +1,7 @@
 package com.kinder.kindergarten.service;
 
+import com.github.f4b6a3.ulid.Ulid;
+import com.github.f4b6a3.ulid.UlidCreator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -9,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -23,9 +24,9 @@ public class FileService {
   }
 
   public String uploadFile(String uploadPath, String originalFileName, byte[] fileData) throws Exception {
-    UUID uuid = UUID.randomUUID();
+    Ulid ulid = UlidCreator.getUlid();
     String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
-    String savedFileName = uuid.toString() + extension;
+    String savedFileName = ulid.toString() + extension;
     String fileUploadFullUrl = uploadPath + savedFileName;
 
     // 파일 저장
@@ -72,8 +73,9 @@ public class FileService {
   }
   private String createFileName(String originalFilename) {
     String ext = extractExt(originalFilename);
-    String uuid = UUID.randomUUID().toString();
-    return uuid + "." + ext;
+    Ulid ulid = UlidCreator.getUlid();
+    String ulid2 = ulid.toString();
+    return ulid2 + "." + ext;
   }
 
   private String extractExt(String originalFilename) {

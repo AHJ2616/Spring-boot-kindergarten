@@ -1,13 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<!--Pico CSS 적용하기-->
-<link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
-<link rel="stylesheet" th:href="@{/css/header.css}">
-<script th:src="@{/js/header.js}" defer></script>
+
 <!-- Header -->
-<header class="container">
+<header th:fragment="header" class="container">
   <nav>
     <h1>어린이집</h1>
     <ul>
@@ -18,6 +13,13 @@
         <a href="#" class="dropdown-toggle">게시판</a>
         <ul class="dropdown-menu">
           <li><a href="/board/basic">자유게시판</a></li>
+          <li><a href="/board/notification">공지게시판</a></li>
+          <li><a href="/material/diary">성장일기</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">관리자</a>
+        <ul class="dropdown-menu">
           <li><a href="/material/materials">자재게시판</a></li>
         </ul>
       </li>
@@ -27,4 +29,5 @@
     </ul>
   </nav>
 </header>
+
 </html>

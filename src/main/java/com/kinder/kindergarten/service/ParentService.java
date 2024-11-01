@@ -1,12 +1,9 @@
 package com.kinder.kindergarten.service;
 
 import com.kinder.kindergarten.DTO.EmailFindDTO;
-import com.kinder.kindergarten.DTO.ParentUpdateFormDTO;
-import com.kinder.kindergarten.entity.Parent;
 import com.kinder.kindergarten.repository.ParentRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,9 +11,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional
