@@ -5,7 +5,6 @@ import com.kinder.kindergarten.DTO.MaterialFormDTO;
 //import com.kinder.kindergarten.repository.MaterialImgRepository;
 
 
-import com.kinder.kindergarten.DTO.MaterialImgDTO;
 import com.kinder.kindergarten.DTO.MaterialSearchDTO;
 import com.kinder.kindergarten.entity.MaterialEntity;
 import com.kinder.kindergarten.entity.MaterialImgEntity;
