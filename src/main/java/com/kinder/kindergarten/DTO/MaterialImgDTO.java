@@ -1,8 +1,6 @@
 package com.kinder.kindergarten.DTO;
 
-import com.kinder.kindergarten.entity.MaterialEntity;
 import com.kinder.kindergarten.entity.MaterialImgEntity;
-import com.kinder.kindergarten.entity.QMaterialImgEntity;
 import lombok.Getter;
 import lombok.Setter;
 import org.modelmapper.ModelMapper;

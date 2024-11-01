@@ -4,7 +4,6 @@ import com.kinder.kindergarten.DTO.MaterialSearchDTO;
 import com.kinder.kindergarten.constant.MaterialStatus;
 import com.kinder.kindergarten.entity.MaterialEntity;
 import com.kinder.kindergarten.entity.QMaterialEntity;
-import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Wildcard;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -47,7 +46,7 @@ public class MaterialRepositoryCustomImpl implements MaterialRepositoryCustom{
             dateTime = dateTime.minusMonths(6);
         }
 
-        return QMaterialEntity.materialEntity.regi_date.after(dateTime);
+        return QMaterialEntity.materialEntity.regiDate.after(dateTime);
     }
 
     private BooleanExpression searchByLike(String searchBy, String searchQuery){ // 특정 조건 검색 "like" 이용

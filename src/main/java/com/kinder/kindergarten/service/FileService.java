@@ -1,35 +1,53 @@
 package com.kinder.kindergarten.service;
 
-import lombok.extern.java.Log;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.io.FileOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.UUID;
 
 @Service
-@Log
+@RequiredArgsConstructor
 public class FileService {
 
-    public String uploadFile(String uploadPath, String originalFileName, byte[] fileData) throws Exception{
-        UUID uuid = UUID.randomUUID();                                      // 랜덤 파일명 생성
-        String extension = originalFileName.substring(originalFileName.lastIndexOf(".")); // 확장자
-        String savedFileName = uuid.toString() + extension;                 //  uuid+원래파일명 결합
-        String fileUploadFullUrl = uploadPath + "/" + savedFileName;        // 경로 추가
-        FileOutputStream fos = new FileOutputStream(fileUploadFullUrl);
-        fos.write(fileData);                                                // 파일 저장
-        fos.close();                                                        // 닫고
-        return savedFileName;                                               // 파일명 리턴
-    }
+  @Value("${uploadPath1}")
+  private String uploadPath;
 
-    public void deleteFile(String filePath) throws Exception{  // 파일 삭제 메서드
-        File deleteFile = new File(filePath);
-        if(deleteFile.exists()) {
-            deleteFile.delete();
-            log.info("파일을 삭제하였습니다.");
-        } else {
-            log.info("파일이 존재하지 않습니다.");
-        }
-    }
+  public String getUploadPath() {
+    return uploadPath;
+  }
 
+  public String uploadFile(String uploadPath, String originalFileName, byte[] fileData) throws Exception {
+    UUID uuid = UUID.randomUUID();
+    String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
+    String savedFileName = uuid.toString() + extension;
+    String fileUploadFullUrl = uploadPath + savedFileName;
+
+    // 파일 저장
+    Files.write(Paths.get(fileUploadFullUrl), fileData);
+
+    return savedFileName;
+  }
+
+  public void deleteFile(String filePath) {
+    File deleteFile = new File(filePath);
+    if(deleteFile.exists()) {
+      deleteFile.delete();
+    }
+  }
+
+  public String getFullPath(String filename) {
+    return uploadPath + filename;
+  }
+
+  // 디렉토리 생성
+  public void createDirectory(String path) {
+    File directory = new File(path);
+    if (!directory.exists()) {
+      directory.mkdirs();
+    }
+  }
 }

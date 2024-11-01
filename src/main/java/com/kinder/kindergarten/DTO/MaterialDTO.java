@@ -26,9 +26,9 @@ public class MaterialDTO {
     private LocalDate material_regdate; // 자재 입고일
 
     // TimeEntity 대응
-    private String regi_date;
+    private String regiDate;
 
-    private String modi_date;
+    private String modiDate;
 
 
 }

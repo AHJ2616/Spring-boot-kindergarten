@@ -107,7 +107,7 @@
           </span>
             </td>
             <td th:text="${material.material_detail}"></td>
-            <td th:text="${material.regi_date}"></td>
+            <td th:text="${material.regiDate}"></td>
             <td>
                 <a th:href="'/material/'+${material.id}">수정</a>
             </td>
@@ -129,7 +129,7 @@
                 <!--  Previous 버튼 클릭시 앞으로                   -->
             </li>
 
-            <li class="page-item" th:each="page: ${#numbers.sequence(start, end)}" th:classappend="${materials.number eq page-1}?'active':''">
+            <li class="page-item" th:each="page: ${#numbers.sequence(start, end)}" th:classappend="${materials.number eq page -1}?'active':''">
                 <a th:onclick="'javascript:page(' + ${page - 1} + ')'" th:inline="text" class="page-link">[[${page}]]</a>
                 <!-- 페이지 번호 순서 처리 : 클릭시 페이지 이동                   -->
             </li>

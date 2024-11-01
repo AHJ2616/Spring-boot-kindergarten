@@ -20,7 +20,6 @@ public class MaterialImgService {
     private String materialImgLocation;
 
     private final MaterialImgRepository materialImgRepository;
-
     private final FileService fileService;
 
     public void saveMaterialImg(MaterialImgEntity materialImgEntity, MultipartFile materialImgFile) throws Exception{

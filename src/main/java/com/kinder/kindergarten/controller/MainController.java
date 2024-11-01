@@ -17,4 +17,11 @@ public class MainController {
   String login(){
     return "/member/login";
     }
+
+  //캘린더
+  @GetMapping(value = "/calendar")
+  public String showCalendar(){
+    return "calendar";
+  }
+
 }

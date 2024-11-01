@@ -15,18 +15,20 @@ public class ScheduleEntity {
 
   @Id
   @Column(name="schedule_id")
-  @GeneratedValue(strategy = GenerationType.UUID)
-  private String schedule_id;
+  private String scheduleId;
 
   @Column(nullable = false)
-  private String schedule_title;
+  private String scheduleTitle;
 
   @Column(nullable = false)
-  private String schedule_content;
+  private String scheduleContent;
 
   @Column(nullable = false)
   private String location;
 
   @Column
-  private LocalDateTime schedule_time;
+  private String start;
+
+  @Column
+  private String end;         // schedule_time (종료)
 }

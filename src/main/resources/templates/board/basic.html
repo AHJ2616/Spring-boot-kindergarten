@@ -3,45 +3,65 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{common/header}">
 <head>
-    <meta charset="UTF-8">
-    <title>자유게시판</title>  <link rel="stylesheet" th:href="@{/css/board.css}">
+  <meta charset="UTF-8">
+  <title>자유게시판</title>
+  <link rel="stylesheet" th:href="@{/css/board.css}">
+  <script th:src="@{/js/board.js}"></script>
 </head>
 <body>
 <div class="board-container">
-    <div class="board-header">
-        <select class="sort-select">
-            <option value="latest">최신순</option>
-            <option value="views">조회수순</option>
-            <option value="likes">좋아요순</option>
-        </select>
-        <div class="search-container">
-            <input type="text" class="search-input" placeholder="검색어를 입력하세요">
-            <button class="search-button">검색</button>
-        </div>
-        <button class="write-button">글쓰기</button>
+  <div class="board-header">
+    <div class="left-section">
+      <select class="sort-select">
+        <option value="전체">전체</option>
+        <option value="regiDate">최신순</option>
+        <option value="views">조회수순</option>
+        <option value="likes">좋아요순</option>
+      </select>
+      <div class="search-container">
+        <input type="text" id="searchInput" name="keyword" placeholder="search">
+        <button type="submit" id="search-button">검색</button>
+      </div>
     </div>
+    <div class="right-section">
+      <button type="button" onclick="location.href='/board/write'" class="write-button">글쓰기</button>
+    </div>
+  </div>
 
-    <div class="board-content" th:if="${not #lists.isEmpty(boards.content)}">
-        <div class="board-item" th:each="board : ${boards.content}">
-            <h3 th:text="${board.board_title}">제목</h3>
-            <p th:text="${board.board_content}">내용</p>
-            <span th:text="${'작성자: ' + board.writer}">작성자</span>
-            <span th:text="${'조회수: ' + board.views}">조회수</span>
-            <span th:text="${'좋아요: ' + board.likes}">좋아요</span>
-            <span th:text="${'작성일: ' + board.regi_date}">작성일</span>
-        </div>
-    </div>
+  <div id="boardList">
+    <table class="board-table">
+      <thead>
+      <tr>
+        <th>제목</th>
+        <th>작성자</th>
+        <th>작성일</th>
+        <th>조회</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="board, status : ${boards.content}">
+        <td class="title">
+          <a th:href="@{/board/{id}(id=${board.boardId})}" th:text="${board.boardTitle}">제목</a>
+        </td>
+        <td th:text="${board.boardWriter}">작성자</td>
+        <td th:text="${#temporals.format(board.regiDate,'yyyy년MM월dd일 HH:mm')}">작성일</td>
+        <td th:text="${board.views}">조회수</td>
+      </tr>
+      </tbody>
+    </table>
     <div class="no-result" th:if="${#lists.isEmpty(boards.content)}">
-        검색과 일치하는 결과가 없습니다.
+      검색과 일치하는 결과가 없습니다.
     </div>
+  </div>
 
-    <div class="pagination" th:if="${not #lists.isEmpty(boards.content)}">
-        <a th:href="@{/board/basic(page=${boards.number - 1})}" th:if="${boards.hasPrevious()}">&laquo; 이전</a>
+  <div class="pagination" th:if="${boards.totalPages > 0}">
         <span th:each="pageNum : ${#numbers.sequence(0, boards.totalPages - 1)}">
-                <a th:href="@{/board/basic(page=${pageNum})}" th:text="${pageNum + 1}" th:class="${pageNum == boards.number} ? 'active'"></a>
-            </span>
-        <a th:href="@{/board/basic(page=${boards.number + 1})}" th:if="${boards.hasNext()}">다음 &raquo;</a>
-    </div>
+            <a th:href="@{${keyword != null ? '/board/search' : '/board/basic'}(page=${pageNum + 1}, keyword=${keyword})}"
+               th:text="${pageNum + 1}"
+               th:class="${pageNum == currentPage} ? 'active' : ''">
+            </a>
+        </span>
+  </div>
 </div>
 </body>
 </html>
