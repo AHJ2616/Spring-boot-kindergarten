@@ -56,7 +56,7 @@
 
   <div class="pagination" th:if="${boards.totalPages > 0}">
         <span th:each="pageNum : ${#numbers.sequence(0, boards.totalPages - 1)}">
-            <a th:href="@{${keyword != null ? '/board/search' : '/board/basic'}(page=${pageNum + 1}, keyword=${keyword})}"
+            <a th:href="@{${keyword != null ? '/board/search' : '/board/list/common'}(page=${pageNum + 1}, keyword=${keyword})}"
                th:text="${pageNum + 1}"
                th:class="${pageNum == currentPage} ? 'active' : ''">
             </a>

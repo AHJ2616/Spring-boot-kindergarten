@@ -1,6 +1,7 @@
 package com.kinder.kindergarten.controller;
 
 import com.kinder.kindergarten.DTO.board.BoardDTO;
+import com.kinder.kindergarten.constant.BoardType;
 import com.kinder.kindergarten.service.board.BoardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -11,9 +12,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 @RestController
@@ -23,30 +26,38 @@ public class BoardRestController {
 
   private final BoardService boardService;
 
-  @GetMapping("/sort")
-  public ResponseEntity<Page<BoardDTO>> getSortedBoards(//정렬
+  @GetMapping("/sort/{type}") //정렬
+  public ResponseEntity<Page<BoardDTO>> getSortedBoards(@PathVariable String type,
           @RequestParam(defaultValue = "0") int page,
           @RequestParam String sortBy) {
+    try {
+      BoardType boardType = BoardType.valueOf(type.toUpperCase(Locale.ROOT));
+      Sort sort;
+      switch (sortBy) {
+        case "regiDate":
+          sort = Sort.by(Sort.Direction.DESC, "regiDate");
+          break;
+        case "views":
+          sort = Sort.by(Sort.Direction.DESC, "views");
+          break;
+        case "likes":
+          sort = Sort.by(Sort.Direction.DESC, "likes");
+          break;
+        default:
+          sort = Sort.by(Sort.Direction.DESC, "regiDate");
+      }
 
-    Sort sort;
-    switch (sortBy) {
-      case "regiDate":
-        sort = Sort.by(Sort.Direction.DESC, "regiDate");
-        break;
-      case "views":
-        sort = Sort.by(Sort.Direction.DESC, "views");
-        break;
-      case "likes":
-        sort = Sort.by(Sort.Direction.DESC, "likes");
-        break;
-      default:
-        sort = Sort.by(Sort.Direction.DESC, "regiDate");
+      Pageable pageable = PageRequest.of(page, 10, sort);
+      Page<BoardDTO> boards = boardService.getBoardsByType(boardType,pageable);
+      return ResponseEntity.ok(boards);
+
+      // 처리 로직
+    } catch (IllegalArgumentException e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid board type");
     }
 
-    Pageable pageable = PageRequest.of(page, 10, sort);
-    Page<BoardDTO> boards = boardService.getCommonBoards(pageable);
 
-    return ResponseEntity.ok(boards);
+
   }
 
   @PostMapping(value="/uploadImage", produces = "application/json")

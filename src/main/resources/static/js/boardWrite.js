@@ -4,6 +4,7 @@ $(document).ready(function() {
     initializeFormSubmit();
 });
 
+
 function initializeSummernote() {
     $('#summernote').summernote({
         height: 300,
@@ -14,10 +15,10 @@ function initializeSummernote() {
             ['fontname', ['fontname']],
             ['fontsize', ['fontsize']],
             ['style', ['bold', 'italic', 'underline', 'strikethrough', 'clear']],
-            ['color', ['forecolor', 'backcolor']],
+            ['color', ['forecolor','backcolor']],
             ['para', ['ul', 'ol', 'paragraph']],
             ['height', ['height']],
-            ['insert', ['picture', 'link', 'video']],
+            ['insert', ['emoji','picture', 'link', 'video']],
             ['view', ['fullscreen','help']]
         ],
         fontNames: ['Arial', '맑은 고딕', '궁서', '굴림', '굴림체', '돋움체', 'sans-serif'],
@@ -28,7 +29,18 @@ function initializeSummernote() {
                     uploadSummernoteImage(files[i], this);
                 }
             }
-        }
+        },
+        emoji: {
+            dropdown: true,
+            container: 'body',
+            categories: [
+                'people', 'nature', 'food', 'activity',
+                'travel', 'objects', 'symbols', 'flags'
+            ],
+            showCategory: true,
+            recentCount: 36,
+            useLocalStorage: true
+        },
     });
 }
 
@@ -76,13 +88,13 @@ function initializeFormSubmit() {
                 if (response.success) {
                     window.location.href = response.redirectUrl;
                 } else {
-                    window.location.href = '/board/basic';
+                    window.location.href = '/board/list/common';
                 }
             },
             error: function(xhr, status, error) {
                 console.error('Error:', error);
                 alert('파일 업로드 중 오류가 발생했습니다.');
-                window.location.href = '/board/basic';
+                window.location.href = '/board/list/common';
             }
         });
     });

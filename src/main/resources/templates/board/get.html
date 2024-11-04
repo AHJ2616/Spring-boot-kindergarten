@@ -29,7 +29,7 @@
       </div>
     </div>
     <!-- 이미지 갤러리 섹션 -->
-    <div class="image-gallery-container" th:if="${boardDTO.BoardFileList != null}">
+    <div class="image-gallery-container" th:if="${boardDTO.BoardFileList != null and not #lists.isEmpty(boardDTO.BoardFileList)}">
       <!-- 썸네일 목록 -->
       <div class="thumbnail-list">
         <div th:each="file : ${boardDTO.BoardFileList}"
@@ -69,6 +69,32 @@
 
       <a href="javascript:history.back()"
          class="btn btn-secondary">뒤로가기</a>
+    </div>
+
+    <!-- 기존 board-footer 다음에 추가 -->
+    <div class="comments-section">
+      <!-- 댓글 작성 폼 -->
+      <div class="comment-form">
+        <h3>댓글 작성</h3>
+        <textarea id="commentContent" placeholder="댓글을 입력하세요"></textarea>
+        <button onclick="submitComment()" class="btn btn-primary">댓글 등록</button>
+      </div>
+
+      <!-- 댓글 목록 -->
+      <div class="comments-list">
+        <h3>댓글 목록</h3>
+        <div th:each="comment : ${comments}" class="comment-item">
+          <div class="comment-header">
+            <span class="comment-writer" th:text="${comment.commentWriter}"></span>
+            <span class="comment-date" th:text="${#temporals.format(comment.regiDate, 'yyyy.MM.dd HH:mm')}"></span>
+          </div>
+          <div class="comment-content" th:text="${comment.commentContent}"></div>
+          <div class="comment-actions" th:if="${comment.commentWriter == #authentication.name}">
+            <button th:onclick="'editComment(' + ${comment.commentId} + ')'" class="btn btn-sm btn-primary">수정</button>
+            <button th:onclick="'deleteComment(' + ${comment.commentId} + ')'" class="btn btn-sm btn-danger">삭제</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -153,6 +179,84 @@
 
   <!-- Font Awesome CDN 추가 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <script th:inline="javascript">
+      function submitComment() {
+          const content = document.getElementById('commentContent').value;
+          const boardId = [[${boardDTO.boardId}]];
+
+          fetch('/comments/write', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+              },
+              body: JSON.stringify({
+                  boardId: boardId,
+                  commentContent: content
+              })
+          })
+              .then(response => {
+                  if (response.ok) {
+                      location.reload();
+                  } else {
+                      alert('댓글 등록에 실패했습니다.');
+                  }
+              });
+      }
+
+      function deleteComment(commentId) {
+          if (!confirm('댓글을 삭제하시겠습니까?')) return;
+
+          fetch(`/comments/delete/${commentId}`, {
+              method: 'DELETE',
+              headers: {
+                  'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+              }
+          })
+              .then(response => {
+                  if (response.ok) {
+                      location.reload();
+                  } else {
+                      alert('댓글 삭제에 실패했습니다.');
+                  }
+              });
+      }
+
+      function editComment(commentId) {
+          const commentDiv = document.querySelector(`[data-comment-id="${commentId}"]`);
+          const content = commentDiv.querySelector('.comment-content').textContent;
+
+          const textarea = document.createElement('textarea');
+          textarea.value = content;
+
+          const saveButton = document.createElement('button');
+          saveButton.textContent = '저장';
+          saveButton.onclick = () => saveEdit(commentId, textarea.value);
+
+          commentDiv.querySelector('.comment-content').replaceWith(textarea);
+          commentDiv.querySelector('.comment-actions').replaceWith(saveButton);
+      }
+
+      function saveEdit(commentId, content) {
+          fetch(`/comments/update/${commentId}`, {
+              method: 'PUT',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+              },
+              body: JSON.stringify({
+                  commentContent: content
+              })
+          })
+              .then(response => {
+                  if (response.ok) {
+                      location.reload();
+                  } else {
+                      alert('댓글 수정에 실패했습니다.');
+                  }
+              });
+      }
+  </script>
 </div>
 </body>
 </html>
