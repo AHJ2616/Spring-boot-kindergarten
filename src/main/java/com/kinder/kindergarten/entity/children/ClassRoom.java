@@ -1,4 +1,4 @@
-package com.kinder.kindergarten.entity.parent;
+package com.kinder.kindergarten.entity.children;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -31,21 +31,9 @@ public class ClassRoom {
 
   private String classRoomDescription; // 반 설명 및 비고
 
+  @OneToMany(mappedBy = "assignedClass")
+  private List<Children> children;  // 반에 배정된 원아들
 
 }
 
-/*
-Hibernate:
-    create table class_room (
-        class_room_id bigint not null auto_increment,
-        class_room_description varchar(255),
-        class_room_name varchar(255) not null,
-        employee_name varchar(255) not null,
-        primary key (class_room_id)
-    ) engine=InnoDB
 
-    11.01 추가 -*
-    Hibernate:
-    alter table if exists class_room
-       add column max_children integer not null
- */

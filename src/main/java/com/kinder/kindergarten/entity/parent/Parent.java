@@ -1,20 +1,27 @@
 package com.kinder.kindergarten.entity.parent;
 
+import com.kinder.kindergarten.constant.parent.Children_Role;
+import com.kinder.kindergarten.entity.children.Children;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Getter
 @Setter
 @ToString
+@Builder
 @Table(name = "parent")
+@AllArgsConstructor
+@NoArgsConstructor
 public class Parent {
 
     /*
-    학부모와 원아의 정보를 관리하는데 테이블
+    학부모 정보를 관리하는 테이블
      */
+
 
   // 학부모 정보
   @Id
@@ -33,101 +40,26 @@ public class Parent {
   @Column(nullable = false)
   private String parentPhone;    // 학부모 핸드폰 번호
 
+  private String childrenEmergencyPhone;//	긴급 연락처	(선택사항)
+
   @Column(nullable = false)
   private String parentAddress;  // 학부모 주소
 
-  @Column(nullable = false)
-  private LocalDate parentBirthDate;    // 학부모 생년월일(yyyy-MM-dd)
+  @Enumerated(EnumType.STRING)
+  private Children_Role childrenRole; // 권한
 
   @Column(nullable = false)
+  @Builder.Default
   private LocalDate parentCreateDate = LocalDate.now();    // 생성 날짜
 
+  @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Children> children;  // 여러 자녀를 가질 수 있음
+   /*
+    하나의 학부모는 여러 자식이 있을 수 있기 때문에 @OneToMany 관계로 설정
 
-  // 원아 정보
-
-  @Column(nullable = false)
-  private String childrenName;    // 원아 이름
-
-  @Column(nullable = false)
-  private LocalDate childrenBirthDate;    // 원아 생년월일
-
-  private String childrenEmergencyPhone;  // 긴급 연락처(학부모)
-
-  private String childrenNotes;   // 기타 사항
-
-  // 반 ID와 연관관계 설정
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "assignedClassId")
-  private ClassRoom classRoom;    // 원아 반
-
-    /*
-      Hibernate:
-    create table parent (
-        parent_id bigint not null auto_increment,
-        children_role enum ('PARENT','TEACHER'),
-        parent_address varchar(255) not null,
-        parent_create_date date not null,
-        parent_email varchar(255) not null,
-        parent_name varchar(255) not null,
-        parent_phone varchar(255) not null,
-        parent_pw varchar(255) not null,
-        primary key (parent_id)
-    ) engine=InnoDB
-Hibernate:
-    alter table if exists parent
-       drop index if exists UK_qkomq02jt7yw7pan7rttcitn4
-Hibernate:
-    alter table if exists parent
-       add constraint UK_qkomq02jt7yw7pan7rttcitn4 unique (parent_email)
-
-
-    10.30 추가 - *
-    Hibernate:
-        alter table if exists parent
-           add column parent_birth_date varchar(255) not null
-
-    11.01 추가 - **
-    Hibernate:
-    alter table if exists parent
-       modify column parent_birth_date date not null
-     */
-
-
-    /*
-    public static Parent createParent(ParentFormDTO parentFormDTO, PasswordEncoder passwordEncoder) {
-        // Parent 엔티티 생성하는 메서드
-
-        Parent parent = new Parent();
-
-        parent.setParentName(parentFormDTO.getParent_name());
-        parent.setParentEmail(parentFormDTO.getParent_email());
-        parent.setParentBirthDate(parentFormDTO.getParent_birthDate());
-        String password = passwordEncoder.encode(parentFormDTO.getParent_pw());
-        parent.setParent_pw(password);
-        parent.setParent_phone(parentFormDTO.getParent_phone());
-        parent.setParent_address(parentFormDTO.getParent_address());
-        parent.setChildren_role(Children_Role.PARENT);
-
-        return parent;
-
-    }
-
-    public static Parent updateParent(ParentUpdateFormDTO parentUpdateFormDTO) {
-        // Parent 엔티티 수정 메서드
-
-        Parent parent = new Parent();
-
-        parent.setParent_name(parentUpdateFormDTO.getParent_name());
-        parent.setParent_email(parentUpdateFormDTO.getParent_email());
-        parent.setParent_phone(parentUpdateFormDTO.getParent_phone());
-        parent.setParent_address(parentUpdateFormDTO.getParent_address());
-        parent.setParent_birthDate(parentUpdateFormDTO.getParent_birthDate());
-
-        return parent;
-    }
+    여기서, cascade = CascadeType.ALL -> 부모를 통해 자녀의 데이터를 함께 관리할 수 있도록 설정, ex) 부모 데이터 저장, 삭제 시 자식 데이터도 저장, 삭제
+    orphanRemoval = true : 자녀가 부모와의 관계에서 제거 될 경우 해당 된 자녀 데이터도 자동으로 삭제 한다.
 
      */
-
-
 
 }

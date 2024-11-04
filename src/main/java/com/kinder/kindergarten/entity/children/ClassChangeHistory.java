@@ -1,5 +1,6 @@
-package com.kinder.kindergarten.entity.parent;
+package com.kinder.kindergarten.entity.children;
 
+import com.kinder.kindergarten.entity.parent.Parent;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,8 +22,8 @@ public class ClassChangeHistory {
   private Long historyId; // 변경 이력 고유 ID
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "parentId", nullable = false)
-  private Parent children;
+  @JoinColumn(name = "childrenId", nullable = false)
+  private Children children;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "previousClassId")
@@ -33,16 +34,7 @@ public class ClassChangeHistory {
   private ClassRoom newClass; // 새 반
 
   @Column(nullable = false)
-  private LocalDate changeDate; // 변경 일자
-
-    /*
+  private LocalDate changeDate; // 반 변경 일자
 
 
-    Hibernate:
-    alter table if exists class_change_history
-       add column change_date date not null
-Hibernate:
-    alter table if exists class_change_history
-       add column parent_id bigint not null
-     */
 }

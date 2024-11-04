@@ -1,5 +1,6 @@
-package com.kinder.kindergarten.entity.parent;
+package com.kinder.kindergarten.entity.children;
 
+import com.kinder.kindergarten.entity.parent.Parent;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,8 +22,8 @@ public class HealthRecord {
   private Long healthRecordId; // 건강 기록 ID
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "parentId", nullable = false)
-  private Parent children;
+  @JoinColumn(name = "childrenId", nullable = false)
+  private Children children;
 
   @Column(nullable = false)
   private LocalDate healthDate;  // 검진 날짜

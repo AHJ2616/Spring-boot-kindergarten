@@ -54,6 +54,9 @@ dependencies {
     // 타입리프 용 코드
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
+    // jsoup : XXS 취약점에 대한 html 보안(HTML sanitize)
+    implementation group: 'org.jsoup', name: 'jsoup', version: '1.18.1' // 11.04(추가(희준이))
+
     //Thymeleaf time-format Java8time
     implementation group: 'org.thymeleaf.extras', name: 'thymeleaf-extras-java8time', version: '3.0.4.RELEASE'
 
