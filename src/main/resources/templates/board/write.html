@@ -1,22 +1,34 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{common/header}">
+      layout:decorate="~{common/layout}">
 <head>
   <meta charset="UTF-8">
   <link rel="stylesheet" th:href="@{/css/board.css}">
   <!-- include libraries(jQuery, bootstrap) -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"></script>
 
   <!-- include summernote css/js -->
-  <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/lang/summernote-ko-KR.js"></script>
+  <script th:src="@{/js/boardWrite.js}"></script>
+
+  <!--썸머노트 toolbar의 메뉴 화살표2개가 나오는 문제 처리-->
+  <style>
+    .dropdown-toggle::after{
+        display: none;
+    }
+  </style>
+
   <title>글작성</title>
 </head>
 <body>
+<div layout:fragment="content">
 <div class="write-container">
   <form th:action="${boardFormDTO.boardId != null} ?
                      @{/board/modify/{boardId}(boardId=${boardFormDTO.boardId})} :
@@ -39,7 +51,7 @@
     </div>
 
     <div class="form-group">
-      <textarea id="boardContents"
+      <textarea id="summernote"
                 th:field="*{boardContents}"
                 class="form-control"></textarea>
     </div>
@@ -47,6 +59,7 @@
     <div class="form-group">
       <label for="boardFile">파일 첨부</label>
       <input type="file" id="boardFile" name="boardFile" class="form-control" multiple>
+      <div id="fileCount" class="mt-2"></div>
     </div>
 
     <div th:if="${boardFormDTO.boardId != null and not #lists.isEmpty(boardFormDTO.boardFileList)}">
@@ -60,39 +73,6 @@
   </form>
 </div>
 
-<script>
-    $(document).ready(function() {
-        $('#boardContents').summernote({
-            height: 300,
-            lang: 'ko-KR',
-            callbacks: {
-                onImageUpload: function(files) {
-                    for(let i = 0; i < files.length; i++) {
-                        uploadSummernoteImage(files[i], this);
-                    }
-                }
-            }
-        });
-    });
-
-    function uploadSummernoteImage(file, editor) {
-        const data = new FormData();
-        data.append("file", file);
-
-        $.ajax({
-            data: data,
-            type: "POST",
-            url: "/rest/board/uploadImage",
-            contentType: false,
-            processData: false,
-            success: function(data) {
-                $(editor).summernote('insertImage', data.url);
-            },
-            error: function(data) {
-                console.log("이미지 업로드 실패");
-            }
-        });
-    }
-</script>
+</div>
 </body>
 </html>

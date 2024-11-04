@@ -1,135 +1,158 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{common/header}">
+      layout:decorate="~{common/layout}">
 <head>
   <meta charset="UTF-8">
   <title>글 보기</title>
   <link rel="stylesheet" th:href="@{/css/board.css}">
 </head>
 <body>
-<div class="view-container">
-  <div class="board-header">
-    <div class="title-section">
-      <span class="title" th:text="${boardDTO.boardTitle}"></span>
-    </div>
-    <div class="info-section">
-      <div class="left-info">
-        <span class="writer" th:text="${boardDTO.boardWriter}"></span>
-        <span class="separator">|</span>
-        <span class="date" th:text="${#temporals.format(boardDTO.regiDate, 'yyyy.MM.dd HH:mm')}"></span>
+<div layout:fragment="content">
+  <div class="view-container">
+    <div class="board-header">
+      <div class="title-section">
+        <span class="title" th:text="${boardDTO.boardTitle}"></span>
       </div>
-      <div class="right-info">
+      <div class="info-section">
+        <div class="left-info">
+          <span class="writer" th:text="${boardDTO.boardWriter}"></span>
+          <span class="separator">|</span>
+          <span class="date" th:text="${#temporals.format(boardDTO.regiDate, 'yyyy.MM.dd HH:mm')}"></span>
+        </div>
+        <div class="right-info">
                 <span class="views">
                     <i class="fas fa-eye"></i>
                     <span th:text="${boardDTO.views}"></span>
                 </span>
+        </div>
       </div>
     </div>
-  </div>
-  <!-- 이미지 갤러리 섹션 -->
-  <div class="image-gallery-container" th:if="${boardDTO.BoardFileList != null}">
-    <!-- 썸네일 목록 -->
-    <div class="thumbnail-list">
-      <div th:each="file : ${boardDTO.BoardFileList}"
-           th:if="${#strings.toLowerCase(file.orignalName).endsWith('.jpg') or
+    <!-- 이미지 갤러리 섹션 -->
+    <div class="image-gallery-container" th:if="${boardDTO.BoardFileList != null}">
+      <!-- 썸네일 목록 -->
+      <div class="thumbnail-list">
+        <div th:each="file : ${boardDTO.BoardFileList}"
+             th:if="${#strings.toLowerCase(file.orignalName).endsWith('.jpg') or
                  #strings.toLowerCase(file.orignalName).endsWith('.jpeg') or
                  #strings.toLowerCase(file.orignalName).endsWith('.png') or
                  #strings.toLowerCase(file.orignalName).endsWith('.PNG') or
                  #strings.toLowerCase(file.orignalName).endsWith('.gif')}"
-           class="thumbnail-item">
-        <img th:src="@{'/images/' +${file.modifiedName}}"
-             alt="썸네일 이미지"
-             class="thumbnail">
+             class="thumbnail-item">
+          <img th:src="@{'/images/' +${file.modifiedName}}"
+               alt="썸네일 이미지"
+               class="thumbnail">
+        </div>
+      </div>
+
+      <!-- 큰 이미지 프리뷰 -->
+      <div class="preview-container">
+        <img id="preview-image"
+             th:if="${boardDTO.BoardFileList != null and not #lists.isEmpty(boardDTO.BoardFileList)}"
+             th:src="@{'/upload/' + ${boardDTO.BoardFileList[0].filePath}}"
+             alt="이미지 프리뷰">
+      </div>
+    </div>
+    <!-- 게시글 내용 부분은 유지 -->
+    <div class="board-content">
+      <div th:utext="${boardDTO.boardContents}" class="content-area"></div>
+    </div>
+
+    <div class="board-footer">
+      <a th:if="${boardDTO.boardWriter == #authentication.name}"
+         th:href="@{/board/modify/{boardId}(boardId=${boardDTO.boardId})}"
+         class="btn btn-primary">수정</a>
+
+      <button th:if="${boardDTO.boardWriter == #authentication.name}"
+              onclick="deleteBoard([[${boardDTO.boardId}]])"
+              class="btn btn-danger">삭제</button>
+
+      <a href="javascript:history.back()"
+         class="btn btn-secondary">뒤로가기</a>
+    </div>
+  </div>
+
+  <!-- 첨부파일이 있는 경우 표시 -->
+  <div class="file-container" th:if="${boardDTO.BoardFileList != null and not #lists.isEmpty(boardDTO.BoardFileList)}">
+    <h3>첨부파일</h3>
+
+    <!-- ZIP 파일 다운로드 섹션 -->
+    <div class="zip-download" th:if="${boardDTO.hasZipFile}">
+      <h4>압축 파일 다운로드</h4>
+      <div class="file-list">
+        <div th:each="file : ${boardDTO.BoardFileList}"
+             th:if="${file.isZip == 'Y'}"
+             class="file-item">
+          <a th:href="@{/board/download/{fileId}(fileId=${file.fileId})}"
+             th:text="|${file.orignalName} (압축파일)|"
+             class="file-link zip-file"></a>
+        </div>
       </div>
     </div>
 
-    <!-- 큰 이미지 프리뷰 -->
-    <div class="preview-container">
-      <img id="preview-image"
-           th:if="${boardDTO.BoardFileList != null and not #lists.isEmpty(boardDTO.BoardFileList)}"
-           th:src="@{'/upload/' + ${boardDTO.BoardFileList[0].filePath}}"
-           alt="이미지 프리뷰">
+    <!-- 개별 파일 다운로드 섹션 -->
+    <div class="individual-download">
+      <h4>개별 파일 다운로드</h4>
+      <div class="file-list">
+        <div th:each="file : ${boardDTO.BoardFileList}"
+             th:if="${file.isZip == 'N'}"
+             class="file-item">
+          <a th:href="@{/board/download/{fileId}(fileId=${file.fileId})}"
+             class="file-link">
+            <i class="fas fa-file"></i>
+            <span th:text="${file.orignalName}"></span>
+          </a>
+        </div>
+      </div>
     </div>
   </div>
-  <!-- 게시글 내용 부분은 유지 -->
-  <div class="board-content">
-    <div th:utext="${boardDTO.boardContents}" class="content-area"></div>
-  </div>
 
-  <div class="board-footer">
-    <a th:if="${boardDTO.boardWriter == #authentication.name}"
-       th:href="@{/board/modify/{boardId}(boardId=${boardDTO.boardId})}"
-       class="btn btn-primary">수정</a>
 
-    <button th:if="${boardDTO.boardWriter == #authentication.name}"
-            onclick="deleteBoard([[${boardDTO.boardId}]])"
-            class="btn btn-danger">삭제</button>
+  <!-- JavaScript 코드 추가 -->
+  <script>
+      function deleteBoard(boardId) {
+          if (confirm('정말 삭제하시겠습니까?')) {
+              fetch(`/board/delete/${boardId}`, {
+                  method: 'DELETE',
+                  headers: {
+                      'Content-Type': 'application/json',
+                      // CSRF 토큰 추가
+                      'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+                  }
+              })
+                  .then(response => {
+                      if (response.ok) {
+                          alert('삭제되었습니다.');
+                          window.location.href = '/board/basic';
+                      } else {
+                          alert('삭제 중 오류가 발생했습니다.');
+                      }
+                  })
+                  .catch(error => {
+                      console.error('Error:', error);
+                      alert('삭제 중 오류가 발생했습니다.');
+                  });
+          }
+      }
 
-    <a href="javascript:history.back()"
-       class="btn btn-secondary">뒤로가기</a>
-  </div>
+      document.addEventListener('DOMContentLoaded', function() {
+          const thumbnails = document.querySelectorAll('.thumbnail-item img');
+          const previewImage = document.getElementById('preview-image');
+
+          thumbnails.forEach(thumbnail => {
+              thumbnail.addEventListener('mouseover', function() {
+                  previewImage.src = this.src;
+              });
+          });
+      });
+  </script>
+
+  <!-- CSRF 토큰을 위한 meta 태그 추가 -->
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+  <!-- Font Awesome CDN 추가 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </div>
-
-<!-- 첨부파일이 있는 경우 표시 -->
-<div class="file-container" th:if="${boardDTO.BoardFileList != null and not #lists.isEmpty(boardDTO.BoardFileList)}">
-  <h3>첨부파일</h3>
-  <div class="file-list">
-    <div th:each="file : ${boardDTO.BoardFileList}" class="file-item">
-
-      <!-- 파일 다운로드 링크 -->
-      <a th:href="@{/board/download/{fileId}(fileId=${file.fileId})}"
-         th:text="${file.orignalName}"
-         class="file-link"></a>
-    </div>
-  </div>
-</div>
-
-<!-- JavaScript 코드 추가 -->
-<script>
-    function deleteBoard(boardId) {
-        if (confirm('정말 삭제하시겠습니까?')) {
-            fetch(`/board/delete/${boardId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    // CSRF 토큰 추가
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
-                }
-            })
-                .then(response => {
-                    if (response.ok) {
-                        alert('삭제되었습니다.');
-                        window.location.href = '/board/basic';
-                    } else {
-                        alert('삭제 중 오류가 발생했습니다.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('삭제 중 오류가 발생했습니다.');
-                });
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const thumbnails = document.querySelectorAll('.thumbnail-item img');
-        const previewImage = document.getElementById('preview-image');
-
-        thumbnails.forEach(thumbnail => {
-            thumbnail.addEventListener('mouseover', function() {
-                previewImage.src = this.src;
-            });
-        });
-    });
-</script>
-
-<!-- CSRF 토큰을 위한 meta 태그 추가 -->
-<meta name="_csrf" th:content="${_csrf.token}"/>
-<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
-
-<!-- Font Awesome CDN 추가 -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-
 </body>
 </html>

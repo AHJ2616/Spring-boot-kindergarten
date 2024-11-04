@@ -28,11 +28,11 @@ public class BoardFileEntity extends TimeEntity {
   @Column(nullable = false)
   private String filePath;
 
-  @Column(nullable = false)
-  private String mainFile;
-
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name="board_id", referencedColumnName = "board_id")
   private BoardEntity boardEntity;
+
+  @Column(name = "is_zip")
+  private String isZip = "N";
 
 }

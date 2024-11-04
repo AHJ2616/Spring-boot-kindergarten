@@ -24,7 +24,7 @@ public class BoardRestController {
   private final BoardService boardService;
 
   @GetMapping("/sort")
-  public ResponseEntity<Page<BoardDTO>> getSortedBoards(
+  public ResponseEntity<Page<BoardDTO>> getSortedBoards(//정렬
           @RequestParam(defaultValue = "0") int page,
           @RequestParam String sortBy) {
 
@@ -49,7 +49,7 @@ public class BoardRestController {
     return ResponseEntity.ok(boards);
   }
 
-  @PostMapping("/uploadImage")
+  @PostMapping(value="/uploadImage", produces = "application/json")
   public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile file)throws IllegalStateException, IOException {
     try {
       String imageUrl = boardService.uploadSummernoteImage(file);

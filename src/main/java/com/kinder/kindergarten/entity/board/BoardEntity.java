@@ -39,4 +39,5 @@ public class BoardEntity extends TimeEntity {
   private Integer views;
 
 
+
 }
