@@ -451,3 +451,34 @@
     max-height: 100%;
     object-fit: contain;
 }
+
+.file-container {
+    margin: 20px 0;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.zip-download, .individual-download {
+    margin: 10px 0;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+}
+
+.file-item {
+    margin: 5px 0;
+}
+
+.file-link {
+    text-decoration: none;
+    color: #007bff;
+}
+
+.file-link:hover {
+    text-decoration: underline;
+}
+
+.zip-file {
+    color: #28a745;
+}

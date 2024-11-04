@@ -5,8 +5,6 @@ m
 =src/main/java/com/kinder/kindergarten/config/AuditConfig.java,e\3\e33ea8a905a1601ab6ed68b19e9359acda896869
 s
 Csrc/main/java/com/kinder/kindergarten/config/ModelMapperConfig.java,7\0\70396683ce81f7df7105453e5e4a54b921c593a4
-j
-:src/main/java/com/kinder/kindergarten/entity/Children.java,9\4\94bc2790854367a07600e8ff2594972b4c8cdd72
 x
 Hsrc/main/java/com/kinder/kindergarten/controller/MaterialController.java,e\0\e0b7be14612cceb5a5f10719d065d7746cf0d059
 p
@@ -49,8 +47,6 @@ u
 Esrc/main/java/com/kinder/kindergarten/DTO/Employee/AttendanceDTO.java,7\9\79b4588924ddc7083baf94d2f45f271481c30548
 x
 Hsrc/main/java/com/kinder/kindergarten/service/Employee/LeaveService.java,2\8\2845deb1bf7c0b49f2b6ae2e48ea23bb2b22818a
-p
-@src/main/java/com/kinder/kindergarten/service/ParentService.java,8\5\85cb0bb022da293ea4d80148b9805d87b137d86c
 x
 Hsrc/main/java/com/kinder/kindergarten/service/board/ScheduleService.java,5\1\5176400b910175690befe51c78ad049b5ab39e3e
 v
@@ -83,8 +79,6 @@ Qsrc/main/java/com/kinder/kindergarten/controller/Employee/EmployeeController.ja
 Nsrc/main/java/com/kinder/kindergarten/controller/Employee/LeaveController.java,6\7\670db4d69bfd09c026e608712a371e471e4c6ec2
 o
 ?src/main/java/com/kinder/kindergarten/entity/ProjectMember.java,d\8\d8fc941efb5784526f7f51d39f8fbdc90e47a773
-h
-8src/main/java/com/kinder/kindergarten/entity/Parent.java,8\5\851df2538981729e8ac34998d6d457de66e7c405
 {
 Ksrc/main/java/com/kinder/kindergarten/repository/board/BoardRepository.java,2\5\254a06c57da7e89d0a6946233f4122094b24aea2
 }
@@ -103,20 +97,10 @@ Nsrc/main/java/com/kinder/kindergarten/repository/board/ScheduleRepository.java
 Ksrc/main/java/com/kinder/kindergarten/service/Employee/EmployeeService.java,4\d\4dac828e1f9b6f59afa03d0c36b6f1a3c1edc6fe
 |
 Lsrc/main/java/com/kinder/kindergarten/controller/CalendarRestController.java,0\7\0765e00988092fafcdefcacfed5d6485d7228e55
-l
-<src/main/java/com/kinder/kindergarten/DTO/ParentFormDTO.java,6\9\69428dff554c8c8bb2e1b6d230b4362cb3369ea3
-n
->src/main/java/com/kinder/kindergarten/DTO/ChildrenFormDTO.java,1\6\16bd65ad06ab99f5cd0d7d1eee7e39280f5af50a
-r
-Bsrc/main/java/com/kinder/kindergarten/DTO/ParentUpdateFormDTO.java,7\f\7f5a086af4bc8bf9a68d7fa046ae23b7e42cb53f
-v
-Fsrc/main/java/com/kinder/kindergarten/controller/ParentController.java,8\a\8a534ba56fc90facc54c4e86581c22e071aca6f1
 q
 Asrc/main/java/com/kinder/kindergarten/DTO/board/BoardFileDTO.java,0\b\0be41651e8e58f9b282512d05c981be1444e0a38
 j
 :src/main/java/com/kinder/kindergarten/entity/Employee.java,0\a\0ad9103197d3432dd6970073e539b5dd04948466
-k
-;src/main/java/com/kinder/kindergarten/DTO/EmailFindDTO.java,b\5\b57fcbc443e99d8ac25348442b5b1bce80961f7a
 ƒ
 Ssrc/main/java/com/kinder/kindergarten/controller/Employee/AttendanceController.java,0\d\0da659689c7d13783aac556f0ea8af2c3e19661a
 n

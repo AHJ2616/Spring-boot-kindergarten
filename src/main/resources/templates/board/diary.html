@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{common/header}">
+      layout:decorate="~{common/layout}">
 <head>
   <meta charset="UTF-8">
   <title>성장일기</title>
@@ -9,6 +10,7 @@
   <script th:src="@{/js/board.js}"></script>
 </head>
 <body>
+<div layout:fragment="content">
 <div class="board-container">
   <div class="board-header">
     <div class="left-section">
@@ -60,6 +62,7 @@
             </a>
         </span>
   </div>
+</div>
 </div>
 </body>
 </html>

@@ -27,7 +27,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Controller
@@ -77,39 +79,47 @@ public class BoardController {
 
 
   @PostMapping(value="/write")
-  public String postWriteBoard(@Valid BoardFormDTO boardFormDTO, BindingResult bindingResult,
-                               Model model, @RequestParam(value = "boardFile", required = false) List<MultipartFile> boardFileList) {
+  public ResponseEntity<?> postWriteBoard(@Valid BoardFormDTO boardFormDTO,
+                                          BindingResult bindingResult,
+                                          @RequestParam(value = "boardFile", required = false) List<MultipartFile> boardFileList) {
     try {
       if (bindingResult.hasErrors()) {
-        return "board/write";
+        return ResponseEntity.badRequest().body("입력값이 올바르지 않습니다.");
       }
 
       // 테스트용 작성자 설정 (나중에 실제 인증 정보로 변경)
       boardFormDTO.setBoardWriter("테스트작성자");
 
-      // 파일 존재 여부 확인
+      String boardId;
+      // 파일 존재 여부와 ZIP 생성 옵션에 따른 처리
       if (boardFileList != null && !boardFileList.isEmpty() && !boardFileList.get(0).isEmpty()) {
-        log.info("boardService.saveBoardWithFile() 실행");
-        boardService.saveBoardWithFile(boardFormDTO, boardFileList);
+        if (boardFileList.size() >= 3) {  // 파일이 3개 이상일 경우
+          boardService.saveWithZip(boardFormDTO, boardFileList);
+        } else {
+          boardService.saveBoardWithFile(boardFormDTO, boardFileList);
+        }
       } else {
-        log.info("boardService.saveBoard() 실행");
         boardService.saveBoard(boardFormDTO);
       }
 
-      // 게시판 타입에 따른 리다이렉트 처리
-      String type = switch(boardFormDTO.getBoardType()) {
-        case COMMON -> "basic";
-        case DIARY -> "diary";
-        case RESEARCH -> "research";
-        case NOTIFICATION -> "notification";
+      // 게시판 타입에 따른 리다이렉트 URL 설정
+      String redirectUrl = switch(boardFormDTO.getBoardType()) {
+        case COMMON -> "/board/basic";
+        case DIARY -> "/board/diary";
+        case RESEARCH -> "/board/research";
+        case NOTIFICATION -> "/board/notification";
       };
 
-      return "redirect:/board/" + type;
+      Map<String, Object> response = new HashMap<>();
+      response.put("success", true);
+      response.put("redirectUrl", redirectUrl);
+
+      return ResponseEntity.ok(response);
 
     } catch (Exception e) {
       log.error("게시글 등록 중 에러 발생: ", e);
-      model.addAttribute("errorMessage", "게시글 등록 중 에러가 발생했습니다.");
-      return "board/write";
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+              .body("게시글 등록 중 오류가 발생했습니다.");
     }
   }
 
@@ -223,5 +233,6 @@ public class BoardController {
 
     return "board/basic";
   }
+
 
 }//class end

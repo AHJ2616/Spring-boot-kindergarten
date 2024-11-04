@@ -35,4 +35,12 @@ public class BoardDTO {
 
   private List<Long> FileIds = new ArrayList<>();
 
+  private boolean hasZipFile;
+
+  public boolean getHasZipFile() {
+    if (BoardFileList == null) return false;
+    return BoardFileList.stream().anyMatch(file -> "Y".equals(file.getIsZip()));
+  }
+
+
 }

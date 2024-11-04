@@ -27,306 +27,432 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 
-@Service
-@RequiredArgsConstructor
-@Transactional
-@Log4j2
-public class BoardService {
+        @Service
+        @RequiredArgsConstructor
+        @Transactional
+        @Log4j2
+        public class BoardService {
 
-  private final BoardRepository boardRepository;
+          private final BoardRepository boardRepository;
 
-  private final BoardFileRepository boardFileRepository;
+          private final BoardFileRepository boardFileRepository;
 
-  private final QueryDSL queryDSL;
+          private final QueryDSL queryDSL;
 
-  private final ModelMapper modelMapper;
+          private final ModelMapper modelMapper;
 
-  private final FileService fileService;
+          private final FileService fileService;
 
-  private final LoadingCache<String, Page<BoardDTO>> searchCache;
+          private final LoadingCache<String, Page<BoardDTO>> searchCache;
 
-  //application.properties 에 있는 값
-  @Value("${uploadPath1}")
-  private String uploadPath;
+          //application.properties 에 있는 값
+          @Value("${uploadPath1}")
+          private String uploadPath;
 
-  @Value("${summerImage}")
-  private String summerImage;
+          @Value("${summerImage}")
+          private String summerImage;
 
-  public Page<BoardDTO> getCommonBoards(Pageable pageable) {
-    log.info("페이지 불러오기 - BoardService.getCommonBoards()실행. pageable 정보 : " +pageable);
+          public Page<BoardDTO> getCommonBoards(Pageable pageable) {
+            log.info("페이지 불러오기 - BoardService.getCommonBoards()실행. pageable 정보 : " +pageable);
 
-    //페이징 처리
-    Page<BoardEntity> boardPage = boardRepository.findByBoardType(BoardType.COMMON, pageable);
+            //페이징 처리
+            Page<BoardEntity> boardPage = boardRepository.findByBoardType(BoardType.COMMON, pageable);
 
-    return boardPage.map(boardEntity -> modelMapper.map(boardEntity, BoardDTO.class));
-  }
+            return boardPage.map(boardEntity -> modelMapper.map(boardEntity, BoardDTO.class));
+          }
 
-  public Page<BoardDTO> getDiaryBoards(Pageable pageable) {
-    log.info("페이지 불러오기 - BoardService.getDiaryBoard()실행. pageable 정보 : " +pageable);
+          public Page<BoardDTO> getDiaryBoards(Pageable pageable) {
+            log.info("페이지 불러오기 - BoardService.getDiaryBoard()실행. pageable 정보 : " +pageable);
 
-    //페이징 처리
-    Page<BoardEntity> boardPage = boardRepository.findByBoardType(BoardType.DIARY, pageable);
+            //페이징 처리
+            Page<BoardEntity> boardPage = boardRepository.findByBoardType(BoardType.DIARY, pageable);
 
-    return boardPage.map(boardEntity -> modelMapper.map(boardEntity, BoardDTO.class));
-  }
+            return boardPage.map(boardEntity -> modelMapper.map(boardEntity, BoardDTO.class));
+          }
 
-  @Transactional
-  public void saveBoard(BoardFormDTO boardFormDTO) throws Exception{
-    Ulid ulid = UlidCreator.getUlid();
-    String id = ulid.toString();
-    boardFormDTO.setBoardId(id); // UUID대신 사용할 ULID
-    BoardEntity board = boardFormDTO.wirteBoard();
-    boardRepository.save(board);
-    log.info("게시글+파일 저장 - BoardService.saveBoard() 실행" + boardFormDTO);
-  }
+          @Transactional
+          public void saveBoard(BoardFormDTO boardFormDTO) throws Exception{
+            Ulid ulid = UlidCreator.getUlid();
+            String id = ulid.toString();
+            boardFormDTO.setBoardId(id); // UUID대신 사용할 ULID
+            BoardEntity board = boardFormDTO.wirteBoard();
+            boardRepository.save(board);
+            log.info("게시글+파일 저장 - BoardService.saveBoard() 실행" + boardFormDTO);
+          }
 
-  public void saveBoardWithFile(BoardFormDTO boardFormDTO, List<MultipartFile> boardFileList) throws Exception{
-    log.info("게시글+파일 저장 - BoardService.saveBoardWithFile() 실행" + boardFormDTO);
+          public void saveBoardWithFile(BoardFormDTO boardFormDTO, List<MultipartFile> boardFileList) throws Exception{
+            log.info("게시글+파일 저장 - BoardService.saveBoardWithFile() 실행" + boardFormDTO);
 
-    Ulid ulid = UlidCreator.getUlid();
-    String id = ulid.toString();
-    boardFormDTO.setBoardId(id); // UUID대신 사용할 ULID
-    BoardEntity board = boardFormDTO.wirteBoard();
+            Ulid ulid = UlidCreator.getUlid();
+            String id = ulid.toString();
+            boardFormDTO.setBoardId(id); // UUID대신 사용할 ULID
+            BoardEntity board = boardFormDTO.wirteBoard();
 
-    //게시물 정보 먼저 저장
-    boardRepository.save(board);
+            //게시물 정보 먼저 저장
+            boardRepository.save(board);
 
-    if (boardFileList != null && !boardFileList.get(0).isEmpty()) {
-      boolean isFirstImage = true;
-      String mainFileName = null;
+            if (boardFileList != null && !boardFileList.get(0).isEmpty()) {
+              boolean isFirstImage = true;
+              String mainFileName = null;
 
-      for (MultipartFile file : boardFileList) {
-        BoardFileEntity boardFile = new BoardFileEntity();
+              for (MultipartFile file : boardFileList) {
+                BoardFileEntity boardFile = new BoardFileEntity();
 
-        String originalFilename = file.getOriginalFilename();
-        String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+                String originalFilename = file.getOriginalFilename();
+                String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
 
-        // FileService를 사용하여 파일 저장
-        String savedFileName = fileService.uploadFile(uploadPath, originalFilename, file.getBytes());
-        String filePath = fileService.getFullPath(savedFileName);
+                // FileService를 사용하여 파일 저장
+                String savedFileName = fileService.uploadFile(uploadPath, originalFilename, file.getBytes());
+                String filePath = fileService.getFullPath(savedFileName);
 
-        // 이미지 파일인 경우 첫 번째 파일을 main_file로 지정
-        if (isFirstImage && isImageFile(extension)) {
-          mainFileName = savedFileName;
-          isFirstImage = false;
-        }
+                // 이미지 파일인 경우 첫 번째 파일을 main_file로 지정
+                if (isFirstImage && isImageFile(extension)) {
+                  mainFileName = savedFileName;
+                  isFirstImage = false;
+                }
 
-        // BoardFileEntity 설정
-        boardFile.setOriginalName(originalFilename);
-        boardFile.setModifiedName(savedFileName);
-        boardFile.setFilePath(filePath);
-        boardFile.setMainFile(mainFileName != null ? mainFileName : ""); // 메인 파일 이름 설정
+                // BoardFileEntity 설정
+                boardFile.setOriginalName(originalFilename);
+                boardFile.setModifiedName(savedFileName);
+                boardFile.setFilePath(filePath);
+                boardFile.setMainFile(mainFileName != null ? mainFileName : ""); // 메인 파일 이름 설정
 
-        // 새로운 파일 ID 생성
-        Ulid fileUlid = UlidCreator.getUlid();
-        boardFile.setFileId(fileUlid.toString());
+                // 새로운 파일 ID 생성
+                Ulid fileUlid = UlidCreator.getUlid();
+                boardFile.setFileId(fileUlid.toString());
 
-        // boardEntity 설정
-        boardFile.setBoardEntity(board);
+                // boardEntity 설정
+                boardFile.setBoardEntity(board);
 
-        //파일 정보 저장
-        boardFileRepository.save(boardFile);
-      }
-    }
+                //파일 정보 저장
+                boardFileRepository.save(boardFile);
+              }
+            }
 
-    log.info("게시글 저장 - BoardService.saveBoard : "+ boardFormDTO);
-  }
+            log.info("게시글 저장 - BoardService.saveBoard : "+ boardFormDTO);
+          }
 
-  //이미지 파일인지 확인하는 method
-  private boolean isImageFile(String extension) {
-    return Arrays.asList(".jpg", ".jpeg", ".png", ".gif", ".bmp")
-            .contains(extension.toLowerCase());
-  }
+          //이미지 파일인지 확인하는 method
+          private boolean isImageFile(String extension) {
+            return Arrays.asList(".jpg", ".jpeg", ".png", ".gif", ".bmp")
+                    .contains(extension.toLowerCase());
+          }
 
-  //페이지 상세보기 board_id로 찾아서 ModelMapper사용(entity -> DTO 로)
-  @Transactional(readOnly = true)
-  public BoardDTO getBoard(String board_id){
-    Optional<BoardDTO> optionalBoardDTO = boardRepository.findById(board_id).map(boardEntity -> modelMapper.map(boardEntity,BoardDTO.class));
-    BoardDTO boardDTO = optionalBoardDTO.get();
+          //페이지 상세보기 board_id로 찾아서 ModelMapper사용(entity -> DTO 로)
+          @Transactional(readOnly = true)
+          public BoardDTO getBoard(String board_id){
+            Optional<BoardDTO> optionalBoardDTO = boardRepository.findById(board_id).map(boardEntity -> modelMapper.map(boardEntity,BoardDTO.class));
+            BoardDTO boardDTO = optionalBoardDTO.get();
 
-    List<BoardFileEntity> fileEntities = boardFileRepository.findByBoardEntity_BoardId(board_id);
-    log.info("파일정보1 : " + fileEntities);
-    if (!fileEntities.isEmpty()) {
-      List<BoardFileDTO> fileDTOs = fileEntities.stream()
-              .map(fileEntity -> {
-                BoardFileDTO fileDTO = new BoardFileDTO();
-                fileDTO.setFileId(fileEntity.getFileId());
-                fileDTO.setOrignalName(fileEntity.getOriginalName());
-                fileDTO.setModifiedName(fileEntity.getModifiedName());
-                fileDTO.setFilePath(fileEntity.getFilePath());
-                fileDTO.setMainFile(fileEntity.getMainFile());
-                fileDTO.setBoardId(board_id);
-                return fileDTO;
-              })
-              .collect(Collectors.toList());
+            List<BoardFileEntity> fileEntities = boardFileRepository.findByBoardEntity_BoardId(board_id);
+            log.info("파일정보1 : " + fileEntities);
+            if (!fileEntities.isEmpty()) {
+              List<BoardFileDTO> fileDTOs = fileEntities.stream()
+                      .map(fileEntity -> {
+                        BoardFileDTO fileDTO = new BoardFileDTO();
+                        fileDTO.setFileId(fileEntity.getFileId());
+                        fileDTO.setOrignalName(fileEntity.getOriginalName());
+                        fileDTO.setModifiedName(fileEntity.getModifiedName());
+                        fileDTO.setFilePath(fileEntity.getFilePath());
+                        fileDTO.setMainFile(fileEntity.getMainFile());
+                        fileDTO.setBoardId(board_id);
+                        fileDTO.setIsZip(fileEntity.getIsZip());
+                        return fileDTO;
+                      })
+                      .collect(Collectors.toList());
 
-      boardDTO.setBoardFileList(fileDTOs);
-      log.info("파일정보 : " + fileDTOs);
-    }
+              boardDTO.setBoardFileList(fileDTOs);
+              log.info("파일정보 : " + fileDTOs);
+            }
 
-    return boardDTO;
-  }
+            return boardDTO;
+          }
 
-  //첨부파일이 있는경우 불러오기(다운로드용)
-  public BoardFileDTO getFile(String fileId) {
-    BoardFileEntity fileEntity = boardFileRepository.findById(fileId)
-            .orElseThrow(() -> new RuntimeException("파일을 찾을 수 없습니다."));
+          //첨부파일이 있는경우 불러오기(다운로드용)
+          public BoardFileDTO getFile(String fileId) {
+            BoardFileEntity fileEntity = boardFileRepository.findById(fileId)
+                    .orElseThrow(() -> new RuntimeException("파일을 찾을 수 없습니다."));
 
-    BoardFileDTO fileDTO = new BoardFileDTO();
-    fileDTO.setFileId(fileEntity.getFileId());
-    fileDTO.setOrignalName(fileEntity.getOriginalName());
-    fileDTO.setFilePath(fileEntity.getFilePath());
+            BoardFileDTO fileDTO = new BoardFileDTO();
+            fileDTO.setFileId(fileEntity.getFileId());
+            fileDTO.setOrignalName(fileEntity.getOriginalName());
+            fileDTO.setFilePath(fileEntity.getFilePath());
 
-    return fileDTO;
-  }
+            return fileDTO;
+          }
 
-  public String uploadSummernoteImage(MultipartFile file) throws Exception {
-    String originalFileName = file.getOriginalFilename();
-    String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
-    Ulid ulid = UlidCreator.getUlid(); //ULID 사용
-    
-    String savedFileName = ulid.toString() + extension;
+          public String uploadSummernoteImage(MultipartFile file) throws Exception {
+            String originalFileName = file.getOriginalFilename();
+            String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
+            Ulid ulid = UlidCreator.getUlid(); //ULID 사용
 
-    String uploadDir = uploadPath + "/summernote/";
-    File uploadPath = new File(uploadDir);
+            String savedFileName = ulid.toString() + extension;
 
-    if (!uploadPath.exists()) {
-      uploadPath.mkdirs();
-    }
+            String uploadDir = uploadPath + "/summernote/";
+            File uploadPath = new File(uploadDir);
 
-    String savePath = uploadDir + savedFileName;
-    file.transferTo(new File(savePath));
+            if (!uploadPath.exists()) {
+              uploadPath.mkdirs();
+            }
 
-    return "/images/summernote/" + savedFileName;
-  }
+            String savePath = uploadDir + savedFileName;
+            file.transferTo(new File(savePath));
 
-  @Transactional
-  public void updateBoard(String boardId, BoardFormDTO boardFormDTO) {
-    BoardEntity board = boardRepository.findById(boardId)
-            .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+            return "/images/summernote/" + savedFileName;
+          }
 
-    board.setBoardTitle(boardFormDTO.getBoardTitle());
-    board.setBoardContents(boardFormDTO.getBoardContents());
-    board.setBoardType(boardFormDTO.getBoardType());
-  }
+          @Transactional
+          public void updateBoard(String boardId, BoardFormDTO boardFormDTO) {
+            BoardEntity board = boardRepository.findById(boardId)
+                    .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
 
-  @Transactional
-  public void updateBoardWithFile(String boardId, BoardFormDTO boardFormDTO,
-                                  List<MultipartFile> boardFileList) throws Exception {
-    // 기존 게시글 조회
-    BoardEntity board = boardRepository.findById(boardId)
-            .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+            board.setBoardTitle(boardFormDTO.getBoardTitle());
+            board.setBoardContents(boardFormDTO.getBoardContents());
+            board.setBoardType(boardFormDTO.getBoardType());
+          }
 
-    // 기존 파일 삭제
-    List<BoardFileEntity> existingFiles = boardFileRepository.findByBoardEntity(board);
-    for (BoardFileEntity file : existingFiles) {
-      fileService.deleteFile(file.getFilePath());
-      boardFileRepository.delete(file);
-    }
+          @Transactional
+          public void updateBoardWithFile(String boardId, BoardFormDTO boardFormDTO,
+                                          List<MultipartFile> boardFileList) throws Exception {
+            // 기존 게시글 조회
+            BoardEntity board = boardRepository.findById(boardId)
+                    .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
 
-    // 새로운 파일 업로드
-    if (boardFileList != null && !boardFileList.get(0).isEmpty()) {
-      boolean isFirstImage = true;
-      String mainFileName = null;
+            // 기존 파일 삭제
+            List<BoardFileEntity> existingFiles = boardFileRepository.findByBoardEntity(board);
+            for (BoardFileEntity file : existingFiles) {
+              fileService.deleteFile(file.getFilePath());
+              boardFileRepository.delete(file);
+            }
 
-      for (MultipartFile file : boardFileList) {
-        BoardFileEntity boardFile = new BoardFileEntity();
-        String originalFilename = file.getOriginalFilename();
+            // 새로운 파일 업로드
+            if (boardFileList != null && !boardFileList.get(0).isEmpty()) {
+              boolean isFirstImage = true;
+              String mainFileName = null;
 
-        // FileService를 사용하여 파일 저장
-        String savedFileName = fileService.uploadFile(uploadPath, originalFilename, file.getBytes());
-        String filePath = fileService.getFullPath(savedFileName);
+              for (MultipartFile file : boardFileList) {
+                BoardFileEntity boardFile = new BoardFileEntity();
+                String originalFilename = file.getOriginalFilename();
 
-        // 첫 번째 이미지 파일을 메인 파일로 설정
-        if (isFirstImage) {
-          mainFileName = savedFileName;
-          isFirstImage = false;
-        }
+                // FileService를 사용하여 파일 저장
+                String savedFileName = fileService.uploadFile(uploadPath, originalFilename, file.getBytes());
+                String filePath = fileService.getFullPath(savedFileName);
 
-        // BoardFileEntity 설정
-        Ulid ulid = UlidCreator.getUlid();
-        boardFile.setFileId(ulid.toString());
-        boardFile.setOriginalName(originalFilename);
-        boardFile.setModifiedName(savedFileName);
-        boardFile.setFilePath(filePath);
-        boardFile.setMainFile(mainFileName != null ? mainFileName : "");
-        boardFile.setBoardEntity(board);
+                // 첫 번째 이미지 파일을 메인 파일로 설정
+                if (isFirstImage) {
+                  mainFileName = savedFileName;
+                  isFirstImage = false;
+                }
 
-        boardFileRepository.save(boardFile);
-      }
-    }
+                // BoardFileEntity 설정
+                Ulid ulid = UlidCreator.getUlid();
+                boardFile.setFileId(ulid.toString());
+                boardFile.setOriginalName(originalFilename);
+                boardFile.setModifiedName(savedFileName);
+                boardFile.setFilePath(filePath);
+                boardFile.setMainFile(mainFileName != null ? mainFileName : "");
+                boardFile.setBoardEntity(board);
 
-    // 게시글 정보 업데이트
-    board.setBoardTitle(boardFormDTO.getBoardTitle());
-    board.setBoardContents(boardFormDTO.getBoardContents());
-    board.setBoardType(boardFormDTO.getBoardType());
-  }
+                boardFileRepository.save(boardFile);
+              }
+            }
 
-  //게시글 삭제
-  public void deleteBoard(String boardId){
-    boardRepository.deleteByBoardId(boardId);
-  }
-  //게시글 검색
-  public Page<BoardDTO> searchBoards(String keyword, Pageable pageable) {
-    try {
-      // 캐시 키 생성 (검색어와 페이지 정보 조합)
-      String cacheKey = keyword + "_" + pageable.getPageNumber();
+            // 게시글 정보 업데이트
+            board.setBoardTitle(boardFormDTO.getBoardTitle());
+            board.setBoardContents(boardFormDTO.getBoardContents());
+            board.setBoardType(boardFormDTO.getBoardType());
+          }
 
-      // 캐시에서 결과 조회 시도
-      return searchCache.get(cacheKey, () -> {
-        // 초성 검색인지 확인
-        boolean isChosung = keyword.matches("^[ㄱ-ㅎ]+$");
+          //게시글 삭제
+          public void deleteBoard(String boardId){
+            boardRepository.deleteByBoardId(boardId);
+          }
+          //게시글 검색
+          public Page<BoardDTO> searchBoards(String keyword, Pageable pageable) {
+            try {
+              // 캐시 키 생성 (검색어와 페이지 정보 조합)
+              String cacheKey = keyword + "_" + pageable.getPageNumber();
 
-        if (isChosung) {
-          // 초성 검색 로직
-          List<BoardEntity> allBoards = boardRepository.findAll();
-          List<BoardDTO> matchedBoards = allBoards.stream()
-                  .filter(entity ->
-                          Hangul.matchesChosung(entity.getBoardTitle(), keyword) ||
-                                  Hangul.matchesChosung(entity.getBoardContents(), keyword) ||
-                                  Hangul.matchesChosung(entity.getBoardWriter(), keyword))
-                  .map(this::convertToDTO)
-                  .collect(Collectors.toList());
+              // 캐시에서 결과 조회 시도
+              return searchCache.get(cacheKey, () -> {
+                // 초성 검색인지 확인
+                boolean isChosung = keyword.matches("^[ㄱ-ㅎ]+$");
 
-          // List를 Page로 변환
-          int start = (int) pageable.getOffset();
-          int end = Math.min((start + pageable.getPageSize()), matchedBoards.size());
+                if (isChosung) {
+                  // 초성 검색 로직
+                  List<BoardEntity> allBoards = boardRepository.findAll();
+                  List<BoardDTO> matchedBoards = allBoards.stream()
+                          .filter(entity ->
+                                  Hangul.matchesChosung(entity.getBoardTitle(), keyword) ||
+                                          Hangul.matchesChosung(entity.getBoardContents(), keyword) ||
+                                          Hangul.matchesChosung(entity.getBoardWriter(), keyword))
+                          .map(this::convertToDTO)
+                          .collect(Collectors.toList());
 
-          return new PageImpl<>(
-                  matchedBoards.subList(start, end),
-                  pageable,
-                  matchedBoards.size()
-          );
-        } else {
-          // 일반 검색 로직
-          return boardRepository
-                  .findByBoardTitleContainingOrBoardContentsContainingOrBoardWriterContaining(
-                          keyword, keyword, keyword, pageable)
-                  .map(this::convertToDTO);
-        }
-      });
-    } catch (Exception e) {
-      throw new RuntimeException("검색 중 오류가 발생했습니다.", e);
-    }
-  }
+                  // List를 Page로 변환
+                  int start = (int) pageable.getOffset();
+                  int end = Math.min((start + pageable.getPageSize()), matchedBoards.size());
 
-  private BoardDTO convertToDTO(BoardEntity entity) {
-    BoardDTO dto = new BoardDTO();
-    dto.setBoardId(entity.getBoardId());
-    dto.setBoardTitle(entity.getBoardTitle());
-    dto.setBoardContents(entity.getBoardContents());
-    dto.setBoardType(entity.getBoardType());
-    dto.setBoardWriter(entity.getBoardWriter());
-    dto.setViews(entity.getViews());
-    dto.setRegiDate(entity.getRegiDate());
-    dto.setModiDate(entity.getModiDate());
-    return dto;
-  }
+                  return new PageImpl<>(
+                          matchedBoards.subList(start, end),
+                          pageable,
+                          matchedBoards.size()
+                  );
+                } else {
+                  // 일반 검색 로직
+                  return boardRepository
+                          .findByBoardTitleContainingOrBoardContentsContainingOrBoardWriterContaining(
+                                  keyword, keyword, keyword, pageable)
+                          .map(this::convertToDTO);
+                }
+              });
+            } catch (Exception e) {
+              throw new RuntimeException("검색 중 오류가 발생했습니다.", e);
+            }
+          }
 
-}//class end
+          private BoardDTO convertToDTO(BoardEntity entity) {
+            BoardDTO dto = new BoardDTO();
+            dto.setBoardId(entity.getBoardId());
+            dto.setBoardTitle(entity.getBoardTitle());
+            dto.setBoardContents(entity.getBoardContents());
+            dto.setBoardType(entity.getBoardType());
+            dto.setBoardWriter(entity.getBoardWriter());
+            dto.setViews(entity.getViews());
+            dto.setRegiDate(entity.getRegiDate());
+            dto.setModiDate(entity.getModiDate());
+            return dto;
+          }
+
+          @Transactional
+          public void saveWithZip(BoardFormDTO boardFormDTO, List<MultipartFile> boardFileList) throws Exception {
+            log.info("게시글+일반파일+ZIP파일 저장 - BoardService.saveBoardWithBothFiles() 실행" + boardFormDTO);
+
+            // 게시글 ID 생성 및 저장
+            Ulid ulid = UlidCreator.getUlid();
+            String boardId = ulid.toString();
+            boardFormDTO.setBoardId(boardId);
+            BoardEntity board = boardFormDTO.wirteBoard();
+            boardRepository.save(board);
+
+            if (boardFileList != null && !boardFileList.isEmpty()) {
+              // ZIP 파일 생성을 위한 임시 디렉토리
+              String tempDir = uploadPath + "/temp/" + boardId + "/";
+              File tempFolder = new File(tempDir);
+              if (!tempFolder.exists()) {
+                tempFolder.mkdirs();
+              }
+
+              try {
+                // 원본 파일들을 임시 디렉토리에 저장하고 개별 파일 엔티티 생성
+                boolean isFirstImage = true;
+                String mainFileName = null;
+
+                for (MultipartFile file : boardFileList) {
+                  if (!file.isEmpty()) {
+                    BoardFileEntity boardFile = new BoardFileEntity();
+                    String originalFilename = file.getOriginalFilename();
+                    String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+
+                    // 개별 파일 저장
+                    String savedFileName = fileService.uploadFile(uploadPath, originalFilename, file.getBytes());
+                    String filePath = fileService.getFullPath(savedFileName);
+
+                    // 첫 번째 이미지 파일을 메인 파일로 설정
+                    if (isFirstImage && isImageFile(extension)) {
+                      mainFileName = savedFileName;
+                      isFirstImage = false;
+                    }
+
+                    // 임시 디렉토리에 파일 복사
+                    File tempFile = new File(tempDir + originalFilename);
+                    file.transferTo(tempFile);
+
+                    // BoardFileEntity 설정
+                    Ulid ulid2 = UlidCreator.getUlid();
+                    boardFile.setFileId(ulid2.toString());
+                    boardFile.setOriginalName(originalFilename);
+                    boardFile.setModifiedName(savedFileName);
+                    boardFile.setFilePath(filePath);
+                    boardFile.setMainFile(mainFileName != null ? mainFileName : "");
+                    boardFile.setBoardEntity(board);
+
+                    boardFileRepository.save(boardFile);
+                  }
+                }
+
+                // ZIP 파일 생성
+                String zipFileName = "files_" + boardId + ".zip";
+                String zipFilePath = uploadPath + "/" + zipFileName;
+
+                // ZIP 파일 생성 및 저장
+                FileOutputStream fos = new FileOutputStream(zipFilePath);
+                ZipOutputStream zos = new ZipOutputStream(fos);
+
+                File[] files = tempFolder.listFiles();
+                byte[] buffer = new byte[1024];
+
+                for (File file : files) {
+                  FileInputStream fis = new FileInputStream(file);
+                  zos.putNextEntry(new ZipEntry(file.getName()));
+
+                  int length;
+                  while ((length = fis.read(buffer)) > 0) {
+                    zos.write(buffer, 0, length);
+                  }
+
+                  zos.closeEntry();
+                  fis.close();
+                }
+
+                zos.close();
+                fos.close();
+
+                // BoardFileEntity 생성 및 저장 (ZIP 파일)
+                BoardFileEntity zipBoardFile = new BoardFileEntity();
+                Ulid fileUlid = UlidCreator.getUlid();
+
+                zipBoardFile.setFileId(fileUlid.toString());
+                zipBoardFile.setOriginalName(zipFileName);
+                zipBoardFile.setModifiedName(zipFileName);
+                zipBoardFile.setFilePath(zipFilePath);
+                zipBoardFile.setMainFile("");
+                zipBoardFile.setBoardEntity(board);
+                zipBoardFile.setIsZip("Y");  // ZIP 파일임을 표시
+
+                boardFileRepository.save(zipBoardFile);
+
+              } finally {
+                // 임시 디렉토리 삭제
+                deleteDirectory(tempFolder);
+              }
+            }
+          }
+
+          // 디렉토리와 그 내용을 삭제하는 헬퍼 메소드
+          private void deleteDirectory(File directory) {
+            File[] files = directory.listFiles();
+            if (files != null) {
+              for (File file : files) {
+                if (file.isDirectory()) {
+                  deleteDirectory(file);
+                } else {
+                  file.delete();
+                }
+              }
+            }
+            directory.delete();
+          }
+
+        }//class end

@@ -35,4 +35,7 @@ public class BoardFileEntity extends TimeEntity {
   @JoinColumn(name="board_id", referencedColumnName = "board_id")
   private BoardEntity boardEntity;
 
+  @Column(name = "is_zip")
+  private String isZip = "N";
+
 }

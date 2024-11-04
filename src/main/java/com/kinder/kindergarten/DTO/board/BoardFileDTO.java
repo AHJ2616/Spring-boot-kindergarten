@@ -23,4 +23,7 @@ public class BoardFileDTO {
   //참고할 BoardEntity
   private String boardId;
 
+  // ZIP 파일 여부
+  private String isZip;
+
 }
