@@ -15,6 +15,7 @@ import com.kinder.kindergarten.repository.board.BoardRepository;
 import com.kinder.kindergarten.repository.QueryDSL;
 import com.kinder.kindergarten.service.FileService;
 import com.kinder.kindergarten.util.Hangul;
+import com.kinder.kindergarten.util.HtmlSanitizer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -83,6 +84,8 @@ import java.util.zip.ZipOutputStream;
 
           @Transactional
           public void saveBoard(BoardFormDTO boardFormDTO) throws Exception{
+            // HTML 컨텐츠 sanitize
+            boardFormDTO.setBoardContents(HtmlSanitizer.sanitize(boardFormDTO.getBoardContents()));
             Ulid ulid = UlidCreator.getUlid();
             String id = ulid.toString();
             boardFormDTO.setBoardId(id); // UUID대신 사용할 ULID
@@ -93,6 +96,8 @@ import java.util.zip.ZipOutputStream;
 
           public void saveBoardWithFile(BoardFormDTO boardFormDTO, List<MultipartFile> boardFileList) throws Exception{
             log.info("게시글+파일 저장 - BoardService.saveBoardWithFile() 실행" + boardFormDTO);
+            // HTML 컨텐츠 sanitize
+            boardFormDTO.setBoardContents(HtmlSanitizer.sanitize(boardFormDTO.getBoardContents()));
 
             Ulid ulid = UlidCreator.getUlid();
             String id = ulid.toString();
@@ -104,7 +109,6 @@ import java.util.zip.ZipOutputStream;
 
             if (boardFileList != null && !boardFileList.get(0).isEmpty()) {
               boolean isFirstImage = true;
-              String mainFileName = null;
 
               for (MultipartFile file : boardFileList) {
                 BoardFileEntity boardFile = new BoardFileEntity();
@@ -116,17 +120,10 @@ import java.util.zip.ZipOutputStream;
                 String savedFileName = fileService.uploadFile(uploadPath, originalFilename, file.getBytes());
                 String filePath = fileService.getFullPath(savedFileName);
 
-                // 이미지 파일인 경우 첫 번째 파일을 main_file로 지정
-                if (isFirstImage && isImageFile(extension)) {
-                  mainFileName = savedFileName;
-                  isFirstImage = false;
-                }
-
                 // BoardFileEntity 설정
                 boardFile.setOriginalName(originalFilename);
                 boardFile.setModifiedName(savedFileName);
                 boardFile.setFilePath(filePath);
-                boardFile.setMainFile(mainFileName != null ? mainFileName : ""); // 메인 파일 이름 설정
 
                 // 새로운 파일 ID 생성
                 Ulid fileUlid = UlidCreator.getUlid();
@@ -165,7 +162,6 @@ import java.util.zip.ZipOutputStream;
                         fileDTO.setOrignalName(fileEntity.getOriginalName());
                         fileDTO.setModifiedName(fileEntity.getModifiedName());
                         fileDTO.setFilePath(fileEntity.getFilePath());
-                        fileDTO.setMainFile(fileEntity.getMainFile());
                         fileDTO.setBoardId(board_id);
                         fileDTO.setIsZip(fileEntity.getIsZip());
                         return fileDTO;
@@ -225,6 +221,8 @@ import java.util.zip.ZipOutputStream;
           @Transactional
           public void updateBoardWithFile(String boardId, BoardFormDTO boardFormDTO,
                                           List<MultipartFile> boardFileList) throws Exception {
+            // HTML 컨텐츠 sanitize
+            boardFormDTO.setBoardContents(HtmlSanitizer.sanitize(boardFormDTO.getBoardContents()));
             // 기존 게시글 조회
             BoardEntity board = boardRepository.findById(boardId)
                     .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
@@ -239,7 +237,6 @@ import java.util.zip.ZipOutputStream;
             // 새로운 파일 업로드
             if (boardFileList != null && !boardFileList.get(0).isEmpty()) {
               boolean isFirstImage = true;
-              String mainFileName = null;
 
               for (MultipartFile file : boardFileList) {
                 BoardFileEntity boardFile = new BoardFileEntity();
@@ -249,11 +246,6 @@ import java.util.zip.ZipOutputStream;
                 String savedFileName = fileService.uploadFile(uploadPath, originalFilename, file.getBytes());
                 String filePath = fileService.getFullPath(savedFileName);
 
-                // 첫 번째 이미지 파일을 메인 파일로 설정
-                if (isFirstImage) {
-                  mainFileName = savedFileName;
-                  isFirstImage = false;
-                }
 
                 // BoardFileEntity 설정
                 Ulid ulid = UlidCreator.getUlid();
@@ -261,7 +253,6 @@ import java.util.zip.ZipOutputStream;
                 boardFile.setOriginalName(originalFilename);
                 boardFile.setModifiedName(savedFileName);
                 boardFile.setFilePath(filePath);
-                boardFile.setMainFile(mainFileName != null ? mainFileName : "");
                 boardFile.setBoardEntity(board);
 
                 boardFileRepository.save(boardFile);
@@ -338,7 +329,8 @@ import java.util.zip.ZipOutputStream;
           @Transactional
           public void saveWithZip(BoardFormDTO boardFormDTO, List<MultipartFile> boardFileList) throws Exception {
             log.info("게시글+일반파일+ZIP파일 저장 - BoardService.saveBoardWithBothFiles() 실행" + boardFormDTO);
-
+            // HTML 컨텐츠 sanitize
+            boardFormDTO.setBoardContents(HtmlSanitizer.sanitize(boardFormDTO.getBoardContents()));
             // 게시글 ID 생성 및 저장
             Ulid ulid = UlidCreator.getUlid();
             String boardId = ulid.toString();
@@ -357,7 +349,6 @@ import java.util.zip.ZipOutputStream;
               try {
                 // 원본 파일들을 임시 디렉토리에 저장하고 개별 파일 엔티티 생성
                 boolean isFirstImage = true;
-                String mainFileName = null;
 
                 for (MultipartFile file : boardFileList) {
                   if (!file.isEmpty()) {
@@ -369,11 +360,6 @@ import java.util.zip.ZipOutputStream;
                     String savedFileName = fileService.uploadFile(uploadPath, originalFilename, file.getBytes());
                     String filePath = fileService.getFullPath(savedFileName);
 
-                    // 첫 번째 이미지 파일을 메인 파일로 설정
-                    if (isFirstImage && isImageFile(extension)) {
-                      mainFileName = savedFileName;
-                      isFirstImage = false;
-                    }
 
                     // 임시 디렉토리에 파일 복사
                     File tempFile = new File(tempDir + originalFilename);
@@ -385,7 +371,6 @@ import java.util.zip.ZipOutputStream;
                     boardFile.setOriginalName(originalFilename);
                     boardFile.setModifiedName(savedFileName);
                     boardFile.setFilePath(filePath);
-                    boardFile.setMainFile(mainFileName != null ? mainFileName : "");
                     boardFile.setBoardEntity(board);
 
                     boardFileRepository.save(boardFile);
@@ -427,7 +412,6 @@ import java.util.zip.ZipOutputStream;
                 zipBoardFile.setOriginalName(zipFileName);
                 zipBoardFile.setModifiedName(zipFileName);
                 zipBoardFile.setFilePath(zipFilePath);
-                zipBoardFile.setMainFile("");
                 zipBoardFile.setBoardEntity(board);
                 zipBoardFile.setIsZip("Y");  // ZIP 파일임을 표시
 

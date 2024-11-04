@@ -16,9 +16,7 @@ public class BoardFileDTO {
   
   //파일 저장 경로
   private String filePath;
-  
-  //메인 사진 이름
-  private String mainFile;
+
 
   //참고할 BoardEntity
   private String boardId;

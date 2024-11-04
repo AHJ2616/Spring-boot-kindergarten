@@ -8,6 +8,8 @@ function initializeSummernote() {
     $('#summernote').summernote({
         height: 300,
         lang: 'ko-KR',
+        sanitize: true, // HTML sanitize 활성화
+        disableDragAndDrop: true, // 드래그 앤 드롭 비활성화
         toolbar: [
             ['fontname', ['fontname']],
             ['fontsize', ['fontsize']],
@@ -16,7 +18,7 @@ function initializeSummernote() {
             ['para', ['ul', 'ol', 'paragraph']],
             ['height', ['height']],
             ['insert', ['picture', 'link', 'video']],
-            ['view', ['fullscreen', 'codeview', 'help']]
+            ['view', ['fullscreen','help']]
         ],
         fontNames: ['Arial', '맑은 고딕', '궁서', '굴림', '굴림체', '돋움체', 'sans-serif'],
         fontSizes: ['8', '9', '10', '11', '12', '14', '16', '18', '20', '22', '24', '28', '30', '36'],
