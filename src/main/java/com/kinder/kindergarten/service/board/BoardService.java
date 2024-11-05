@@ -30,7 +30,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -64,20 +63,11 @@ import java.util.zip.ZipOutputStream;
           @Value("${summerImage}")
           private String summerImage;
 
-          public Page<BoardDTO> getCommonBoards(Pageable pageable) {
-            log.info("페이지 불러오기 - BoardService.getCommonBoards()실행. pageable 정보 : " +pageable);
+          public Page<BoardDTO> getBoardsByType(BoardType boardType, Pageable pageable) {
+            log.info("페이지 불러오기 - BoardService.getBoardsByType() 실행. boardType: " + boardType + ", pageable 정보: " + pageable);
 
-            //페이징 처리
-            Page<BoardEntity> boardPage = boardRepository.findByBoardType(BoardType.COMMON, pageable);
-
-            return boardPage.map(boardEntity -> modelMapper.map(boardEntity, BoardDTO.class));
-          }
-
-          public Page<BoardDTO> getDiaryBoards(Pageable pageable) {
-            log.info("페이지 불러오기 - BoardService.getDiaryBoard()실행. pageable 정보 : " +pageable);
-
-            //페이징 처리
-            Page<BoardEntity> boardPage = boardRepository.findByBoardType(BoardType.DIARY, pageable);
+            // 페이징 처리
+            Page<BoardEntity> boardPage = boardRepository.findByBoardType(boardType, pageable);
 
             return boardPage.map(boardEntity -> modelMapper.map(boardEntity, BoardDTO.class));
           }

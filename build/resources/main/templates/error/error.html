@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Error</title>
+  <style>
+      .error-container {
+          text-align: center;
+          padding: 50px;
+          margin-top: 50px;
+      }
+      .error-code {
+          font-size: 72px;
+          color: #dc3545;
+          margin-bottom: 20px;
+      }
+      .error-message {
+          font-size: 24px;
+          color: #6c757d;
+          margin-bottom: 30px;
+      }
+      .back-button {
+          padding: 10px 20px;
+          background-color: #007bff;
+          color: white;
+          border: none;
+          border-radius: 5px;
+          text-decoration: none;
+          transition: background-color 0.3s;
+          display: inline-block;
+      }
+      .back-button:hover {
+          background-color: #0056b3;
+          color: white;
+          text-decoration: none;
+      }
+      .error-details {
+          margin: 20px 0;
+          padding: 10px;
+          background-color: #f8f9fa;
+          border-radius: 4px;
+          font-size: 16px;
+          color: #6c757d;
+      }
+  </style>
+</head>
+<body>
+<div class="error-container">
+  <div class="error-code">
+    <span th:text="${status != null ? status : '오류'}">500</span>
+  </div>
+  <div class="error-message">
+        <span th:text="${error != null ? error : '서버 오류가 발생했습니다.'}">
+            Internal Server Error
+        </span>
+  </div>
+  <div class="error-details" th:if="${message != null}">
+    <span th:text="${message}">Error Details</span>
+  </div>
+  <div style="margin-top: 30px;">
+    <a href="javascript:history.back()" class="back-button">이전 페이지로 돌아가기</a>
+    <a href="/" class="back-button" style="margin-left: 10px;">홈으로 가기</a>
+  </div>
+</div>
+</body>
+</html>

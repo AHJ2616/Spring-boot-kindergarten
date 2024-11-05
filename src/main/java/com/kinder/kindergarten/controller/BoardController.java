@@ -3,8 +3,11 @@ package com.kinder.kindergarten.controller;
 import com.kinder.kindergarten.DTO.board.BoardDTO;
 import com.kinder.kindergarten.DTO.board.BoardFileDTO;
 import com.kinder.kindergarten.DTO.board.BoardFormDTO;
+import com.kinder.kindergarten.DTO.board.CommentsDTO;
+import com.kinder.kindergarten.constant.BoardType;
 import com.kinder.kindergarten.repository.QueryDSL;
 import com.kinder.kindergarten.service.board.BoardService;
+import com.kinder.kindergarten.service.board.CommentsService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,12 +26,17 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 
@@ -39,36 +47,31 @@ import java.util.Map;
 public class BoardController {
 
   private final BoardService boardService;
+
+  private final CommentsService commentsService;
   private final QueryDSL queryDSL;
 
-  @GetMapping(value="/basic")
-  public String getBasicBoard(@RequestParam(required = false, defaultValue = "1", value = "page")int pageNum,
-                              Model model) {
-    pageNum = pageNum == 0 ? 0 : (pageNum - 1);
-    Pageable pageable = PageRequest.of(pageNum, 10); // 한 페이지당 10개의 게시글
+  @GetMapping(value="/list/{type}")
+  public String getBoardsByType(@PathVariable String type,
+                                @RequestParam(required = false, defaultValue = "1", value = "page") int pageNum,
+                                Model model) {
+    try {
+      BoardType boardType = BoardType.valueOf(type.toUpperCase(Locale.ROOT));
+      pageNum = pageNum == 0 ? 0 : (pageNum - 1);
+      Pageable pageable = PageRequest.of(pageNum, 10); // 한 페이지당 10개의 게시글
 
-    Page<BoardDTO> boardDtoPage = boardService.getCommonBoards(pageable);
+      Page<BoardDTO> boardDtoPage = boardService.getBoardsByType(boardType, pageable);
 
-    model.addAttribute("boards", boardDtoPage);
-    model.addAttribute("currentPage", pageNum);
-    model.addAttribute("totalPages", boardDtoPage.getTotalPages());
+      model.addAttribute("boards", boardDtoPage);
+      model.addAttribute("currentPage", pageNum);
+      model.addAttribute("totalPages", boardDtoPage.getTotalPages());
+      // 처리 로직
+    } catch (IllegalArgumentException e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid board type");
+    }
+
 
     return "board/basic";
-  }
-
-  @GetMapping(value="/diary")
-  public String getDiaryList(@RequestParam(required = false, defaultValue = "1", value = "page")int pageNum,
-                              Model model) {
-    pageNum = pageNum == 0 ? 0 : (pageNum - 1);
-    Pageable pageable = PageRequest.of(pageNum, 10); // 한 페이지당 10개의 게시글
-
-    Page<BoardDTO> boardDtoPage = boardService.getDiaryBoards(pageable);
-
-    model.addAttribute("boards", boardDtoPage);
-    model.addAttribute("currentPage", pageNum);
-    model.addAttribute("totalPages", boardDtoPage.getTotalPages());
-
-    return "board/diary";
   }
 
   @GetMapping(value="/write")
@@ -104,10 +107,10 @@ public class BoardController {
 
       // 게시판 타입에 따른 리다이렉트 URL 설정
       String redirectUrl = switch(boardFormDTO.getBoardType()) {
-        case COMMON -> "/board/basic";
-        case DIARY -> "/board/diary";
-        case RESEARCH -> "/board/research";
-        case NOTIFICATION -> "/board/notification";
+        case COMMON -> "/board/list/common";
+        case DIARY -> "/board/list/diary";
+        case RESEARCH -> "/board/list/research";
+        case NOTIFICATION -> "/board/list/notification";
       };
 
       Map<String, Object> response = new HashMap<>();
@@ -128,7 +131,10 @@ public class BoardController {
     queryDSL.increaseViews(board_id,request);//조회수 1 증가시키기
     BoardDTO boardDTO = boardService.getBoard(board_id);
     log.info("BoardService.getBoard() 실행 : " + boardDTO);
+    List<CommentsDTO> comments = commentsService.getCommentsByBoardId(board_id);
+
     model.addAttribute("boardDTO", boardDTO);
+    model.addAttribute("comments", comments);
     return "board/get";
   }
 
@@ -141,17 +147,23 @@ public class BoardController {
       Resource resource = new UrlResource(filePath.toUri());
 
       if (resource.exists() || resource.isReadable()) {
+        // UTF-8로 파일명 인코딩
+        String encodedFileName = URLEncoder.encode(fileDTO.getOrignalName(), StandardCharsets.UTF_8.toString())
+                .replaceAll("\\+", "%20");  // 공백 문자 처리
+
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=\"" + fileDTO.getOrignalName() + "\"")
+                        "attachment; filename=\"" + encodedFileName + "\"")
+                .header(HttpHeaders.CONTENT_TYPE, "application/octet-stream; charset=UTF-8")
                 .body(resource);
       } else {
         throw new RuntimeException("파일을 찾을 수 없습니다.");
       }
-    } catch (MalformedURLException e) {
+    } catch (MalformedURLException | UnsupportedEncodingException e) {
       throw new RuntimeException("파일 다운로드 중 오류가 발생했습니다.", e);
     }
   }
+
 
   @GetMapping(value="/modify/{boardId}")
   public String modifyBoard(@PathVariable String boardId, Model model) {

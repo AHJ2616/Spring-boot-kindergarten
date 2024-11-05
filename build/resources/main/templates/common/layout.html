@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+  <meta charset="UTF-8">
+  <!--Pico CSS 적용하기-->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+  <link rel="stylesheet" th:href="@{/css/header.css}">
+  <!--폰트 추가 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <script th:src="@{/js/header.js}" defer></script>
+</head>
+<body>
+<div th:replace="~{common/header :: header}"></div>
+
+<main layout:fragment="content"></main>
+
+<div th:replace="~{common/footer :: footer}"></div>
+</body>
+</html>

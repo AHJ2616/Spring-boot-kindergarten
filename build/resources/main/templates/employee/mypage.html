@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Mypage</title>
+</head>
+<body>
+<div class="container">
+    <h2>내 정보</h2>
+    <div class="button-section">
+        <p>테스트 화면</p>
+        <a th:href="@{/employee/new}" class="btn">직원등록(완료)</a>
+        <a th:href="@{/employee/edit/{id}(id=${employeeDTO.id})}" class="btn">정보 수정(완료)</a>
+        <a th:href="@{/attendance/my-records}" class="btn">근태 기록(완료)</a>
+        <a th:href="@{/leave/my-leaves}" class="btn">휴가 현황(개발중)</a>
+        <a th:href="@{/certificate/my-certificates}" class="btn">자격증 관리(개발중)</a>
+        <a th:href="@{/education/history}" class="btn">교육이력(개발중)</a>
+    </div>
+    <div class="info-section">
+        <p>사번: <span th:text="${employeeDTO.cleanup}"></span></p>
+        <p>이름: <span th:text="${employeeDTO.name}"></span></p>
+        <p>이메일: <span th:text="${employeeDTO.email}"></span></p>
+        <p>전화번호: <span th:text="${employeeDTO.phone}"></span></p>
+        <p>직위: <span th:text="${employeeDTO.position}"></span></p>
+        <p>부서: <span th:text="${employeeDTO.department}"></span></p>
+        <p>상태: <span th:text="${employeeDTO.status}"></span></p>
+        <p>입사일: <span th:text="${employeeDTO.hireDate}"></span></p>
+    </div>
+    <h3>근태현황</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>날짜</th>
+            <th>출근시간</th>
+            <th>퇴근시간</th>
+            <th>상태</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="record : ${records}">
+            <td th:text="${record.at_date}"></td>
+            <td th:text="${record.at_checkIn}"></td>
+            <td th:text="${record.at_checkOut}"></td>
+            <td th:text="${record.at_status}"></td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="attendance-buttons"><!--나중에 메인페이지로 이동-->
+        <button onclick="checkIn()">출근</button>
+        <button onclick="checkOut()">퇴근</button>
+    </div>
+    <h2>내 휴가 현황</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>시작일</th>
+            <th>종료일</th>
+            <th>유형</th>
+            <th>상태</th>
+            <th>사용휴가</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="leave : ${leaves}">
+            <td th:text="${leave.le_start}"></td>
+            <td th:text="${leave.le_end}"></td>
+            <td th:text="${leave.le_type}"></td>
+            <td th:text="${leave.le_status}"></td>
+            <td th:text="${leave.le_total}"></td>
+        </tr>
+        </tbody>
+    </table>
+    <a th:href="@{/leave/request}" class="btn">휴가 신청</a>
+</div>
+</div>
+<script src="/Employee/Attendance.js"></script>
+</body>
+</html>

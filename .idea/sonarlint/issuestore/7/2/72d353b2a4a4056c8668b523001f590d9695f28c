@@ -1,0 +1,10 @@
+
+t	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(™äÁ–üÿÿÿÿ
+r	java:S116"XRename this field "material_name" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ªº¾ßùÿÿÿÿ
+t	java:S116"ZRename this field "material_detail" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(„‚ƒäüÿÿÿÿ
+v	java:S116"\Rename this field "material_category" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÅƒšÒúÿÿÿÿ
+s	java:S116"YRename this field "material_price" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Æàê­úÿÿÿÿ
+p	java:S116"VRename this field "material_ea" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(çéë³øÿÿÿÿ
+o	java:S116"ZRename this field "material_remark" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(®ð˜Ú
+o	java:S116"ZRename this field "material_status" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÖÎ‹í
+p	java:S116"[Rename this field "material_regdate" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÇÉÊ£

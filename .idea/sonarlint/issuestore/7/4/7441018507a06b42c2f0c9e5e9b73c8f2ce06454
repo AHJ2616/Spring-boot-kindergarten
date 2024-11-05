@@ -1,0 +1,7 @@
+
+o	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(²Ê™œ
+j	java:S116"PRename this field "ed_id" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(šŠ¢¹ùÿÿÿÿ
+g	java:S116"RRename this field "ed_name" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(õ«óß
+m	java:S116"SRename this field "ed_start" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ªœßéûÿÿÿÿ
+k	java:S116"QRename this field "ed_end" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(´ºí‰ýÿÿÿÿ
+s	java:S116"YRename this field "ed_certificate" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(¸­ªðüÿÿÿÿ

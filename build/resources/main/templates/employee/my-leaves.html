@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>내 휴가 현황</title>
+</head>
+<body>
+<div class="container">
+  <h2>내 휴가 현황</h2>
+  <table>
+    <thead>
+    <tr>
+      <th>시작일</th>
+      <th>종료일</th>
+      <th>유형</th>
+      <th>상태</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="leave : ${leaves}">
+      <td th:text="${leave.le_start}"></td>
+      <td th:text="${leave.le_end}"></td>
+      <td th:text="${leave.le_type}"></td>
+      <td th:text="${leave.le_status}"></td>
+    </tr>
+    </tbody>
+  </table>
+  <a th:href="@{/leave/request}" class="btn">휴가 신청</a>
+</div>
+</body>
+</html>
