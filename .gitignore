@@ -11,7 +11,7 @@
 .mtj.tmp/
 
 # Gradle 및 빌드 파일 제외
-.gradle/
+*.gradle/
 build/
 
 # Package Files #
