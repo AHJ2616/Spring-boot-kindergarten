@@ -25,8 +25,7 @@ public class CommentsEntity extends TimeEntity {
   @JoinColumn(name="board_id")
   private BoardEntity boardId;
 
-  @Column(nullable = false,length = 500)
-  @Lob
+  @Column(nullable = false)
   private String contents;
 
 }

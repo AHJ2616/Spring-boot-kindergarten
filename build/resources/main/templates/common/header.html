@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<!-- Header -->
+<header th:fragment="header" class="container">
+  <nav>
+    <h1>어린이집</h1>
+    <ul>
+      <li>
+        <a href="/">Home</a>
+      </li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">게시판</a>
+        <ul class="dropdown-menu">
+          <li><a href="/board/list/common">자유게시판</a></li>
+          <li><a href="/board/list/notification">공지게시판</a></li>
+          <li><a href="/board/list/diary">성장일기</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle">관리자</a>
+        <ul class="dropdown-menu">
+          <li><a href="/material/materials">자재게시판</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="/calendar">캘린더</a>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+</html>

@@ -1,0 +1,7 @@
+
+g	java:S1123"FDefine and throw a dedicated exception instead of using a generic one.(ÝÈ±ýþÿÿÿÿ8Ÿ»Þ²¯2
+b	java:S112>"FDefine and throw a dedicated exception instead of using a generic one.(ª”ì¯8 »Þ²¯2
+o
+java:S6204+"RReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()'(ª™¨¹8¬¾º³¯2
+V
+java:S1128"4Remove this unused import 'java.time.LocalDateTime'.(æÃ§ƒüÿÿÿÿ8±¾º³¯2

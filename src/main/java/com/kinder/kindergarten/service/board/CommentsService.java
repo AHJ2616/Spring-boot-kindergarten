@@ -1,27 +1,50 @@
 package com.kinder.kindergarten.service.board;
 
+import com.github.f4b6a3.ulid.Ulid;
+import com.github.f4b6a3.ulid.UlidCreator;
 import com.kinder.kindergarten.DTO.board.CommentsDTO;
 import com.kinder.kindergarten.entity.board.BoardEntity;
 import com.kinder.kindergarten.entity.board.CommentsEntity;
 import com.kinder.kindergarten.repository.board.BoardRepository;
 import com.kinder.kindergarten.repository.board.CommentsRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.PropertyMap;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Log4j2
 public class CommentsService {
   private final CommentsRepository commentsRepository;
   private final BoardRepository boardRepository;
 
   private final ModelMapper modelMapper;
+
+  @PostConstruct
+  private void configureModelMapper() {
+    modelMapper.addMappings(new PropertyMap<CommentsEntity, CommentsDTO>() {
+      @Override
+      protected void configure() {
+        map().setBoardId(source.getBoardId().getBoardId());
+      }
+    });
+
+    modelMapper.addMappings(new PropertyMap<CommentsDTO, CommentsEntity>() {
+      @Override
+      protected void configure() {
+        skip(destination.getBoardId());
+      }
+    });
+  }
+
 
   public CommentsDTO createComment(CommentsDTO commentsDTO, String writer) {
     BoardEntity board = boardRepository.findById(commentsDTO.getBoardId())
@@ -31,6 +54,9 @@ public class CommentsService {
     comment.setBoardId(board);
     comment.setWriter(writer);
     comment.setContents(commentsDTO.getContents());
+    Ulid ulid = UlidCreator.getUlid();
+    comment.setCommentsId(ulid.toString());
+    //comment의 PK 할당
 
     CommentsEntity savedComment = commentsRepository.save(comment);
     return convertToDTO(savedComment);

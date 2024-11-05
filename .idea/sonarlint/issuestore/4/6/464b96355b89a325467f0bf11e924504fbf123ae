@@ -1,0 +1,12 @@
+
+r	java:S117!"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(‹ÈÛÉıÿÿÿÿ8şÕƒ®2
+r	java:S117!"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(‹ÈÛÉıÿÿÿÿ8şÕƒ®2
+r	java:S117!"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(‹ÈÛÉıÿÿÿÿ8şÕƒ®2
+|	java:S116"[Rename this field "material_imgName" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(‘¯õÜùÿÿÿÿ8”şÕƒ®2
+	java:S116"^Rename this field "material_orgImgName" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ò•Üşúÿÿÿÿ8”şÕƒ®2
+v	java:S116"ZRename this field "material_ImgUrl" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ù²ØÅ8”şÕƒ®2
+x	java:S116"\Rename this field "material_repimgYn" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(õüõª8”şÕƒ®2
+e
+java:S1128"HRemove this unused import 'com.kinder.kindergarten.DTO.MaterialFormDTO'.(Õ¸Ñƒ8¤œÖƒ®2
+w
+java:S1128"URemove this unused import 'org.springframework.transaction.annotation.Transactional'.(ğùçøùÿÿÿÿ8§Ïİƒ®2

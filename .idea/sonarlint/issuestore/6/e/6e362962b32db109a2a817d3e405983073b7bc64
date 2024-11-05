@@ -1,0 +1,6 @@
+
+o	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(²Κ™
+e	java:S116"PRename this field "ce_id" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ζάς
+g	java:S116"RRename this field "ce_name" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ύλ°
+n	java:S116"TRename this field "ce_issued" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(η…ώΊϊÿÿÿÿ
+m	java:S116"SRename this field "ce_expri" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(εµ™ώÿÿÿÿ
