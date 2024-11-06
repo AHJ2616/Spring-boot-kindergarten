@@ -7,6 +7,7 @@ import lombok.ToString;
 
 import java.time.LocalDateTime;
 
+
 @Entity
 @Table(name="schedule")
 @Getter @Setter
@@ -14,21 +15,17 @@ import java.time.LocalDateTime;
 public class ScheduleEntity {
 
   @Id
-  @Column(name="schedule_id")
-  private String scheduleId;
+  private String id;
 
-  @Column(nullable = false)
-  private String scheduleTitle;
+  private String title;
+  private String description;
+  private LocalDateTime start;
+  private LocalDateTime end;
+  private String type;
+  private String backgroundColor;
 
-  @Column(nullable = false)
-  private String scheduleContent;
+  private String textColor;
 
-  @Column(nullable = false)
-  private String location;
-
-  @Column
-  private String start;
-
-  @Column
-  private String end;         // schedule_time (종료)
+  private boolean allDay;
+  private String username;
 }

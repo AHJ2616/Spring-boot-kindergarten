@@ -27,6 +27,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
     // Summernote 이미지 경로 추가
     registry.addResourceHandler("/images/summernote/**")
             .addResourceLocations(uploadPath2 + "summernote/");
+    
+      // No static resource css/bootstrap.min.css.map 오류 해결
+    registry.addResourceHandler("/static/**")
+            .addResourceLocations("classpath:/static/");
 
   }
 }

@@ -1,20 +1,23 @@
-.container{
+.header-container{
     display: grid;
     height: 80px;
     background: beige;
     padding-bottom: 20px;
     border-bottom: black 1px solid;
 }
-.container a:link{
+.header-container a:link{
     color: black;
 }
-.container a:visited{
+.header-container a:visited{
     color: black;
 }
 
-.container a:hover{
+.header-container a:hover{
     color: cornflowerblue;
     text-decoration-line: none;
+}
+.header-container nav{
+    display: flex;
 }
 
 /* 드롭다운 메뉴 스타일링 */

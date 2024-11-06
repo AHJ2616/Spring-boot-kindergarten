@@ -1,79 +1,153 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       layout:decorate="~{common/layout}">
 <head>
   <meta charset="UTF-8">
-  <title>유치원 일정표</title>
-  <link href='/css/calendar.css' rel='stylesheet' />
-  <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.css' rel='stylesheet' />
-  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.js'></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <!--캘린더 JS 수정-->
-  <script src="/js/calendar.js"></script>
+  <meta name="_csrf" content="${_csrf.token}">
+  <meta name="_csrf_header" content="${_csrf.headerName}">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>메인페이지</title>
+
+<link rel="stylesheet" href="vendor/css/fullcalendar.min.css" />
+<link rel="stylesheet" href="vendor/css/bootstrap.min.css">
+<link rel="stylesheet" href='vendor/css/select2.min.css' />
+<link rel="stylesheet" href='vendor/css/bootstrap-datetimepicker.min.css' />
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,500,600">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="css/calendar.css">
+
+
 </head>
+
 <body>
 <div layout:fragment="content">
-<input type="hidden" id="isAdmin" th:value="${#authorization.expression('hasRole(''ADMIN'')')}"/>
-<input type="hidden" id="currentEventId"/>
-
-<div id='calendar'></div>
-
-<!-- 일정 입력/수정 모달 -->
-<div id="scheduleModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h2 style="display: inline-block; margin: 0;">일정 관리</h2>
-      <span class="close">&times;</span>
-    </div>
-    <form id="scheduleForm" th:action="@{/event/add}">
-      <input type="hidden" id="scheduleId">
-      <div class="form-group">
-        <label for="scheduleTitle">제목:</label>
-        <input type="text" id="scheduleTitle" required>
-      </div>
-      <div class="form-group">
-        <label for="scheduleContent">내용:</label>
-        <textarea id="scheduleContent" required></textarea>
-      </div>
-      <div class="form-group">
-        <label for="location">장소:</label>
-        <input type="text" id="location" required>
-      </div>
-      <div class="form-group">
-        <label for="start">시작일시:</label>
-        <input type="datetime-local" id="start" required>
-      </div>
-      <div class="form-group">
-        <label for="end">종료일시:</label>
-        <input type="datetime-local" id="end" required>
-      </div>
-      <button type="submit" class="btn btn-primary">저장</button>
-    </form>
+<div class="container">
+  <input type="hidden" id="currentEventId"/>
+  <!-- 일자 클릭시 메뉴오픈 -->
+  <div id="contextMenu" class="dropdown clearfix">
+    <ul class="dropdown-menu dropNewEvent" role="menu" aria-labelledby="dropdownMenu"
+        style="display:block;position:static;margin-bottom:5px;">
+      <li><a tabindex="-1" href="#">카테고리1</a></li>
+      <li><a tabindex="-1" href="#">카테고리2</a></li>
+      <li><a tabindex="-1" href="#">카테고리3</a></li>
+      <li><a tabindex="-1" href="#">카테고리4</a></li>
+      <li class="divider"></li>
+      <li><a tabindex="-1" href="#" data-role="close">Close</a></li>
+    </ul>
   </div>
-</div>
 
-<!-- 일정 상세보기 모달 -->
-<div id="viewModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h2 style="display: inline-block; margin: 0;">일정 상세보기</h2>
-      <span class="close">&times;</span>
-    </div>
-    <div id="eventDetails">
-      <p><strong>제목: </strong><span id="viewTitle"></span></p>
-      <p><strong>내용: </strong><span id="viewContent"></span></p>
-      <p><strong>장소: </strong><span id="viewLocation"></span></p>
-      <p><strong>시작: </strong><span id="viewStart"></span></p>
-      <p><strong>종료: </strong><span id="viewEnd"></span></p>
-    </div>
-    <div sec:authorize="hasRole('ADMIN')" class="admin-buttons">
-      <button id="editEvent" class="btn btn-warning">수정</button>
-      <button id="deleteEvent" class="btn btn-danger">삭제</button>
-    </div>
+  <div id="wrapper">
+    <div id="loading"></div>
+    <div id="calendar"></div>
   </div>
+
+
+  <!-- 일정 추가 MODAL -->
+  <div class="modal fade" tabindex="-1" role="dialog" id="eventModal">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                  aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title"></h4>
+        </div>
+        <div class="modal-body">
+
+          <div class="row">
+            <div class="col-xs-12">
+              <label class="col-xs-4" for="edit-allDay">하루종일</label>
+              <input class='allDayNewEvent' id="edit-allDay" type="checkbox"></label>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-xs-12">
+              <label class="col-xs-4" for="edit-title">일정명</label>
+              <input class="inputModal" type="text" name="edit-title" id="edit-title"
+                     required="required" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xs-12">
+              <label class="col-xs-4" for="edit-start">시작</label>
+              <input class="inputModal" type="text" name="edit-start" id="edit-start" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xs-12">
+              <label class="col-xs-4" for="edit-end">끝</label>
+              <input class="inputModal" type="text" name="edit-end" id="edit-end" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xs-12">
+              <label class="col-xs-4" for="edit-type">구분</label>
+              <select class="inputModal" type="text" name="edit-type" id="edit-type">
+                <option value="카테고리1">카테고리1</option>
+                <option value="카테고리2">카테고리2</option>
+                <option value="카테고리3">카테고리3</option>
+                <option value="카테고리4">카테고리4</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xs-12">
+              <label class="col-xs-4" for="edit-color">색상</label>
+              <select class="inputModal" name="color" id="edit-color">
+                <option value="#D25565" style="color:#D25565;">빨간색</option>
+                <option value="#9775fa" style="color:#9775fa;">보라색</option>
+                <option value="#ffa94d" style="color:#ffa94d;">주황색</option>
+                <option value="#74c0fc" style="color:#74c0fc;">파란색</option>
+                <option value="#f06595" style="color:#f06595;">핑크색</option>
+                <option value="#63e6be" style="color:#63e6be;">연두색</option>
+                <option value="#a9e34b" style="color:#a9e34b;">초록색</option>
+                <option value="#4d638c" style="color:#4d638c;">남색</option>
+                <option value="#495057" style="color:#495057;">검정색</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xs-12">
+              <label class="col-xs-4" for="edit-desc">설명</label>
+              <textarea rows="4" cols="50" class="inputModal" name="edit-desc"
+                        id="edit-desc"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer modalBtnContainer-addEvent">
+          <button type="button" class="btn btn-default" data-dismiss="modal">취소</button>
+          <button type="button" class="btn btn-primary" id="save-event">저장</button>
+        </div>
+        <div class="modal-footer modalBtnContainer-modifyEvent">
+          <button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
+          <button type="button" class="btn btn-danger" id="deleteEvent">삭제</button>
+          <button type="button" class="btn btn-primary" id="updateEvent">저장</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+
 </div>
+<!-- /.container -->
+
+<script src="vendor/js/jquery.min.js"></script>
+<script src="vendor/js/bootstrap.min.js"></script>
+<script src="vendor/js/moment.min.js"></script>
+<script src="vendor/js/fullcalendar.min.js"></script>
+<script src="vendor/js/ko.js"></script>
+<script src="vendor/js/select2.min.js"></script>
+<script src="vendor/js/bootstrap-datetimepicker.min.js"></script>
+<script src="js/calendar/main.js"></script>
+<script src="js/calendar/addEvent.js"></script>
+<script src="js/calendar/editEvent.js"></script>
+<script src="js/calendar/etcSetting.js"></script>
+  <script>
+      const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute("content");
+      const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute("content");
+  </script>
 </div>
 </body>
+
 </html>

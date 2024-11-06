@@ -19,6 +19,9 @@ public class FileService {
   @Value("${uploadPath1}")
   private String uploadPath;
 
+  @Value("${uploadPathMoney1}")
+  private String uploadPathMoney;
+
   public String getUploadPath() {
     return uploadPath;
   }
@@ -44,6 +47,10 @@ public class FileService {
 
   public String getFullPath(String filename) {
     return uploadPath + filename;
+  }
+
+  public String getFullPathMoney(String filename){
+    return uploadPathMoney + filename;
   }
 
   // 디렉토리 생성
