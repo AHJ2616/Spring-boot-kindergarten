@@ -3,36 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <title>교육이력</title>
+  <style>
+    .education-item {
+      margin-bottom: 20px;
+      padding: 15px;
+      border: 1px solid #ddd;
+    }
+  </style>
 </head>
 <body>
 <div class="container">
   <h2>교육이력</h2>
   <a th:href="@{/education/record}" class="btn">교육이력 등록</a>
-  <table>
-    <thead>
-    <tr>
-      <th>교육명</th>
-      <th>시작일</th>
-      <th>종료일</th>
-      <th>수료증</th>
-      <th>관리</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="edu : ${history}">
-      <td th:text="${edu.ed_name}"></td>
-      <td th:text="${edu.ed_start}"></td>
-      <td th:text="${edu.ed_end}"></td>
-      <td th:text="${edu.ed_certificate}"></td>
-      <td>
-        <a th:if="${edu.ed_certificate == '있음'}"
-           th:href="@{/education/certificate/{id}(id=${edu.ed_id})}">수료증 보기</a>
-        <a th:href="@{/education/delete/{id}(id=${edu.ed_id})}"
-           onclick="return confirm('삭제하시겠습니까?')">삭제</a>
-      </td>
-    </tr>
-    </tbody>
-  </table>
+
+  <div th:each="education : ${history}" class="education-item">
+    <h3 th:text="${education.ed_name}"></h3>
+    <p>교육기간: <span th:text="${education.ed_start}"></span> ~ <span th:text="${education.ed_end}"></span></p>
+
+    <div th:if="${education.ed_certificate != null}" class="pdf-preview">
+      <a th:href="@{'/education/download/' + ${education.ed_id}}"
+         class="btn btn-primary" target="_blank">
+        미리보기
+      </a>
+      <a></a>
+    </div>
+  </div>
 </div>
+<script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
+<script src="/js/Employee/history.js"></script>
 </body>
 </html>

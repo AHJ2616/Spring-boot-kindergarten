@@ -1,34 +1,71 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-
-<!-- Header -->
-<header th:fragment="header" class="header-container">
-  <nav>
-    <h1>어린이집</h1>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<header th:fragment="header">
+  <!-- 사이드바 메뉴 -->
+  <nav class="sidebar-navigation">
     <ul>
-      <li>
-        <a href="/">Home</a>
-      </li>
-      <li class="dropdown">
-        <a href="#" class="dropdown-toggle">게시판</a>
-        <ul class="dropdown-menu">
-          <li><a href="/board/list/common">자유게시판</a></li>
-          <li><a href="/board/list/notification">공지게시판</a></li>
-          <li><a href="/board/list/diary">성장일기</a></li>
-        </ul>
-      </li>
-      <li class="dropdown">
-        <a href="#" class="dropdown-toggle">관리자</a>
-        <ul class="dropdown-menu">
-          <li><a href="/material/materials">자재게시판</a></li>
-          <li><a href="/money/moneys">지출게시판</a></li>
-        </ul>
+      <!-- 공통 메뉴-->
+      <li class="active">
+        <a th:href="@{/admin/dashboard}">
+          <i class="fa-solid fa-house" style="color: white;"></i></a>
+        <span class="tooltip">Home</span>
       </li>
       <li>
-        <a href="/calendar">캘린더</a>
+        <a th:href="@{/employee/new}">
+          <i class="fa-solid fa-pen-to-square" style="color: white;"></i></a>
+        <span class="tooltip">전자결제(개발중)</span>
+      </li>
+      <li>
+        <a th:href="@{/employee/mypage/{id}(id=${#authentication.principal.employee.id})}">
+          <i class="fa-solid fa-user" style="color: white;"></i></a>
+        <span class="tooltip">마이페이지</span>
+      </li>
+
+      <!--어드민만 볼수있는 메뉴-->
+      <li sec:authorize="hasRole('ROLE_ADMIN')">
+        <a th:href="@{/employee/new}">
+          <i class="fa-solid fa-pen" style="color: white;"></i></a>
+        <span class="tooltip">직원등록</span>
+      </li>
+      <li sec:authorize="hasRole('ROLE_ADMIN')">
+        <a th:href="@{/employee/new}">
+          <i class="fa-solid fa-user-group" style="color: white;"></i></a>
+        <span class="tooltip">직원리스트</span>
+      </li>
+
+      <!--교사만 볼수있는 메뉴-->
+      <li sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')">
+        <a th:href="@{/teacher/dashboard}">
+          <i class="fa-solid fa-marker" style="color: white;"></i></a>
+        <span class="tooltip">원아/학부모등록</span>
+      </li>
+      <li sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')">
+        <a th:href="@{/manager/dashboard}">
+          <i class="fa-solid fa-user-gear" style="color: white;"></i></a>
+        <span class="tooltip">원아관리</span>
+      </li>
+      <li sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')">
+        <a th:href="@{/employee/new}">
+          <i class="fa-solid fa-landmark" style="color: white;"></i></a>
+        <span class="tooltip">교실관리</span>
+      </li>
+
+      <!--행정직원만 볼수있는 메뉴-->
+      <li sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')">
+        <a th:href="@{/employee/new}">
+          <i class="fa-solid fa-calculator" style="color: white;"></i></a>
+        <span class="tooltip">회계관리</span>
+      </li>
+      <li sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')">
+        <a th:href="@{/employee/new}">
+          <i class="fa-solid fa-industry" style="color: white;"></i></a>
+        <span class="tooltip">자재관리</span>
       </li>
     </ul>
   </nav>
+  <!-- 사이드바 종료-->
 </header>
-
+</body>
 </html>

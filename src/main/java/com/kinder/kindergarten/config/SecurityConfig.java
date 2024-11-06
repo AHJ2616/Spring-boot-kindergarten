@@ -1,6 +1,6 @@
 package com.kinder.kindergarten.config;
 
-import com.kinder.kindergarten.service.Employee.EmployeeService;
+import com.kinder.kindergarten.service.employee.EmployeeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
@@ -19,33 +20,43 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-
+  private final EmployeeService employeeService;
+  private final CustomAuthenticationSuccessHandler successHandler;
   @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    return http
-            .csrf(csrf -> csrf.ignoringRequestMatchers("/calendar","/events/**"))
+  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+    http
+            .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+            // CSRF 보호 활성화 및 쿠키 설정
             .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/css/**", "/js/**", "/img/**").permitAll()
-                    .requestMatchers("/**", "/board/**", "/item/**", "/images/**").permitAll()
-                    .requestMatchers("/admin/**").hasRole("ADMIN")  //관리자 권한 접속 범위 설정
-                    .anyRequest()
-                    .authenticated()
-            ).formLogin(form -> form
-                    .loginPage("/employee/login")
-                    .defaultSuccessUrl("/")
-                    .usernameParameter("email")
-                    .failureUrl("/parents/login/error")
-                    .failureHandler(new CustomAuthenticationFailureHandler())
-            ).logout( logout -> logout
-                    .logoutRequestMatcher(new AntPathRequestMatcher("/employee/logout"))
-                    .logoutSuccessUrl("/")
+                    // css,js,image 파일 접근 허용
+                    .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
+                    // 로그인페이지 허용
+                    .requestMatchers("/main/login").permitAll()
 
+                    // 본인 작업 경로 적어주시면 됩니다.
+                    .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자만 /admin/** 경로 접근 가능
+                    .requestMatchers("/manager/**").hasRole("MANAGER") // 매니저만 /manager/** 경로 접근 가능
+                    .requestMatchers("/teacher/**").hasRole("USER") // 사용자만 /teacher/** 경로 접근 가능
+                    .requestMatchers("/employee/**").hasAnyRole("ADMIN", "MANAGER", "USER") // 직원은 모든 역할 접근 가능
+                    .requestMatchers("/parent/**").hasRole("Parent")
+                    .anyRequest().authenticated()
             )
-            .build()
-            ;
+            .formLogin(form -> form
+                    .loginPage("/main/login") // 로그인 페이지
+                    .successHandler(successHandler) // 커스텀 로그인 성공 핸들러 설정
+                    .usernameParameter("email")   // 로그인 키 값
+                    .failureUrl("/login/error") // 로그인 실패시 URL
+                    .permitAll()
+            )
+            .logout(logout -> logout
+                    .logoutRequestMatcher(new AntPathRequestMatcher("/main/logout")) // 로그아웃 경로
+                    .logoutSuccessUrl("/main/login")      // 로그아웃 성공시 URL
+                    .invalidateHttpSession(true)
+            );
+
+    return http.build();
   }
 
-  private final EmployeeService employeeService;
   @Bean
   public AuthenticationManager authManager(HttpSecurity http) throws Exception {
     // HttpSecurity 에서 AuthenticationManagerBuilder 를 가져옴
@@ -68,11 +79,8 @@ public class SecurityConfig {
     return provider;
   }
 
-
-
-  @Bean
+  @Bean  // 패스워드를 db에 저장할 때 암호화 처리함.
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
   }
-
 }
