@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>학부모 등록</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h2 class="mb-4">학부모 등록</h2>
+    <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+        <span th:text="${errorMessage}"></span>
+    </div>
+    <form th:action="@{/erp/parent/register}" th:object="${parentErpDTO}" method="post">
+        <div class="form-group">
+            <label>성함:</label>
+            <input type="text" class="form-control" th:field="*{parentName}"/>
+            <span class="text-danger" th:if="${#fields.hasErrors('parentName')}" th:errors="*{parentName}"></span>
+        </div>
+
+        <div class="form-group">
+            <label>이메일:</label>
+            <input type="email" class="form-control" th:field="*{parentEmail}"/>
+            <span class="text-danger" th:if="${#fields.hasErrors('parentEmail')}" th:errors="*{parentEmail}"></span>
+        </div>
+
+        <div class="form-group">
+            <label>연락처:</label>
+            <input type="text" class="form-control" th:field="*{parentPhone}"/>
+            <span class="text-danger" th:if="${#fields.hasErrors('parentPhone')}" th:errors="*{parentPhone}"></span>
+        </div>
+
+        <div class="form-group">
+            <label>주소:</label>
+            <input type="text" class="form-control" th:field="*{parentAddress}"/>
+            <span class="text-danger" th:if="${#fields.hasErrors('parentAddress')}" th:errors="*{parentAddress}"></span>
+        </div>
+
+        <div class="form-group">
+            <label>비상연락처:</label>
+            <input type="text" class="form-control" th:field="*{emergencyContact}"/>
+        </div>
+
+        <div class="form-group">
+            <label>자녀와의 관계:</label>
+            <select class="form-control" th:field="*{parentType}">
+                <option th:each="type : ${T(com.kinder.kindergarten.constant.parent.ParentType).values()}"
+                        th:value="${type}"
+                        th:text="${type.displayName}">
+                </option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">다음 (원아 등록)</button>
+    </form>
+</div>
+</body>
+</html>

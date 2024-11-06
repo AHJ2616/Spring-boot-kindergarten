@@ -1,8 +1,9 @@
-package com.kinder.kindergarten.entity.parent;
+package com.kinder.kindergarten.entity.children;
 
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity // 테이블 담당한다.
@@ -10,9 +11,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@ToString
+@Setter
 @Table(name = "classRoom")
-public class ClassRoom {
+public class ClassRoom extends ChildrenBaseEntity {
 
   // 해당 반의 정보와 담당 교사를 관리하는 엔티티
 
@@ -31,21 +32,31 @@ public class ClassRoom {
 
   private String classRoomDescription; // 반 설명 및 비고
 
+  @OneToMany(mappedBy = "assignedClass")
+  private List<Children> children;  // 반에 배정된 원아들
 
-}
+  @Builder.Default
+  private Integer currentStudents = 0;  // 현재 원아 수
 
-/*
-Hibernate:
+ /* private LocalDate ClassCreatedDate = LocalDate.now(); // 반 등록일
+
+  private LocalDate ClassUpdatedDate; // 마지막 수정일
+
+  */
+
+  /*
+  Hibernate:
     create table class_room (
         class_room_id bigint not null auto_increment,
+        created_date datetime(6),
+        updated_date datetime(6),
         class_room_description varchar(255),
         class_room_name varchar(255) not null,
         employee_name varchar(255) not null,
+        max_children integer not null,
         primary key (class_room_id)
     ) engine=InnoDB
+   */
+}
 
-    11.01 추가 -*
-    Hibernate:
-    alter table if exists class_room
-       add column max_children integer not null
- */
+
