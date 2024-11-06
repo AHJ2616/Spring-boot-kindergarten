@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>회계 상세 페이지</title>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+<body>
+
+<!--jQuery에서 제공하는 3.5.1 버전의 jQuery CDN 호스트-->
+<script src="http://code.jquery.com/jquery-3.5.1.min.js"></script>
+<!-- 아이템 디테일 페이지 -->
+<!-- 사용자 스크립트 추가 -->
+<th:block layout:fragment="script">
+
+</th:block>
+
+<div layout:fragment="content" style="margin-left:25%;margin-right:25%">
+
+  <input type="hidden" id="moneyId" th:value="${moneyFormDTO.moneyId}">
+
+  <div class="d-flex">
+
+    <div class="wd50">
+
+            <span th:switch="${moneyFormDTO.moneyStatus}">
+              <span th:case="${T(com.kinder.kindergarten.constant.money.MoneyStatus).INCOME}" class="badge badge-primary mgb-15">수입</span>
+              <span th:case="${T(com.kinder.kindergarten.constant.money.MoneyStatus).EXPENDITURE}" class="badge btn-danger mgb-15">지출</span>
+              <span th:case="*">상태 미정</span> <!-- 예외 처리 -->
+          </span>
+      <div class="h4" th:text="${moneyFormDTO.moneyName}"></div>
+      <hr class="my-4">
+
+      <div class="text-right">
+        <div class="h4 text-danger text-left">
+          <span th:text="${moneyFormDTO.moneyUseDate}"></span>
+        </div>
+      </div>
+      <hr class="my-4">
+    </div>
+  </div>
+
+  <div class="jumbotron jumbotron-fluid mgt-30">
+    <div class="container">
+      <h4 class="display-5">집행 상세 내역</h4>
+      <hr class="my-4">
+      <p class="lead" th:text="${moneyFormDTO.moneyContent}"></p>
+    </div>
+  </div>
+
+    <div class="file-container" th:if="${moneyFormDTO.MoneyFileList != null and not #lists.isEmpty(moneyFormDTO.MoneyFileList)}">
+        <h3>첨부파일</h3>
+        <div class="file-list">
+            <div th:each="file : ${moneyFormDTO.MoneyFileList}" class="file-item">
+                &lt;!&ndash; 이미지 파일인 경우 미리보기 표시 모두 소문자로 변환 &ndash;&gt;
+                <div th:if="${#strings.toLowerCase(file.orignalName).endsWith('.jpg') or
+                             #strings.toLowerCase(file.orignalName).endsWith('.jpeg') or
+                             #strings.toLowerCase(file.orignalName).endsWith('.png') or
+                             #strings.toLowerCase(file.orignalName).endsWith('.PNG') or
+                             #strings.toLowerCase(file.orignalName).endsWith('.gif')}"
+                     class="image-preview">
+                    <img th:src="@{'/upload/money/' +${file.modifiedName}}", alt="이미지 미리보기">
+
+                </div>
+
+                <a th:href="@{/money/download/{moneyId}(moneyId=${file.fileId})}"
+                   th:text="${file.orignalName}"
+                   class="file-link"></a>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

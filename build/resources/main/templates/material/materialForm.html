@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{common/header}">
+      layout:decorate="~{common/layout}">
 <head>
     <meta charset="UTF-8">
     <title>자재 등록 페이지</title>
 </head>
 <body>
+<div layout:fragment="content">
  <!--jQuery에서 제공하는 3.5.1 버전의 jQuery CDN 호스트-->
 <script src="http://code.jquery.com/jquery-3.5.1.min.js"></script>
 
@@ -69,7 +70,7 @@
         자재 등록
     </p>
 
-    <input type="hidden" th:field="*{id}">
+    <input type="text" th:field="*{id}" readonly>
     <!-- th:field="*{itemName}" -->
     <!--        id="itemName"
                 name="itemName"
@@ -180,6 +181,7 @@
         </div>
     </div>
 
+
     <div th:if="${#strings.isEmpty(materialFormDTO.id)}" style="text-align: center">
         <button th:formaction="@{/material/new}" type="submit" class="btn btn-primary">저장</button>
         <!-- 상품 아이디가 없는 경우 저장           나중에 매칭 경로 변경 필요 2024 10 28-->
@@ -195,6 +197,6 @@
 
 
 
-
+</div>
 </body>
 </html>

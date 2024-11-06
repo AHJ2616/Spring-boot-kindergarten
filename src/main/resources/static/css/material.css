@@ -1,0 +1,111 @@
+.material-table-container {/* 전체 */
+    margin-top: 100px;
+    margin-left: 150px;
+    margin-right: 150px;
+
+}
+
+.search-container { /*검색창*/
+    margin-top: 50px;
+    margin-bottom: 50px;
+
+}
+
+.search-container .form-control { /* 검색 옵션 조절 */
+    font-size: 14px;
+    width: auto;
+    height: 50px;
+}
+
+.search-container .form-control-search { /* 검색 바 조절 */
+    font-size: 14px;
+    width: 1000px;
+    height: 50px;
+}
+
+.search-container .btn-primary { /* 검색 버튼 조절 */
+    font-size: 14px;
+    width: 200px;
+    height: 50px;
+}
+
+.table-material-manage .form-control-delr { /* 삭제 버튼 조절 */
+    font-size: 14px;
+    width: 70px;
+    height: 35px;
+}
+
+.table-material-manage {
+    width: 100%;
+    border-collapse: collapse; /* 셀 간의 테두리를 합침 */
+    font-size: 14px; /* 테이블 전체 폰트 사이즈 */
+}
+
+.table-material-manage thead td {
+    background-color: #f2f2f2; /* 상단 헤더 배경색 */
+    font-weight: bold; /* 헤더 글씨를 굵게 */
+    color: #333; /* 헤더 글씨 색상 */
+    padding: 10px; /* 셀 간격 */
+    text-align: center; /* 가운데 정렬 */
+}
+
+.table-material-manage tbody td {
+    padding: 10px; /* 셀 간격 */
+    border-bottom: 1px solid #ddd; /* 각 행 사이에 구분선 */
+    text-align: center; /* 가운데 정렬 */
+}
+
+.table-material-manage tbody tr:hover {
+    background-color: #f9f9f9; /* 마우스를 올렸을 때 배경색 */
+}
+
+/* 자재 상태 테두리 스타일 */
+.material-status-normal {
+    padding: 5px 10px;
+    border: 1px solid #4CAF50; /* 테두리 추가 */
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.material-status-repair {
+    padding: 5px 10px;
+    border: 1px solid #ffc107; /* 테두리 추가 */
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.material-status-destroy {
+    padding: 5px 10px;
+    border: 1px solid #bd2130; /* 테두리 추가 */
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+/* 페이징 중앙 정렬 */
+.pagination {
+    display: flex;
+    justify-content: center; /* 중앙 정렬 */
+    flex-wrap: wrap;
+    margin: 20px 0;
+}
+
+.pagination .page-item {/*페이징 버튼*/
+    margin: 0 5px; /* Adds space between buttons */
+    list-style-type: none;
+}
+
+.pagination .page-link {
+    padding: 10px 15px; /* Adjusts button size */
+    font-size: 16px;
+    text-decoration-line: none;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white;
+}
+
+.pagination .page-item.disabled .page-link {
+    color: #ccc;
+}

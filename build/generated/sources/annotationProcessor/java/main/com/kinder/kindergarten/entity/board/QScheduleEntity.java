@@ -19,17 +19,25 @@ public class QScheduleEntity extends EntityPathBase<ScheduleEntity> {
 
     public static final QScheduleEntity scheduleEntity = new QScheduleEntity("scheduleEntity");
 
-    public final StringPath end = createString("end");
+    public final BooleanPath allDay = createBoolean("allDay");
 
-    public final StringPath location = createString("location");
+    public final StringPath backgroundColor = createString("backgroundColor");
 
-    public final StringPath scheduleContent = createString("scheduleContent");
+    public final StringPath description = createString("description");
 
-    public final StringPath scheduleId = createString("scheduleId");
+    public final DateTimePath<java.time.LocalDateTime> end = createDateTime("end", java.time.LocalDateTime.class);
 
-    public final StringPath scheduleTitle = createString("scheduleTitle");
+    public final StringPath id = createString("id");
 
-    public final StringPath start = createString("start");
+    public final DateTimePath<java.time.LocalDateTime> start = createDateTime("start", java.time.LocalDateTime.class);
+
+    public final StringPath textColor = createString("textColor");
+
+    public final StringPath title = createString("title");
+
+    public final StringPath type = createString("type");
+
+    public final StringPath username = createString("username");
 
     public QScheduleEntity(String variable) {
         super(ScheduleEntity.class, forVariable(variable));
