@@ -26,7 +26,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/css/**", "/js/**", "/img/**").permitAll()
                     .requestMatchers("/**", "/board/**", "/item/**", "/images/**").permitAll()
-                    .requestMatchers("/admin/**").hasRole("ADMIN")  //관리자 권한 접속 범위 설정
+                    .requestMatchers("/erp/**").hasAnyRole("ADMIN", "MANAGER")  // ERP 접근 권한 추가
+                    .requestMatchers("/admin/**").hasRole("ADMIN")
                     .anyRequest()
                     .authenticated()
             ).formLogin(form -> form
@@ -35,13 +36,12 @@ public class SecurityConfig {
                     .usernameParameter("email")
                     .failureUrl("/parents/login/error")
                     .failureHandler(new CustomAuthenticationFailureHandler())
-            ).logout( logout -> logout
+            ).logout(logout -> logout
                     .logoutRequestMatcher(new AntPathRequestMatcher("/employee/logout"))
                     .logoutSuccessUrl("/")
-
             )
-            .build()
-            ;
+            .csrf(csrf -> csrf.disable())  // CSRF 비활성화 (개발 중에만)
+            .build();
   }
 
   private final EmployeeService employeeService;

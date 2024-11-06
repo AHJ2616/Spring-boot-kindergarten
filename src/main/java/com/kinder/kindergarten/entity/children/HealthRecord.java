@@ -47,4 +47,29 @@ public class HealthRecord {
 
   @Column(length = 255)
   private String healthNotes; // 기타 성장 관련 메모
+
+  /*
+  Hibernate:
+    create table health_record (
+        health_record_id bigint not null auto_increment,
+        health_allergies varchar(255),
+        health_date date not null,
+        health_height float(53),
+        health_meal_status varchar(255),
+        health_medical_history varchar(255),
+        health_notes varchar(255),
+        health_sleep_status varchar(255),
+        health_status varchar(255) not null,
+        health_temperature float(53),
+        health_weight float(53),
+        children_id bigint not null,
+        primary key (health_record_id)
+    ) engine=InnoDB
+
+Hibernate:
+    alter table if exists health_record
+       add constraint FKpalm39r16l7almohxufmw3x4g
+       foreign key (children_id)
+       references children (children_id)
+   */
 }

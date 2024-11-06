@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>원아 등록</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="/js/children/childrenErp.js"></script>
+</head>
+<body>
+<div class="container mt-5">
+  <h2 class="mb-4">원아 등록</h2>
+
+  <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+    <span th:text="${errorMessage}"></span>
+  </div>
+
+  <form th:action="@{/erp/children/register}" method="post">
+    <div id="childrenForms">
+      <div th:each="child, stat : ${childrenList}" class="card mb-4">
+        <div class="card-header">
+          <h5 class="card-title mb-0">자녀 정보 #[[${stat.index + 1}]]</h5>
+        </div>
+        <div class="card-body">
+          <!-- 이름 -->
+          <div class="form-group">
+            <label class="required-label">이름</label>
+            <input type="text" class="form-control"
+                   th:field="${childrenList[__${stat.index}__].childrenName}"
+                   required>
+          </div>
+
+          <div class="form-group">
+            <label class="required-label">생년월일</label>
+            <input type="date" class="form-control"
+                   th:field="${childrenList[__${stat.index}__].childrenBirthDate}"
+                   required>
+          </div>
+
+          <div class="form-group">
+            <label class="required-label">성별</label>
+            <select class="form-control"
+                    th:field="${childrenList[__${stat.index}__].childrenGender}"
+                    required>
+              <option value="">선택하세요</option>
+              <option value="MALE">남자</option>
+              <option value="FEMALE">여자</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>혈액형</label>
+            <select class="form-control" th:field="${childrenList[__${stat.index}__].childrenBloodType}">
+              <option value="">혈액형 선택</option>
+              <option value="A">A형</option>
+              <option value="B">B형</option>
+              <option value="AB">AB형</option>
+              <option value="O">O형</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="required-label">반</label>
+            <select class="form-control"
+                    th:field="${childrenList[__${stat.index}__].classRoomId}"
+                    required>
+              <option value="">선택하세요</option>
+              <option th:each="classroom : ${classRooms}"
+                      th:value="${classroom.id}"
+                      th:text="${classroom.name}">반 이름</option>
+            </select>
+          </div>
+
+    <div class="form-group">
+      <label>알레르기:</label>
+      <textarea class="form-control" th:field="${childrenList[__${stat.index}__].childrenAllergies}"
+      placeholder="알레르기가 있다면 입력해 주시길 바랍니다."></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>병력 정보:</label>
+      <textarea class="form-control" th:field="${childrenList[__${stat.index}__].childrenMedicalHistory}"
+      placeholder="병력 정보가 있다면 입력해 주시길 바랍니다."></textarea>
+    </div>
+
+          <div class="form-group">
+            <label>특이사항</label>
+            <textarea class="form-control"th:field="${childrenList[__${stat.index}__].childrenNotes}"
+                      rows="3"></textarea>
+    </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mb-4">
+    <button type="button" class="btn btn-secondary mb-3" onclick="addChildForm()">자녀 추가</button>
+    </div>
+
+    <input type="hidden" name="parentId" th:value="${parentId}"/>
+
+    <div class="text-center">
+      <button type="submit" class="btn btn-primary">등록</button>
+      <a th:href="@{/erp/parent/list}" class="btn btn-secondary">취소</a>
+    </div>
+  </form>
+
+</div>
+</body>
+</html>

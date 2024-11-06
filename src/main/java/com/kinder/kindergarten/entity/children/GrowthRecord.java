@@ -26,11 +26,29 @@ public class GrowthRecord {
   private Children children;
 
   @Column(nullable = false)
-  private LocalDate growth_date;  // 활동 날짜
+  private LocalDate growthDate;  // 활동 날짜
 
   @Column(nullable = false)
-  private String growth_activity;  // 활동 내용
+  private String growthActivity;  // 활동 내용
 
   @Column(length = 255)
-  private String growth_notes;     // 성장 과정에 대한 추가 메모
+  private String growthNotes;     // 성장 과정에 대한 추가 메모
+
+  /*
+  Hibernate:
+    create table growth_record (
+        growth_id bigint not null auto_increment,
+        growth_activity varchar(255) not null,
+        growth_date date not null,
+        growth_notes varchar(255),
+        children_id bigint not null,
+        primary key (growth_id)
+    ) engine=InnoDB
+
+Hibernate:
+    alter table if exists growth_record
+       add constraint FKnh9gstykweriv1yp73f1hgdk8
+       foreign key (children_id)
+       references children (children_id)
+   */
 }
