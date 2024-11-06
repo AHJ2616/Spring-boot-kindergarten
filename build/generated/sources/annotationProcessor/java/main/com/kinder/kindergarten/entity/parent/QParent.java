@@ -18,25 +18,20 @@ public class QParent extends EntityPathBase<Parent> {
 
     private static final long serialVersionUID = -1873230261L;
 
-    private static final PathInits INITS = PathInits.DIRECT2;
-
     public static final QParent parent = new QParent("parent");
 
-    public final DatePath<java.time.LocalDate> childrenBirthDate = createDate("childrenBirthDate", java.time.LocalDate.class);
+    public final com.kinder.kindergarten.entity.children.QChildrenBaseEntity _super = new com.kinder.kindergarten.entity.children.QChildrenBaseEntity(this);
+
+    public final ListPath<com.kinder.kindergarten.entity.children.Children, com.kinder.kindergarten.entity.children.QChildren> children = this.<com.kinder.kindergarten.entity.children.Children, com.kinder.kindergarten.entity.children.QChildren>createList("children", com.kinder.kindergarten.entity.children.Children.class, com.kinder.kindergarten.entity.children.QChildren.class, PathInits.DIRECT2);
 
     public final StringPath childrenEmergencyPhone = createString("childrenEmergencyPhone");
 
-    public final StringPath childrenName = createString("childrenName");
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> createdDate = _super.createdDate;
 
-    public final StringPath childrenNotes = createString("childrenNotes");
-
-    public final QClassRoom classRoom;
+    public final BooleanPath isErpRegistered = createBoolean("isErpRegistered");
 
     public final StringPath parentAddress = createString("parentAddress");
-
-    public final DatePath<java.time.LocalDate> parentBirthDate = createDate("parentBirthDate", java.time.LocalDate.class);
-
-    public final DatePath<java.time.LocalDate> parentCreateDate = createDate("parentCreateDate", java.time.LocalDate.class);
 
     public final StringPath parentEmail = createString("parentEmail");
 
@@ -48,25 +43,21 @@ public class QParent extends EntityPathBase<Parent> {
 
     public final StringPath parentPhone = createString("parentPhone");
 
+    public final EnumPath<com.kinder.kindergarten.constant.parent.ParentType> parentType = createEnum("parentType", com.kinder.kindergarten.constant.parent.ParentType.class);
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> updatedDate = _super.updatedDate;
+
     public QParent(String variable) {
-        this(Parent.class, forVariable(variable), INITS);
+        super(Parent.class, forVariable(variable));
     }
 
     public QParent(Path<? extends Parent> path) {
-        this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
+        super(path.getType(), path.getMetadata());
     }
 
     public QParent(PathMetadata metadata) {
-        this(metadata, PathInits.getFor(metadata, INITS));
-    }
-
-    public QParent(PathMetadata metadata, PathInits inits) {
-        this(Parent.class, metadata, inits);
-    }
-
-    public QParent(Class<? extends Parent> type, PathMetadata metadata, PathInits inits) {
-        super(type, metadata, inits);
-        this.classRoom = inits.isInitialized("classRoom") ? new QClassRoom(forProperty("classRoom")) : null;
+        super(Parent.class, metadata);
     }
 
 }

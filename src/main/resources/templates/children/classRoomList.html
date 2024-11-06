@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>반 목록</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h2 class="mb-4">반 목록</h2>
+
+    <a th:href="@{/erp/classRoom/register}" class="btn btn-primary mb-3">새 반 등록</a>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>반 이름</th>
+            <th>담임 교사</th>
+            <th>정원</th>
+            <th>반 설명</th>
+            <th>현재 원아 수</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="classRoom : ${classRooms}">
+            <td th:text="${classRoom.classRoomName}"></td>
+            <td th:text="${classRoom.employeeName}"></td>
+            <td th:text="${classRoom.maxChildren}"></td>
+            <td th:text="${classRoom.classRoomDescription}"></td>
+            <td th:text="${classRoom.currentStudents}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div class="container mt-3">
+<div th:if="${classRooms != null and not #lists.isEmpty(classRooms)}">
+    <p>데이터 확인:</p>
+    <div th:each="room : ${classRooms}">
+        <p th:text="${'반 정보: ' + room}"></p>
+    </div>
+</div>
+<div th:if="${classRooms == null or #lists.isEmpty(classRooms)}">
+    <p>등록된 반이 없습니다.</p>
+</div>
+</div>
+</body>
+</html>
