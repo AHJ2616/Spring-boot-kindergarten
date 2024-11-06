@@ -4,12 +4,71 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{common/layout}">
 <head>
+    <link rel="stylesheet" href="/css/employee/manager.css">
     <meta charset="UTF-8">
     <title>행정직원</title>
 </head>
 <body>
 <div layout:fragment="content">
-    <h2>행정직원 대시보드</h2>
+    <div class="dashboard-container">
+        <!-- 통계 카드 섹션 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>이번달 예산</h3>
+                <div class="number">￦15,000,000</div>
+            </div>
+            <div class="stat-card">
+                <h3>지출 현황</h3>
+                <div class="number">￦8,500,000</div>
+            </div>
+            <div class="stat-card">
+                <h3>미처리 구매요청</h3>
+                <div class="number">5건</div>
+            </div>
+            <div class="stat-card">
+                <h3>재고 부족 항목</h3>
+                <div class="number">3건</div>
+            </div>
+        </div>
+
+        <!-- 재무 현황 섹션 -->
+        <div class="finance-section">
+            <div class="finance-card">
+                <h3>월별 예산 집행 현황</h3>
+                <!-- 차트가 들어갈 자리 -->
+            </div>
+            <div class="finance-card">
+                <h3>항목별 지출 현황</h3>
+                <!-- 차트가 들어갈 자리 -->
+            </div>
+        </div>
+
+        <!-- 업무 목록 -->
+        <div class="task-list">
+            <h3>처리 대기 업무</h3>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>요청일</th>
+                    <th>요청자</th>
+                    <th>항목</th>
+                    <th>금액</th>
+                    <th>상태</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>2024-03-21</td>
+                    <td>김교사</td>
+                    <td>교구 구매</td>
+                    <td>￦150,000</td>
+                    <td>승인대기</td>
+                </tr>
+                <!-- 추가 행... -->
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 </body>
 </html>

@@ -35,9 +35,10 @@ public class SecurityConfig{
                         .requestMatchers("/main/login").permitAll()
 
                         // 본인 작업 경로 적어주시면 됩니다.
-                        .requestMatchers("/employee/**", "/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/employee/**","/teacher/**").hasRole("MANAGER")
-                        .requestMatchers("/employee/**", "/manager/**").hasRole("USER")
+                        .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자만 /admin/** 경로 접근 가능
+                        .requestMatchers("/manager/**").hasRole("MANAGER") // 매니저만 /manager/** 경로 접근 가능
+                        .requestMatchers("/teacher/**").hasRole("USER") // 사용자만 /teacher/** 경로 접근 가능
+                        .requestMatchers("/employee/**").hasAnyRole("ADMIN", "MANAGER", "USER") // 직원은 모든 역할 접근 가능
                         .requestMatchers("/parent/**").hasRole("Parent")
                         .anyRequest().authenticated()
                 )

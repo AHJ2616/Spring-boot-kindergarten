@@ -113,7 +113,6 @@ public class EmployeeController {
         return response;
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin/employees")
     public String listEmployees(Model model) {
         List<EmployeeDTO> employees = employeeService.getAllEmployees();
@@ -121,7 +120,6 @@ public class EmployeeController {
         return "clist";
     }
 
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.employee.id")
     @GetMapping("/edit/{id}")
     public String editEmployeeForm(@PathVariable Long id, Model model) {
         EmployeeDTO employeeDTO = employeeService.getEmployeeById(id);
@@ -129,7 +127,6 @@ public class EmployeeController {
         return "employee/edit";
     }
 
-    @PreAuthorize("hasRole('ADMIN') or #employeeDTO.id == authentication.principal.employee.id")
     @PostMapping("/edit")
     public String updateEmployee(@Valid @ModelAttribute EmployeeDTO employeeDTO,
                                  BindingResult result) {
@@ -140,7 +137,6 @@ public class EmployeeController {
         return "redirect:/employee/mypage/" + employeeDTO.getId();
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/delete/{id}")
     public String deleteEmployee(@PathVariable Long id) {
         employeeService.deleteEmployee(id);

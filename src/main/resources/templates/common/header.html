@@ -8,23 +8,11 @@
     <ul>
       <!-- 공통 메뉴-->
       <li class="active">
-        <a th:switch="${#authentication?.authorities}">
-        <span th:case="'ROLE_ADMIN'">
-            <a th:href="/admin/dashboard">Admin Dashboard</a>
-        </span>
-          <span th:case="'ROLE_MANAGER'">
-            <a th:href="/manager/dashboard">Manager Dashboard</a>
-        </span>
-          <span th:case="'ROLE_USER'">
-            <a th:href="/teacher/dashboard">Teacher Dashboard</a>
-        </span>
-          <span th:case="*">
-            <a th:href="/">Home</a>
-        </span>
-        </a>
-        <i class="fa-solid fa-house" style="color: white;"></i>
+        <a th:href="@{/admin/dashboard}">
+          <i class="fa-solid fa-house" style="color: white;"></i></a>
         <span class="tooltip">Home</span>
       </li>
+      <li>
         <a th:href="@{/employee/new}">
           <i class="fa-solid fa-pen-to-square" style="color: white;"></i></a>
         <span class="tooltip">전자결제(개발중)</span>
@@ -49,12 +37,12 @@
 
       <!--교사만 볼수있는 메뉴-->
       <li sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')">
-        <a th:href="@{/employee/new}">
+        <a th:href="@{/teacher/dashboard}">
         <i class="fa-solid fa-marker" style="color: white;"></i></a>
         <span class="tooltip">원아/학부모등록</span>
       </li>
       <li sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')">
-        <a th:href="@{/employee/new}">
+        <a th:href="@{/manager/dashboard}">
           <i class="fa-solid fa-user-gear" style="color: white;"></i></a>
         <span class="tooltip">원아관리</span>
       </li>

@@ -4,12 +4,70 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{common/layout}">
 <head>
+    <link rel="stylesheet" href="/css/employee/admin.css">
     <meta charset="UTF-8">
     <title>어드민</title>
 </head>
 <body>
 <div layout:fragment="content">
-    <h2>어드민 대시보드</h2>
+    <div class="dashboard-container">
+
+        <!-- 통계 카드 섹션 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>전체 직원 수</h3>
+                <div class="number">125명</div>
+            </div>
+            <div class="stat-card">
+                <h3>금일 출근율</h3>
+                <div class="number">98.5%</div>
+            </div>
+            <div class="stat-card">
+                <h3>휴가 신청 대기</h3>
+                <div class="number">12건</div>
+            </div>
+            <div class="stat-card">
+                <h3>신규 입사자</h3>
+                <div class="number">3명</div>
+            </div>
+        </div>
+
+        <!-- 차트 섹션 -->
+        <div class="chart-grid">
+            <div class="chart-card">
+                <h3>부서별 인원 현황</h3>
+                <!-- 차트가 들어갈 자리 -->
+            </div>
+            <div class="chart-card">
+                <h3>월별 휴가 사용 현황</h3>
+                <!-- 차트가 들어갈 자리 -->
+            </div>
+        </div>
+
+        <!-- 최근 활동 목록 -->
+        <div class="recent-list">
+            <h3>최근 활동</h3>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>일시</th>
+                    <th>직원명</th>
+                    <th>활동내역</th>
+                    <th>상태</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>2024-03-21 09:00</td>
+                    <td>홍길동</td>
+                    <td>휴가 신청</td>
+                    <td>승인대기</td>
+                </tr>
+                <!-- 추가 행... -->
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 </body>
 </html>
