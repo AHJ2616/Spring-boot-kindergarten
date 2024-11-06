@@ -2,14 +2,15 @@ package com.kinder.kindergarten.service.Employee;
 
 import com.kinder.kindergarten.constant.Employee.DayOff;
 import com.kinder.kindergarten.DTO.Employee.LeaveDTO;
-import com.kinder.kindergarten.entity.Employee;
-import com.kinder.kindergarten.entity.Leave;
+import com.kinder.kindergarten.entity.Employee.Employee;
+import com.kinder.kindergarten.entity.Employee.Leave;
 import com.kinder.kindergarten.repository.Employee.EmployeeRepository;
 import com.kinder.kindergarten.repository.Employee.LeaveRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,19 +36,23 @@ public class LeaveService {
                 .start(leaveDTO.getLe_start())
                 .end(leaveDTO.getLe_end())
                 .type(DayOff.valueOf(leaveDTO.getLe_type()))
-                .total(calculateLeaveDays(leaveDTO))
+                .total(requestedLeaveDays)
                 .status("대기")
                 .build();
-        employee = Employee.builder()
-                .annualLeave(employee.getAnnualLeave() - requestedLeaveDays)
-                .build();
+
+        employee.setAnnualLeave(employee.getAnnualLeave() - requestedLeaveDays);
+
         employeeRepository.save(employee);
         leaveRepository.save(leave);
     }
 
     // 휴가 일수 계산
     private double calculateLeaveDays(LeaveDTO dto) {
-        double daysBetween = ChronoUnit.DAYS.between(dto.getLe_start(), dto.getLe_end()) + 1; // 포함하기 위해 +1
+        // 종료일이 null인 경우 시작일을 종료일로 사용
+        LocalDate endDate = (dto.getLe_end() != null) ? dto.getLe_end() : dto.getLe_start();
+
+        // 시작일과 종료일 간의 일수 계산
+        double daysBetween = ChronoUnit.DAYS.between(dto.getLe_start(), endDate) + 1; // 포함하기 위해 +1
 
         // 요청된 휴가의 타입에 따른 실제 사용일수 반환
         DayOff dayOffType = DayOff.valueOf(dto.getLe_type());

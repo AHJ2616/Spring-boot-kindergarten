@@ -1,5 +1,6 @@
 package com.kinder.kindergarten.DTO.Employee;
 
+import com.kinder.kindergarten.constant.Employee.Role;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import org.hibernate.validator.constraints.Length;
@@ -29,6 +30,9 @@ public class EmployeeDTO {
     @Length(min = 8, max = 16, message = "비밀번호는 8자 이상, 16자 이하로 입력해주세요")
     private String password;
 
+    @NotBlank(message = "주소는 필수 입력 값입니다.")
+    private String address;
+
     @NotBlank(message = "전화번호는 필수 입력 값입니다.")
     @Pattern(regexp = "\\d{3}-\\d{3,4}-\\d{4}", message = "전화번호 형식은 000-0000-0000입니다.")
     private String phone;
@@ -49,6 +53,20 @@ public class EmployeeDTO {
     private LocalDate hireDate;
 
     // 잔여 연차
-    private int annualLeave;
+    private double annualLeave;
+
+    public Role getRoleByDepartment() {
+        switch (this.department) {
+            case "교육부":
+                return Role.ROLE_USER;
+            case "운행부":
+            case "행정부":
+                return Role.ROLE_MANAGER;
+            case "학부모":
+                return Role.ROLE_PARENT;
+            default:
+                return null;
+        }
+    }
 
 }

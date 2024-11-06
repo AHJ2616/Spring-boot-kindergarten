@@ -2,9 +2,8 @@ package com.kinder.kindergarten.service.Employee;
 
 
 import com.kinder.kindergarten.config.PrincipalDetails;
-import com.kinder.kindergarten.constant.Employee.Role;
 import com.kinder.kindergarten.DTO.Employee.EmployeeDTO;
-import com.kinder.kindergarten.entity.Employee;
+import com.kinder.kindergarten.entity.Employee.Employee;
 import com.kinder.kindergarten.exception.OutOfStockException;
 import com.kinder.kindergarten.repository.Employee.EmployeeRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -45,10 +44,6 @@ public class EmployeeService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email){
         // 이메일 정보를 받아 처리
         Employee employee = employeeRepository.findByEmail(email);
-
-        if(employee == null){
-            return null;
-        }
         return new PrincipalDetails(employee);
     }
 
@@ -66,10 +61,12 @@ public class EmployeeService implements UserDetailsService {
         dto.setName(employee.getName());
         dto.setCleanup(employee.getCleanup());
         dto.setEmail(employee.getEmail());
+        dto.setAddress(employee.getAddress());
         dto.setPassword(employee.getPassword());
         dto.setPhone(employee.getPhone());
         dto.setPosition(String.valueOf(employee.getPosition()));
         dto.setDepartment(employee.getDepartment());
+        dto.setAnnualLeave(employee.getAnnualLeave());
         dto.setStatus(employee.getStatus());
         dto.setSalary(employee.getSalary());
         dto.setHireDate(employee.getHireDate());
@@ -80,10 +77,20 @@ public class EmployeeService implements UserDetailsService {
         employeeRepository.deleteById(id);
     }
 
+    // 이메일 중복 여부 체크
+    public boolean isEmailExists(String email) {
+        return employeeRepository.existsByEmail(email);
+    }
+
+    // 전화번호 중복 여부 체크
+    public boolean isPhoneExists(String phone) {
+        return employeeRepository.existsByPhone(phone);
+    }
+
     @Transactional(readOnly = true)
     public List<EmployeeDTO> getAllEmployees() {
         return employeeRepository.findAll().stream()
-                .map(this::convertToDTO)
+                .map(this::covertToDTO)
                 .collect(Collectors.toList());
     }
 
@@ -91,21 +98,7 @@ public class EmployeeService implements UserDetailsService {
     public EmployeeDTO getEmployeeById(Long id) {
         Employee employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("직원을 찾을 수 없습니다."));
-        return convertToDTO(employee);
-    }
-
-    private EmployeeDTO convertToDTO(Employee employee) {
-        EmployeeDTO dto = new EmployeeDTO();
-        dto.setId(employee.getId());
-        dto.setName(employee.getName());
-        dto.setEmail(employee.getEmail());
-        dto.setPhone(employee.getPhone());
-        dto.setPosition(employee.getPosition());
-        dto.setDepartment(employee.getDepartment());
-        dto.setStatus(employee.getStatus());
-        dto.setSalary(employee.getSalary());
-        dto.setHireDate(employee.getHireDate());
-        return dto;
+        return covertToDTO(employee);
     }
 
     @Transactional

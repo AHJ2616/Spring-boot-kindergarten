@@ -14,5 +14,6 @@ public class EducationDTO {
     private String ed_name;         // 교육이름
     private LocalDate ed_start;     // 교육시작 날짜
     private LocalDate ed_end;       // 교육 종료 날짜
-    private String ed_certificate;  // 수료증 유무
+    private String ed_path;         // 파일 경로
+    private String originalFileName; // 원본 파일명
 }

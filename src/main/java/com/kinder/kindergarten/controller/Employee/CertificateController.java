@@ -25,20 +25,30 @@ public class CertificateController {
     private final CertificateService certificateService;
     private final FileService fileService;
 
+    @GetMapping("/upload")
+    public String leaveRequestForm() {
+        return "employee/upload";
+    }
+
     @PostMapping("/upload")
     public String uploadCertificate(@RequestParam("file") MultipartFile file,
                                     @Valid CertificateDTO certificateDTO,
-                                    @AuthenticationPrincipal PrincipalDetails principalDetails) {
-        String filePath = fileService.uploadFile_employee(file);
-        certificateService.saveCertificate(certificateDTO, filePath, principalDetails.getEmployee());
-        return "redirect:/certificate/my-certificates";
+                                    @AuthenticationPrincipal PrincipalDetails principalDetails, Model model) {
+
+        try {
+        certificateService.saveCertificate(certificateDTO, file, principalDetails.getEmployee());
+        return "redirect:/certificate/list";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
+            return "employee/upload";
+        }
     }
 
-    @GetMapping("/my-certificates")
+    @GetMapping("/list")
     public String getMyCertificates(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                     Model model) {
         List<CertificateDTO> certificates = certificateService.getCertificatesByEmployee(principalDetails.getEmployee());
         model.addAttribute("certificates", certificates);
-        return "certificate/list";
+        return "employee/clist";
     }
 }
