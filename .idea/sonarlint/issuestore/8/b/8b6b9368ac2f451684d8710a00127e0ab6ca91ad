@@ -1,7 +1,7 @@
 
-b	java:S112"FDefine and throw a dedicated exception instead of using a generic one.(¦ûØ÷8¼…½®2
-g	java:S112E"FDefine and throw a dedicated exception instead of using a generic one.(¢†Îüÿÿÿÿ8å«Ä„®2
-W	java:S899)";Do something with the "boolean" value returned by "delete".(Î†ñ¥8†½®2
+b	java:S112"FDefine and throw a dedicated exception instead of using a generic one.(¦ûØ÷8¼…½®2
+g	java:S112L"FDefine and throw a dedicated exception instead of using a generic one.(¢†Îüÿÿÿÿ8å«Ä„®2
+W	java:S899,";Do something with the "boolean" value returned by "delete".(Î†ñ¥8†½®2
 k
-java:S4042)"NUse "java.nio.file.Files#delete" here for better messages on error conditions.(Î†ñ¥8‘†½®2
-o	java:S1009"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ş£†¢üÿÿÿÿ8”ÕÄ„®2
+java:S4042,"NUse "java.nio.file.Files#delete" here for better messages on error conditions.(Î†ñ¥8‘†½®2
+o	java:S100@"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ş£†¢üÿÿÿÿ8”ÕÄ„®2

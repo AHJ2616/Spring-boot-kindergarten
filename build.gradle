@@ -87,6 +87,10 @@ dependencies {
     //google 의 Guava 사용(캐시 관리)
     implementation group: 'com.google.guava', name: 'guava', version: '33.3.1-jre'
 
+    // PDF 변환을 위한 의존성 추가
+    implementation 'org.apache.pdfbox:pdfbox:2.0.29'
+    implementation 'commons-io:commons-io:2.16.1'
+
     // jsoup : XXS 취약점에 대한 html 보안(HTML sanitize)
     implementation group: 'org.jsoup', name: 'jsoup', version: '1.18.1'
 

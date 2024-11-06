@@ -1,20 +1,25 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout}">
 <head>
     <meta charset="UTF-8">
     <title>Mypage</title>
 </head>
 <body>
+<div layout:fragment="content">
 <div class="container">
     <h2>내 정보</h2>
     <div class="button-section">
         <p>테스트 화면</p>
-        <a th:href="@{/employee/new}" class="btn">직원등록(완료)</a>
+        <a th:href="@{/employee/new}">직원등록(완료)</a>
         <a th:href="@{/employee/edit/{id}(id=${employeeDTO.id})}" class="btn">정보 수정(완료)</a>
-        <a th:href="@{/attendance/my-records}" class="btn">근태 기록(완료)</a>
-        <a th:href="@{/leave/my-leaves}" class="btn">휴가 현황(개발중)</a>
-        <a th:href="@{/certificate/my-certificates}" class="btn">자격증 관리(개발중)</a>
-        <a th:href="@{/education/history}" class="btn">교육이력(개발중)</a>
+        <a th:href="@{/attendance/my-records}" class="btn">근태 기록(CR 완료)</a>
+        <a th:href="@{/leave/my-leaves}" class="btn">휴가 현황(CR 완료)</a>
+        <a th:href="@{/certificate/list}" class="btn">자격증 관리(CR 완료)</a>
+        <a th:href="@{/education/history}" class="btn">교육이력(CR 완료)</a>
+        <a th:href="@{/assets/index.html}" class="btn">프론트 테스트</a>
     </div>
     <div class="info-section">
         <p>사번: <span th:text="${employeeDTO.cleanup}"></span></p>
@@ -58,6 +63,7 @@
             <th>유형</th>
             <th>상태</th>
             <th>사용휴가</th>
+            <th>잔여휴가</th>
         </tr>
         </thead>
         <tbody>
@@ -67,12 +73,58 @@
             <td th:text="${leave.le_type}"></td>
             <td th:text="${leave.le_status}"></td>
             <td th:text="${leave.le_total}"></td>
+            <td th:text="${employeeDTO.annualLeave}"></td>
         </tr>
         </tbody>
     </table>
-    <a th:href="@{/leave/request}" class="btn">휴가 신청</a>
+    <a th:href="@{/leave/request/{id}(id=${#authentication.principal.employee.id})}" class="btn">휴가 신청</a>
+        <H2>교육이력현황</H2>
+    <a th:href="@{/education/record}" class="btn">교육이력 등록</a>
+    <table>
+        <thead>
+        <tr>
+            <th>교육이름</th>
+            <th>교육시작 날짜</th>
+            <th>교육종료 날짜</th>
+            <th>수료증 여부</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="history : ${history}">
+            <td th:text="${history.ed_name}"></td>
+            <td th:text="${history.ed_start}"></td>
+            <td th:text="${history.ed_end}"></td>
+            <td th:text="${history.ed_path != null ? 'O' : 'X'}"></td>
+        </tr>
+        </tbody>
+    </table>
+        <H2>자격증현황</H2>
+    <a th:href="@{/certificate/upload}" class="btn">자격증 등록</a>
+    <table>
+        <thead>
+        <tr>
+            <th>자격증명</th>
+            <th>취득일</th>
+            <th>만료일</th>
+            <th>관리</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="cert : ${certificates}">
+            <td th:text="${cert.ce_name}"></td>
+            <td th:text="${cert.ce_issued}"></td>
+            <td th:text="${cert.ce_expri}"></td>
+            <td>
+                <a th:href="@{/certificate/view/{id}(id=${cert.ce_id})}">보기</a>
+                <a th:href="@{/certificate/delete/{id}(id=${cert.ce_id})}"
+                   onclick="return confirm('삭제하시겠습니까?')">삭제</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    </div>
 </div>
 </div>
-<script src="/Employee/Attendance.js"></script>
+<script src="/js/Employee/Attendance.js"></script>
 </body>
 </html>
