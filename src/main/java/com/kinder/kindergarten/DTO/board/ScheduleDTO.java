@@ -2,27 +2,34 @@ package com.kinder.kindergarten.DTO.board;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
+
+import java.time.LocalDateTime;
 
 @Getter @Setter
+@ToString
 public class ScheduleDTO {
 
+
   //기본키
-  private String scheduleId;
+  private String id;
 
   //일정 제목
-  private String scheduleTitle;
+  private String title;
 
   //일정 내용
-  private String scheduleContent;
+  private String description;
 
-  //장소
-  private String location;
+  private String type;
 
-  private String start;       // schedule_time (시작)
-  private String end;         // schedule_time (종료)
+  private String username;
 
-  public ScheduleDTO(String scheduleTitle,String start){
-    this.scheduleTitle = scheduleTitle;
-    this.start = start;
-  }
+  private String backgroundColor;
+
+  private String textColor;
+
+  private boolean allDay;
+  private LocalDateTime start;       // schedule_time (시작)
+  private LocalDateTime end;         // schedule_time (종료)
+
 }

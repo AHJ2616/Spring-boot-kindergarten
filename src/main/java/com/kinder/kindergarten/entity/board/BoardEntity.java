@@ -32,11 +32,12 @@ public class BoardEntity extends TimeEntity {
   @Column(name = "board_type")
   private BoardType boardType;
 
-  @Column(nullable = false)
+  @Column(nullable = false) //나중에 변경
   private String boardWriter;
 
   @ColumnDefault("0")
   private Integer views;
+
 
 
 }

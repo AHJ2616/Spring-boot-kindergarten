@@ -42,7 +42,7 @@ public class ScheduleService {
   public ScheduleDTO createSchedule(ScheduleDTO scheduleDTO) {
     ScheduleEntity schedule = modelMapper.map(scheduleDTO, ScheduleEntity.class);
     Ulid ulid = UlidCreator.getUlid();
-    schedule.setScheduleId(ulid.toString());
+    schedule.setId(ulid.toString());
 
     ScheduleEntity savedSchedule = scheduleRepository.save(schedule);
     return modelMapper.map(savedSchedule, ScheduleDTO.class);
@@ -54,11 +54,14 @@ public class ScheduleService {
             .orElseThrow(() -> new RuntimeException("일정을 찾을 수 없습니다."));
 
     // 기존 일정 정보 업데이트
-    schedule.setScheduleTitle(scheduleDTO.getScheduleTitle());
-    schedule.setScheduleContent(scheduleDTO.getScheduleContent());
-    schedule.setLocation(scheduleDTO.getLocation());
+    schedule.setTitle(scheduleDTO.getTitle());
+    schedule.setDescription(scheduleDTO.getDescription());
+    schedule.setType(scheduleDTO.getType());
     schedule.setStart(scheduleDTO.getStart());
     schedule.setEnd(scheduleDTO.getEnd());
+    schedule.setBackgroundColor(scheduleDTO.getBackgroundColor());
+    schedule.setAllDay(scheduleDTO.isAllDay());
+    schedule.setUsername(scheduleDTO.getUsername());
 
     ScheduleEntity updatedSchedule = scheduleRepository.save(schedule);
     return modelMapper.map(updatedSchedule, ScheduleDTO.class);

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout}">
+<head>
+
+  <meta charset="UTF-8">
+  <title>회계 페이지</title>
+  <link rel="stylesheet" th:href="@{/css/material.css}">
+  <meta id="_csrf" name="_csrf" th:content="${_csrf.token}"/>
+  <meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+<body>
+<div layout:fragment="content">
+<!--jQuery에서 제공하는 3.5.1 버전의 jQuery CDN 호스트-->
+<script src="http://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+<!-- 사용자 스크립트 추가 -->
+<th:block layout:fragment="script">
+  <script th:inline="javascript">
+
+    $(document).ready(function () {
+      $("#searchBtn").on("click", function (e) {
+        e.preventDefault();
+        page(0);
+      });
+
+      var deleteMessage = '';
+      if (deleteMessage) {
+        alert(deleteMessage);
+      }
+
+    });
+
+    function page(page) {
+      var searchDateType = $("#searchDateType").val();
+      var searchMoneyStatus = $("#searchMoneyStatus").val();
+      var searchBy = $("#searchBy").val();
+      var searchQuery = $("#searchQuery").val();
+
+      location.href = "/money/moneys/" + page + "?searchDateType=" + searchDateType
+              + "&searchMoneyStatus=" + searchMoneyStatus
+              + "&searchBy=" + searchBy
+              + "&searchQuery=" + searchQuery;
+    }
+
+    function deleteMoney(moneyId) {
+      if (confirm("정말로 이 자재를 삭제하시겠습니까?")) {
+        var token = $("meta[name='_csrf']").attr("content");
+        var header = $("meta[name='_csrf_header']").attr("content");
+
+
+        $.ajax({
+          url: '/money/delete/' + moneyId,
+          type: 'POST',
+          beforeSend: function (xhr) {
+            xhr.setRequestHeader(header, token);
+          },
+          success: function (result) {
+            alert("자재가 삭제되었습니다.");
+            location.reload();
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+            alert("자재 삭제 중 오류가 발생했습니다.");
+          }
+        });
+      }
+    }
+
+
+  </script>
+</th:block>
+
+<!-- 사용자 CSS 추가 -->
+<th:block layout:fragment="css">
+  <style>
+    select {
+      margin-right: 10px;
+    }
+  </style>
+</th:block>
+
+
+<form th:action="@{'/money/moneys/' + ${moneys.number}}" role="form" method="get" th:object="${moneys}">
+  <div class="material-table-container">
+
+    <div class="search-container">
+      <div class="form-inline justify-content-center" th:object="${moneySearchDTO}">
+        <select th:field="*{searchDateType}" class="form-control" style="width:auto;">
+          <option value="all">전체기간</option>
+          <option value="1d">1일</option>
+          <option value="1w">1주</option>
+          <option value="1m">1개월</option>
+          <option value="6m">6개월</option>
+        </select>
+        <select th:field="*{moneySearchStatus}" class="form-control" style="width:auto;">
+          <option value="INCOME">수입</option>
+          <option value="EXPENDITURE">지출</option>
+          <option value="">재고 상태(전체)</option>
+        </select>
+        <select th:field="*{searchBy}" class="form-control" style="width:auto;">
+          <option value="moneyName">집행 내역</option>
+          <option value="moneyId">아이디 코드</option>
+        </select>
+        <input th:field="*{searchQuery}" type="text" class="form-control-search" placeholder="검색어를 입력해주세요">
+        <button id="searchBtn" type="submit" class="btn btn-primary">검색</button>
+      </div>
+    </div><!--./search-container-->
+
+    <table class="table-material-manage">
+      <thead>
+      <tr>
+        <td>회계 아이디</td>
+        <td>상태</td>
+        <td>집행 내역</td>
+        <td>상세 내용</td>
+        <td>등록일</td>
+        <td>수정</td>
+        <td>삭제</td>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="money, status: ${moneys.getContent()}">
+        <td th:text="${money.moneyId}"></td>
+        <td>
+                    <span th:switch="${money.moneyStatus}">
+                        <span th:case="${T(com.kinder.kindergarten.constant.money.MoneyStatus).INCOME}"
+                              class="material-status-normal">수입</span>
+                        <span th:case="${T(com.kinder.kindergarten.constant.money.MoneyStatus).EXPENDITURE}"
+                              class="material-status-destroy">지출</span>
+                        <span th:case="*" class="material-status">상태 미정</span> <!-- 예외 처리 -->
+                    </span>
+        </td>
+        <td>
+          <a th:href="'/money/moneyDtl/'+${money.moneyId}" th:text="${money.moneyName}"></a>
+        </td>
+
+        <td th:text="${money.moneyContent}"></td>
+        <td th:text="${money.regiDate}"></td>
+        <td>
+          <a th:href="'/money/'+${money.moneyId}">수정</a>
+        </td>
+        <td>
+          <!-- 삭제 버튼 수정 -->
+          <a class="form-control-delr" th:attr="onclick=|javascript:deleteMoney('${money.moneyId}')|">삭제</a>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+    <div th:with="start=${(moneys.number / maxPage) * maxPage + 1},
+               end=${(moneys.totalPages == 0) ? 1 :
+                    (start + (maxPage - 1) < moneys.totalPages ? start + (maxPage - 1) : moneys.totalPages)}">
+
+      <ul class="pagination justify-content-center" style="display: flex; flex-wrap: wrap; margin: 20px 0;">
+
+        <!-- Previous button -->
+        <li class="page-item" th:classappend="${moneys.first} ? 'disabled'">
+          <!-- 페이지 이동 버튼 수정 -->
+          <a class="page-link" th:attr="onclick=|javascript:page(${moneys.number - 1})|" aria-label="Previous">
+            <span aria-hidden="true">이전</span>
+          </a>
+        </li>
+
+        <!-- Page number buttons -->
+        <li class="page-item" th:each="page : ${#numbers.sequence(start, end)}"
+            th:classappend="${moneys.number eq page - 1} ? 'active' : ''">
+          <a class="page-link" th:onclick="'javascript:page(' + ${page - 1} + ')'" th:inline="text">[[${page}]]</a>
+        </li>
+
+        <!-- Next button -->
+        <li class="page-item" th:classappend="${moneys.last} ? 'disabled'">
+          <a class="page-link" th:onclick="'javascript:page(' + ${moneys.number + 1} + ')'"
+             aria-label="Next">
+            <span aria-hidden="true">다음</span>
+          </a>
+        </li>
+
+      </ul>
+    </div>
+
+
+  </div><!--./.material-table-container -->
+</form>
+</div>
+</body>
+</html>

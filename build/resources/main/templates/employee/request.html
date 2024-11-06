@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>휴가 신청</title>
+</head>
+<body>
+<div class="container">
+  <h2>휴가 신청</h2>
+  <form th:action="@{/leave/request}" th:object="${leaveDTO}" method="post">
+    <input type="hidden" th:field="*{le_total}">
+    <div class="form-group">
+      <label>시작일</label>
+      <input type="date" th:field="*{le_start}" required>
+    </div>
+    <div class="form-group">
+      <label>종료일</label>
+      <input type="date" th:field="*{le_end}" required>
+    </div>
+    <div class="form-group">
+      <label>휴가 유형</label>
+      <select th:field="*{le_type}">
+        <option value="연차">연차</option>
+        <option value="반차">반차</option>
+        <option value="병가">병가</option>
+        <option value="휴가">휴가</option>
+      </select>
+    </div>
+    <button type="submit">신청</button>
+  </form>
+</div>
+</body>
+</html>
