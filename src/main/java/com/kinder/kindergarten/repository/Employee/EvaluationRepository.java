@@ -1,7 +1,7 @@
-package com.kinder.kindergarten.repository.Employee;
+package com.kinder.kindergarten.repository.employee;
 
-import com.kinder.kindergarten.entity.Employee;
-import com.kinder.kindergarten.entity.Evaluation;
+import com.kinder.kindergarten.entity.employee.Employee;
+import com.kinder.kindergarten.entity.employee.Evaluation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

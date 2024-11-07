@@ -1,4 +1,4 @@
-package com.kinder.kindergarten.constant.Employee;
+package com.kinder.kindergarten.constant.employee;
 
 public enum DayOff {
     반차(0.5), // 반차: 0.5일

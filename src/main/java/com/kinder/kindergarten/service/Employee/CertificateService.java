@@ -1,13 +1,15 @@
-package com.kinder.kindergarten.service.Employee;
+package com.kinder.kindergarten.service.employee;
 
-import com.kinder.kindergarten.DTO.Employee.CertificateDTO;
-import com.kinder.kindergarten.entity.Certificate;
-import com.kinder.kindergarten.entity.Employee;
-import com.kinder.kindergarten.entity.Employee_File;
-import com.kinder.kindergarten.repository.Employee.CertificateRepository;
+import com.kinder.kindergarten.DTO.employee.CertificateDTO;
+import com.kinder.kindergarten.entity.employee.Certificate;
+import com.kinder.kindergarten.entity.employee.Employee;
+import com.kinder.kindergarten.entity.employee.Employee_File;
+import com.kinder.kindergarten.repository.employee.CertificateRepository;
+import com.kinder.kindergarten.service.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,20 +21,19 @@ public class CertificateService {
 
     private final CertificateRepository certificateRepository;
 
+    private final FileService fileService;
+
     // 자격증 등록
-    public void saveCertificate(CertificateDTO certificateDTO, String filePath, Employee employee) {
+    public void saveCertificate(CertificateDTO certificateDTO, MultipartFile file, Employee employee) {
+        if (file != null && !file.isEmpty()) {
+            fileService.uploadAndConvertToPdf(file, employee);
+        }
+
         Certificate certificate = Certificate.builder()
                 .employee(employee)
                 .name(certificateDTO.getCe_name())
                 .issued(certificateDTO.getCe_issued())
                 .expri(certificateDTO.getCe_expri())
-                .build();
-
-        // 파일 정보 저장
-        Employee_File file = Employee_File.builder()
-                .employee(employee)
-                .name(certificateDTO.getCe_name() + "_certificate")
-                .path(filePath)
                 .build();
 
         certificateRepository.save(certificate);

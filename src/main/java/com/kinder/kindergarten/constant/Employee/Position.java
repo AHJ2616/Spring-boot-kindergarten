@@ -1,4 +1,4 @@
-package com.kinder.kindergarten.constant.Employee;
+package com.kinder.kindergarten.constant.employee;
 
 public enum Position {
     사원(12), // 사원 : 12일

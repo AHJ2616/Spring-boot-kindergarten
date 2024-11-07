@@ -19,75 +19,66 @@ var newEvent = function (start, end, eventType) {
 
     $("#contextMenu").hide(); //메뉴 숨김
 
-    modalTitle.html('새로운 일정');
-    editType.val(eventType).prop('selected', true);
-    editTitle.val('');
-    editStart.val(start);
-    editEnd.val(end);
-    editDesc.val('');
+    const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+    const modalTitle = document.querySelector('.modal-title');
+    
+    modalTitle.textContent = '새로운 일정';
+    document.getElementById('edit-type').value = eventType;
+    document.getElementById('edit-title').value = '';
+    document.getElementById('edit-start').value = moment(start).format('YYYY-MM-DDTHH:mm');
+    document.getElementById('edit-end').value = moment(end).format('YYYY-MM-DDTHH:mm');
+    document.getElementById('edit-desc').value = '';
 
-    addBtnContainer.show();
-    modifyBtnContainer.hide();
-    eventModal.modal('show');
+    document.querySelector('.modalBtnContainer-addEvent').style.display = 'block';
+    document.querySelector('.modalBtnContainer-modifyEvent').style.display = 'none';
+    
+    eventModal.show();
 
-    //새로운 일정 저장버튼 클릭
-    $('#save-event').unbind();
-    $('#save-event').on('click', function () {
-
-
-        // 유효성 검사를 먼저 수행
-        if (editTitle.val() === '') {
+    $('#save-event').off('click').on('click', function() {
+        const editTitle = document.getElementById('edit-title');
+        const editStart = document.getElementById('edit-start');
+        const editEnd = document.getElementById('edit-end');
+        const editDesc = document.getElementById('edit-desc');
+        
+        if (editTitle.value.trim() === '') {
             alert('일정명은 필수입니다.');
-            return false;
+            return;
         }
 
-        if (editStart.val() > editEnd.val()) {
+        if (editStart.value > editEnd.value) {
             alert('끝나는 날짜가 앞설 수 없습니다.');
-            return false;
+            return;
         }
 
-        let eventData = {
-            title: editTitle.val(),
-            start: moment(editStart.val()).format('YYYY-MM-DDTHH:mm:ss'),
-            end: moment(editEnd.val()).format('YYYY-MM-DDTHH:mm:ss'),
-            description: editDesc.val(),
-            type: editType.val(),
+        const eventData = {
+            title: editTitle.value.trim(),
+            start: editStart.value,
+            end: editEnd.value,
+            description: editDesc.value.trim() || '', // 빈 문자열이면 빈 문자열로 설정
+            type: document.getElementById('edit-type').value,
             username: '사나',
-            backgroundColor: editColor.val(),
+            backgroundColor: document.getElementById('edit-color').value,
             textColor: '#ffffff',
-            allDay: editAllDay.is(':checked')
+            allDay: document.getElementById('edit-allDay').checked
         };
 
-        // allDay 체크 처리
-        if (eventData.allDay) {
-            eventData.start = moment(eventData.start).format('YYYY-MM-DD[T]00:00:00');
-            eventData.end = moment(eventData.end).add(1, 'days').format('YYYY-MM-DD[T]00:00:00');
-        }
+        console.log('전송할 일정 데이터:', eventData);
 
-        console.log('전송할 데이터:', eventData); // 데이터 확인용 로그
 
-        // AJAX 요청
         $.ajax({
             url: '/events/add',
             type: 'POST',
             data: JSON.stringify(eventData),
             contentType: 'application/json',
-            dataType: 'json',
-            success: function (response) {
-                console.log('저장 성공:', response);
-
-                // 캘린더에 이벤트 추가
-                $("#calendar").fullCalendar('renderEvent', eventData, true);
-
-                // 모달 초기화 및 닫기
-                eventModal.find('input, textarea').val('');
-                editAllDay.prop('checked', false);
-                eventModal.modal('hide');
-
-                // 캘린더 새로고침
-                $('#calendar').fullCalendar('refetchEvents');
+            success: function(response) {
+                console.log('저장된 일정:', response);
+                calendar.refetchEvents();
+                eventModal.hide();
+                alert('일정이 저장되었습니다.');
             },
-            error: function (xhr, status, error) {
+            error: function(xhr, status, error) {
+                console.error('저장 실패:', error);
+                console.error('상태:', status);
                 alert('일정 저장 중 오류가 발생했습니다.');
             }
         });

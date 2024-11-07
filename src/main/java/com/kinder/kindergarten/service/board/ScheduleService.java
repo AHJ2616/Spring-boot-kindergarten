@@ -26,7 +26,17 @@ public class ScheduleService {
   public List<ScheduleDTO> getAllSchedules() {
     List<ScheduleEntity> schedules = scheduleRepository.findAll();
     return schedules.stream()
-            .map(schedule -> modelMapper.map(schedule, ScheduleDTO.class))
+            .map(schedule -> {
+                ScheduleDTO dto = modelMapper.map(schedule, ScheduleDTO.class);
+                if (dto.getTextColor() == null) {
+                    dto.setTextColor("#ffffff");
+                }
+                if (dto.getBackgroundColor() == null) {
+                    dto.setBackgroundColor("#3788d8");
+                }
+                return dto;
+            })
+            .filter(ScheduleDTO::isValid)
             .collect(Collectors.toList());
   }
 

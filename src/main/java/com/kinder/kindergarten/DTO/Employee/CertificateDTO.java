@@ -1,4 +1,4 @@
-package com.kinder.kindergarten.DTO.Employee;
+package com.kinder.kindergarten.DTO.employee;
 
 import lombok.*;
 

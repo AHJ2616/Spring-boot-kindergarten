@@ -2,10 +2,10 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{common/layout}">
+      layout:decorate="~{common/layout2}">
 <head>
   <meta charset="UTF-8">
-  <title>자유게시판</title>
+  <title>게시판</title>
   <link rel="stylesheet" th:href="@{/css/board.css}">
   <script th:src="@{/js/board.js}"></script>
 </head>
@@ -19,8 +19,10 @@
         <option value="views">조회수순</option>
       </select>
       <div class="search-container">
-        <input type="text" id="searchInput" name="keyword" placeholder="search">
-        <button type="button" id="search-button">검색</button>
+        <form th:action="@{'/board/' + ${type} + '/search'}" method="get">
+          <input type="text" name="keyword" th:value="${keyword}" id="searchInput" placeholder="search">
+          <button type="submit" id="search-button">검색</button>
+        </form>
       </div>
     </div>
     <div class="right-section">
@@ -56,7 +58,7 @@
 
   <div class="pagination" th:if="${boards.totalPages > 0}">
         <span th:each="pageNum : ${#numbers.sequence(0, boards.totalPages - 1)}">
-            <a th:href="@{${keyword != null ? '/board/search' : '/board/list/common'}(page=${pageNum + 1}, keyword=${keyword})}"
+            <a th:href="@{${keyword != null ? '/board/search' : '/board/basic'}(page=${pageNum + 1}, keyword=${keyword})}"
                th:text="${pageNum + 1}"
                th:class="${pageNum == currentPage} ? 'active' : ''">
             </a>

@@ -1,93 +1,46 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // 정렬 select 요소의 변경 이벤트 처리
     const sortSelect = document.querySelector('.sort-select');
     if (sortSelect) {
+        // 초기 데이터 저장
+        const tbody = document.querySelector('.board-table tbody');
+        if (tbody) {
+            // 원본 데이터를 보존하기 위해 깊은 복사 수행
+            tbody.originalRows = Array.from(tbody.querySelectorAll('tr')).map(row => row.cloneNode(true));
+        }
+
         sortSelect.addEventListener('change', function() {
             const sortBy = this.value;
-            const currentUrl = window.location.pathname;
-            const urlParams = new URLSearchParams(window.location.search);
-            const keyword = urlParams.get('keyword');
-
-            // 검색 결과 페이지인 경우
-            if (currentUrl === '/board/search' && keyword) {
-                fetch(`/rest/board/search?keyword=${encodeURIComponent(keyword)}&sortBy=${sortBy}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        updateBoardList(data);
-                    })
-                    .catch(error => console.error('Error:', error));
-            }
-            // 일반 게시판 페이지인 경우
-            else {
-                fetch(`/rest/board/sort?sortBy=${sortBy}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        updateBoardList(data);
-                    })
-                    .catch(error => console.error('Error:', error));
-            }
-        });
-    }
-
-    // 검색 버튼 클릭 이벤트 처리
-    const searchButton = document.getElementById('search-button');
-    const searchInput = document.getElementById('searchInput');
-
-    if (searchButton && searchInput) {
-        searchButton.addEventListener('click', function() {
-            const keyword = searchInput.value.trim();
-            if (keyword) {
-                window.location.href = `/board/search?keyword=${encodeURIComponent(keyword)}`;
-            }
-        });
-
-        // 엔터 키 이벤트 처리
-        searchInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                const keyword = this.value.trim();
-                if (keyword) {
-                    window.location.href = `/board/search?keyword=${encodeURIComponent(keyword)}`;
-                }
-            }
+            sortBoardListClient(sortBy);
         });
     }
 });
 
-// 게시판 목록 업데이트 함수
-function updateBoardList(data) {
+// 클라이언트 사이드 정렬 함수
+function sortBoardListClient(sortBy) {
     const tbody = document.querySelector('.board-table tbody');
-    if (!tbody) return;
+    if (!tbody || !tbody.originalRows) return;
 
-    tbody.innerHTML = '';
-
-    data.content.forEach(board => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td class="title">
-                <a href="/board/${board.boardId}">${board.boardTitle}</a>
-            </td>
-            <td>${board.boardWriter}</td>
-            <td>${formatDate(board.regiDate)}</td>
-            <td>${board.views}</td>
-        `;
-        tbody.appendChild(tr);
+    // 원본 데이터를 복사하여 정렬
+    const rows = Array.from(tbody.originalRows).map(row => row.cloneNode(true));
+    
+    rows.sort((a, b) => {
+        switch(sortBy) {
+            case 'latest':
+                const dateA = new Date(a.children[2].textContent);
+                const dateB = new Date(b.children[2].textContent);
+                return dateB - dateA;
+            case 'views':
+                const viewsA = parseInt(a.children[3].textContent);
+                const viewsB = parseInt(b.children[3].textContent);
+                return viewsB - viewsA;
+            default:
+                return 0;
+        }
     });
 
-    // 검색 결과가 없는 경우 메시지 표시
-    const noResult = document.querySelector('.no-result');
-    if (noResult) {
-        noResult.style.display = data.content.length === 0 ? 'block' : 'none';
-    }
+    // tbody 내용을 비우고 정렬된 행들을 추가
+    tbody.innerHTML = '';
+    rows.forEach(row => tbody.appendChild(row));
 }
 
 // 날짜 포맷 함수
@@ -100,3 +53,6 @@ function formatDate(dateString) {
     const minutes = String(date.getMinutes()).padStart(2, '0');
     return `${year}.${month}.${day} ${hours}:${minutes}`;
 }
+
+
+
