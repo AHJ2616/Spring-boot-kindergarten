@@ -1,7 +1,14 @@
 
-b	java:S112"FDefine and throw a dedicated exception instead of using a generic one.(¦ûØ÷8¼…½®2
-g	java:S112L"FDefine and throw a dedicated exception instead of using a generic one.(¢†Îüÿÿÿÿ8å«Ä„®2
-W	java:S899,";Do something with the "boolean" value returned by "delete".(Î†ñ¥8†½®2
+b	java:S112'"FDefine and throw a dedicated exception instead of using a generic one.(¦ûØ÷8ÒÙ„°2
+g	java:S112V"FDefine and throw a dedicated exception instead of using a generic one.(¢†Îüÿÿÿÿ8ÒÙ„°2
+h	java:S112ƒ"FDefine and throw a dedicated exception instead of using a generic one.(ñ¿¬¡üÿÿÿÿ8‰ÔÛ„°2
+m	java:S117q"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(îâ˜‡8‹ÔÛ„°2
+n	java:S117œ"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(îâ˜‡8’ÔÛ„°2
+t
+java:S2095"QUse try-with-resources or close this "PDPageContentStream" in a "finally" clause.(‡±®şûÿÿÿÿ8ïç’…°2
+W	java:S8996";Do something with the "boolean" value returned by "delete".(Î†ñ¥8ÌÒÙ„°2
 k
-java:S4042,"NUse "java.nio.file.Files#delete" here for better messages on error conditions.(Î†ñ¥8‘†½®2
-o	java:S100@"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ş£†¢üÿÿÿÿ8”ÕÄ„®2
+java:S40426"NUse "java.nio.file.Files#delete" here for better messages on error conditions.(Î†ñ¥8ÌÒÙ„°2
+o	java:S100J"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ş£†¢üÿÿÿÿ8ĞÒÙ„°2
+M
+java:S2093ˆ"*Change this "try" to a try-with-resources.(¡»¢üùÿÿÿÿ8·ñÛ„°2

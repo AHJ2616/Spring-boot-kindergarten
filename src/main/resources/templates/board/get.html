@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{common/layout}">
+      layout:decorate="~{common/layout2}">
 <head>
   <meta charset="UTF-8">
   <!-- CSRF 토큰을 위한 meta 태그 추가 -->
@@ -85,21 +85,27 @@
             <span class="comment-date" th:text="${#temporals.format(comment.regiDate, 'yyyy.MM.dd HH:mm')}"></span>
           </div>
           <div class="comment-content" th:text="${comment.contents}"></div>
-          <div class="comment-actions" th:if="${comment.writer == #authentication.name}">
-            <button th:onclick="'editComment(' + ${comment.commentId} + ')'" class="btn btn-sm btn-primary">수정</button>
-            <button th:onclick="'deleteComment(' + ${comment.commentId} + ')'" class="btn btn-sm btn-danger">삭제</button>
+         <!-- <div class="comment-actions" th:if="${comment.writer == #authentication.name}">-->
+          <div class="comment-actions">
+            <button th:onclick="'editComment(${comment.commentsId})'" class="btn btn-sm btn-primary">수정</button>
+            <button th:onclick="'deleteComment(${comment.commentsId})'" class="btn btn-sm btn-danger">삭제</button>
           </div>
         </div>
       </div>
     </div>
 
     <div class="board-footer">
-      <a th:if="${boardDTO.boardWriter == #authentication.name}"
+    <!--  <a th:if="${boardDTO.boardWriter == #authentication.name}"
          th:href="@{/board/modify/{boardId}(boardId=${boardDTO.boardId})}"
          class="btn btn-primary">수정</a>
 
       <button th:if="${boardDTO.boardWriter == #authentication.name}"
               onclick="deleteBoard([[${boardDTO.boardId}]])"
+              class="btn btn-danger">삭제</button>-->
+      <a th:href="@{/board/modify/{boardId}(boardId=${boardDTO.boardId})}"
+         class="btn btn-primary">수정</a>
+
+      <button onclick="deleteBoard([[${boardDTO.boardId}]])"
               class="btn btn-danger">삭제</button>
     </div>
 

@@ -31,7 +31,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
-
+    implementation 'org.springframework.boot:spring-boot-starter'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 
@@ -96,6 +96,10 @@ dependencies {
 
 
 
+    // 기타 필요한 의존성들은 유지
+    implementation 'org.webjars:bootstrap:5.2.3'  // Bootstrap 5로 업데이트
+    implementation 'org.webjars:select2:4.0.13'
+    implementation 'org.webjars:momentjs:2.29.1'
 
 }
 

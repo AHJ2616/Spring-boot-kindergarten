@@ -16,7 +16,7 @@ public class CacheConfig {
   @Bean
   public LoadingCache<String, Page<BoardDTO>> searchCache() {
     return CacheBuilder.newBuilder()
-            .maximumSize(100) // 최대 100개의 검색 결과를 캐시
+            .maximumSize(500) // 최대 100개의 검색 결과를 캐시
             .expireAfterWrite(30, TimeUnit.MINUTES) // 30분 후 캐시 만료
             .build(new CacheLoader<>() {
               @Override

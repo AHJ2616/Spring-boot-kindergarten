@@ -19,8 +19,8 @@ public class ScheduleEntity {
 
   private String title;
   private String description;
-  private LocalDateTime start;
-  private LocalDateTime end;
+  private String start;
+  private String end;
   private String type;
   private String backgroundColor;
 

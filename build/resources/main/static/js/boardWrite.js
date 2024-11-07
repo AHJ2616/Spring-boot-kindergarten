@@ -18,7 +18,7 @@ function initializeSummernote() {
             ['color', ['forecolor','backcolor']],
             ['para', ['ul', 'ol', 'paragraph']],
             ['height', ['height']],
-            ['insert', ['emoji','picture', 'link', 'video']],
+            ['insert', ['picture', 'link', 'video']],
             ['view', ['fullscreen','help']]
         ],
         fontNames: ['Arial', '맑은 고딕', '궁서', '굴림', '굴림체', '돋움체', 'sans-serif'],

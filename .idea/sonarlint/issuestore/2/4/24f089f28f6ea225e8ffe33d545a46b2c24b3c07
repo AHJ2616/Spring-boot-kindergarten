@@ -1,7 +1,5 @@
 
 t
-java:S1128"RRemove this unused import 'com.kinder.kindergarten.service.board.ScheduleService'.(ßÂæÉùÿÿÿÿ8œŸ’Û¯2
+java:S1128"RRemove this unused import 'com.kinder.kindergarten.service.board.ScheduleService'.(ßÂæÉùÿÿÿÿ8®ğ¥„°2
 ]
-java:S1128";Remove this unused import 'lombok.RequiredArgsConstructor'.(ÑØúøÿÿÿÿ8Ÿ’Û¯2
-[
-java:S1128"9Remove this unused import 'org.springframework.ui.Model'.(ê†ıÿÿÿÿ8ª–ÎÖ¯2
+java:S1128";Remove this unused import 'lombok.RequiredArgsConstructor'.(ÑØúøÿÿÿÿ8µğ¥„°2

@@ -25,11 +25,13 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
     http
-            .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+            .csrf(csrf -> csrf
+                    .ignoringRequestMatchers("/calendar", "/events/**")  // calendar와 events 관련 엔드포인트는 CSRF 검사 제외
+                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
             // CSRF 보호 활성화 및 쿠키 설정
             .authorizeHttpRequests(auth -> auth
                     // css,js,image 파일 접근 허용
-                    .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
+                    .requestMatchers("/**","/css/**", "/js/**", "/images/**").permitAll()
                     // 로그인페이지 허용
                     .requestMatchers("/main/login").permitAll()
 

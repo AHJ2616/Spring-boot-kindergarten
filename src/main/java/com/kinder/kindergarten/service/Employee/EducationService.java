@@ -1,12 +1,16 @@
-package com.kinder.kindergarten.service.Employee;
+package com.kinder.kindergarten.service.employee;
 
-import com.kinder.kindergarten.DTO.Employee.EducationDTO;
-import com.kinder.kindergarten.entity.Education;
-import com.kinder.kindergarten.entity.Employee;
-import com.kinder.kindergarten.repository.Employee.EducationRepository;
+import com.kinder.kindergarten.DTO.employee.EducationDTO;
+import com.kinder.kindergarten.entity.employee.Education;
+import com.kinder.kindergarten.entity.employee.Employee;
+import com.kinder.kindergarten.entity.employee.Employee_File;
+import com.kinder.kindergarten.repository.employee.EducationRepository;
+import com.kinder.kindergarten.repository.employee.FileRepository;
+import com.kinder.kindergarten.service.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,15 +21,23 @@ import java.util.stream.Collectors;
 public class EducationService {
 
     private final EducationRepository educationRepository;
+    private final FileService fileService;
+
+    private final FileRepository fileRepository;
 
     // 교육이력 등록
-    public void saveEducation(EducationDTO educationDTO, String certificatePath, Employee employee) {
+    public void saveEducation(EducationDTO educationDTO, MultipartFile file, Employee employee) {
+        String pdfPath = null;
+        if (file != null && !file.isEmpty()) {
+            pdfPath = fileService.uploadAndConvertToPdf(file, employee);
+        }
+
         Education education = Education.builder()
                 .employee(employee)
                 .name(educationDTO.getEd_name())
                 .startDate(educationDTO.getEd_start())
                 .endDate(educationDTO.getEd_end())
-                .certificate(certificatePath)
+                .certificate(pdfPath)
                 .build();
 
         educationRepository.save(education);
@@ -44,7 +56,14 @@ public class EducationService {
                 .ed_name(education.getName())
                 .ed_start(education.getStartDate())
                 .ed_end(education.getEndDate())
-                .ed_certificate(education.getCertificate() != null ? "있음" : "없음")
+                .ed_path(education.getCertificate())
                 .build();
+    }
+
+    public EducationDTO getEducationById(Long id) {
+        Education education = educationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("교육 정보를 찾을 수 없습니다."));
+
+        return convertToDTO(education);
     }
 }

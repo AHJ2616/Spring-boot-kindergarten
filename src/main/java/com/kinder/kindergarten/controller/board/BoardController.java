@@ -229,21 +229,28 @@ public class BoardController {
   }
 
 //검색
-  @GetMapping("/search")
-  public String searchBoards(@RequestParam String keyword,
+  @GetMapping("/{type}/search")
+  public String searchBoards(@PathVariable String type,
+                             @RequestParam String keyword,
                              @RequestParam(required = false, defaultValue = "0") int page,
                              Model model) {
-    page = page == 0 ? 0 : (page - 1);
-    Pageable pageable = PageRequest.of(page, 10);
+    try {
+        BoardType boardType = BoardType.valueOf(type.toUpperCase(Locale.ROOT));
+        page = page == 0 ? 0 : (page - 1);
+        Pageable pageable = PageRequest.of(page, 10);
 
-    Page<BoardDTO> searchResults = boardService.searchBoards(keyword, pageable);
+        Page<BoardDTO> searchResults = boardService.searchBoardsByType(boardType, keyword, pageable);
 
-    model.addAttribute("boards", searchResults);
-    model.addAttribute("currentPage", page);
-    model.addAttribute("totalPages", searchResults.getTotalPages());
-    model.addAttribute("keyword", keyword);
+        model.addAttribute("boards", searchResults);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", searchResults.getTotalPages());
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("type", type.toLowerCase());
 
-    return "board/basic";
+        return "board/basic";
+    } catch (IllegalArgumentException e) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid board type");
+    }
   }
 
 

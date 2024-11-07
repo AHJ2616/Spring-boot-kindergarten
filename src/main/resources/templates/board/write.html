@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{common/layout}">
+      layout:decorate="~{common/layout2}">
 <head>
   <meta charset="UTF-8">
   <link rel="stylesheet" th:href="@{/css/board.css}">
@@ -17,17 +17,7 @@
   <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/lang/summernote-ko-KR.js"></script>
   <script th:src="@{/js/boardWrite.js}"></script>
-  <!-- Summernote Emoji 플러그인 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/summernote-emoji-ext@latest/dist/summernote-emoji-ext.css" rel="stylesheet">
 
-  <!-- Summernote Emoji 플러그인 JS -->
-  <script src="https://cdn.jsdelivr.net/npm/summernote-emoji-ext@latest/dist/summernote-emoji-ext.js"></script>
-  <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
-
-  <!-- summernote-emoji 플러그인 추가 -->
-  <script src="https://cdn.jsdelivr.net/npm/summernote-emoji@0.8.18/tam-emoji/tam-emoji.min.js"></script>
-  <link href="https://cdn.jsdelivr.net/npm/summernote-emoji@0.8.18/tam-emoji/tam-emoji.min.css" rel="stylesheet">
   <!--썸머노트 toolbar의 메뉴 화살표2개가 나오는 문제 처리-->
   <style>
     .dropdown-toggle::after{
