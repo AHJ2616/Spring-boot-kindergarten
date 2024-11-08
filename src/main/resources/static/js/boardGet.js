@@ -1,16 +1,17 @@
 // DOM이 로드되면 실행될 초기화 함수
 $(document).ready(function() {
-    // 이미지 프리뷰 초기화
-    const thumbnails = document.querySelectorAll('.thumbnail-item img');
+    // 이미지 갤러리 관련 코드
+    const thumbnails = document.querySelectorAll('.thumbnail');
     const previewImage = document.getElementById('preview-image');
+    const previewFilename = document.querySelector('.preview-filename');
+    const thumbnailList = document.querySelector('.thumbnail-list');
 
-    if (thumbnails.length > 0 && previewImage) {
-        thumbnails.forEach(thumbnail => {
-            thumbnail.addEventListener('mouseover', function() {
-                previewImage.src = this.src;
-            });
+    // 썸네일 호버 이벤트
+    thumbnails.forEach(thumbnail => {
+        thumbnail.addEventListener('mouseenter', function() {
+            updatePreview(this);
         });
-    }
+    });
 
     // 댓글 토글 초기화
     const toggleButton = document.getElementById('toggleComments');
@@ -171,3 +172,15 @@ function saveEdit(commentId, content) {
             alert('댓글 수정 중 오류가 발생했습니다.');
         });
 }
+
+// 프리뷰 업데이트 함수
+function updatePreview(thumbnail) {
+    const previewImage = document.getElementById('preview-image');
+    const previewFilename = document.querySelector('.preview-filename');
+
+    if (previewImage && previewFilename) {
+        previewImage.src = thumbnail.src;
+        previewFilename.textContent = thumbnail.getAttribute('data-filename');
+    }
+}
+

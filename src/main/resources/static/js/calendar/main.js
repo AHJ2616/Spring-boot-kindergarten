@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function() {
             };
 
             $.ajax({
-                url: `/events/${event.id}`,
+                url: `/events/drag/${event.id}`,
                 type: 'PUT',
                 data: JSON.stringify(eventData),
                 contentType: 'application/json',

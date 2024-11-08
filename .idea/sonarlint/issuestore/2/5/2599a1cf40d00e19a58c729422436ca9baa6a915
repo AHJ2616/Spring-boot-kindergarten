@@ -1,6 +1,7 @@
 
 c	java:S112µ"FDefine and throw a dedicated exception instead of using a generic one.(×›´8±£ÿª¯2
 h	java:S112®"FDefine and throw a dedicated exception instead of using a generic one.(ãÍåüÿÿÿÿ8²£ÿª¯2
+h	java:S112Û"FDefine and throw a dedicated exception instead of using a generic one.(ãÍåüÿÿÿÿ8ê¦å®°2
 n	java:S117"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(“ÏÔÚ8º£ÿª¯2
 l
 java:S2259·"NA "NullPointerException" could be thrown; "originalFileName" is nullable here.(ê ‚8ªÛÈ¯¯2
@@ -32,5 +33,7 @@ java:S4042©"NUse "java.nio.file.Files#delete" here for better messages on erro
 ]	java:S899­";Do something with the "boolean" value returned by "delete".(²­¡Øûÿÿÿÿ8¨¦ÿª¯2
 q
 java:S4042­"NUse "java.nio.file.Files#delete" here for better messages on error conditions.(²­¡Øûÿÿÿÿ8¨¦ÿª¯2
+p
+java:S6204Ä"RReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()'(ª™¨¹8Œªå®°2
 N
 java:S1144†"0Remove this unused private "isImageFile" method.(ÂØ‹Ö8¬ÜÈ¯¯2

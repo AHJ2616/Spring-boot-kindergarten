@@ -31,32 +31,52 @@
                     <i class="fas fa-eye"></i>
                     <span th:text="${boardDTO.views}"></span>
                 </span>
+          <div class="dropdown">
+            <a href="#" class="zip-download-btn" th:if="${boardDTO.hasZipFile}">
+              <i class="fas fa-ellipsis-v"></i>
+            </a>
+            <div class="dropdown-content">
+              <div th:each="file : ${boardDTO.BoardFileList}"
+                   th:if="${file.isZip == 'Y'}"
+                   class="dropdown-item">
+                <a th:href="@{/board/download/{fileId}(fileId=${file.fileId})}"
+                   class="file-link">압축파일 다운로드</a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
     <!-- 이미지 갤러리 섹션 -->
     <div class="image-gallery-container" th:if="${boardDTO.BoardFileList != null and not #lists.isEmpty(boardDTO.BoardFileList)}">
       <!-- 썸네일 목록 -->
-      <div class="thumbnail-list">
-        <div th:each="file : ${boardDTO.BoardFileList}"
-             th:if="${#strings.toLowerCase(file.orignalName).endsWith('.jpg') or
-                 #strings.toLowerCase(file.orignalName).endsWith('.jpeg') or
-                 #strings.toLowerCase(file.orignalName).endsWith('.png') or
-                 #strings.toLowerCase(file.orignalName).endsWith('.PNG') or
-                 #strings.toLowerCase(file.orignalName).endsWith('.gif')}"
-             class="thumbnail-item">
-          <img th:src="@{'/images/' +${file.modifiedName}}"
-               alt="썸네일 이미지"
-               class="thumbnail">
+      <div class="thumbnail-wrapper">
+        <div class="thumbnail-list">
+          <div th:each="file : ${boardDTO.BoardFileList}"
+               th:if="${#strings.toLowerCase(file.orignalName).endsWith('.jpg') or
+                   #strings.toLowerCase(file.orignalName).endsWith('.jpeg') or
+                   #strings.toLowerCase(file.orignalName).endsWith('.png') or
+                   #strings.toLowerCase(file.orignalName).endsWith('.PNG') or
+                   #strings.toLowerCase(file.orignalName).endsWith('.gif')}"
+               class="thumbnail-item">
+            <img th:src="@{'/images/' + ${file.modifiedName}}"
+                 th:data-filename="${file.orignalName}"
+                 alt="썸네일 이미지"
+                 class="thumbnail"
+                 onclick="updatePreview(this)">
+          </div>
         </div>
       </div>
 
       <!-- 큰 이미지 프리뷰 -->
       <div class="preview-container">
-        <img id="preview-image"
-             th:if="${boardDTO.BoardFileList != null and not #lists.isEmpty(boardDTO.BoardFileList)}"
-             th:src="@{'/upload/' + ${boardDTO.BoardFileList[0].filePath}}"
-             alt="이미지 프리뷰">
+        <div class="preview-content">
+          <img id="preview-image"
+               th:if="${boardDTO.BoardFileList != null and not #lists.isEmpty(boardDTO.BoardFileList)}"
+               th:src="@{'/images/' + ${boardDTO.BoardFileList[0].modifiedName}}"
+               alt="이미지 프리뷰">
+          <div class="preview-filename" th:text="${boardDTO.BoardFileList[0].orignalName}"></div>
+        </div>
       </div>
     </div>
     <!-- 게시글 내용 부분은 유지 -->
@@ -85,7 +105,7 @@
             <span class="comment-date" th:text="${#temporals.format(comment.regiDate, 'yyyy.MM.dd HH:mm')}"></span>
           </div>
           <div class="comment-content" th:text="${comment.contents}"></div>
-         <!-- <div class="comment-actions" th:if="${comment.writer == #authentication.name}">-->
+          <!-- <div class="comment-actions" th:if="${comment.writer == #authentication.name}">-->
           <div class="comment-actions">
             <button th:onclick="'editComment(${comment.commentsId})'" class="btn btn-sm btn-primary">수정</button>
             <button th:onclick="'deleteComment(${comment.commentsId})'" class="btn btn-sm btn-danger">삭제</button>
@@ -95,13 +115,13 @@
     </div>
 
     <div class="board-footer">
-    <!--  <a th:if="${boardDTO.boardWriter == #authentication.name}"
-         th:href="@{/board/modify/{boardId}(boardId=${boardDTO.boardId})}"
-         class="btn btn-primary">수정</a>
+      <!--  <a th:if="${boardDTO.boardWriter == #authentication.name}"
+           th:href="@{/board/modify/{boardId}(boardId=${boardDTO.boardId})}"
+           class="btn btn-primary">수</a>
 
-      <button th:if="${boardDTO.boardWriter == #authentication.name}"
-              onclick="deleteBoard([[${boardDTO.boardId}]])"
-              class="btn btn-danger">삭제</button>-->
+        <button th:if="${boardDTO.boardWriter == #authentication.name}"
+                onclick="deleteBoard([[${boardDTO.boardId}]])"
+                class="btn btn-danger">삭제</button>-->
       <a th:href="@{/board/modify/{boardId}(boardId=${boardDTO.boardId})}"
          class="btn btn-primary">수정</a>
 
@@ -113,23 +133,9 @@
     <div class="file-container" th:if="${boardDTO.BoardFileList != null and not #lists.isEmpty(boardDTO.BoardFileList)}">
       <h3>첨부파일</h3>
 
-      <!-- ZIP 파일 다운로드 섹션 -->
-      <div class="zip-download" th:if="${boardDTO.hasZipFile}">
-        <h4>압축 파일 다운로드</h4>
-        <div class="file-list">
-          <div th:each="file : ${boardDTO.BoardFileList}"
-               th:if="${file.isZip == 'Y'}"
-               class="file-item">
-            <a th:href="@{/board/download/{fileId}(fileId=${file.fileId})}"
-               th:text="|${file.orignalName} (압축파일)|"
-               class="file-link zip-file"></a>
-          </div>
-        </div>
-      </div>
-
       <!-- 개별 파일 다운로드 섹션 -->
       <div class="individual-download">
-        <h4>개별 파일 다운로드</h4>
+        <h4>개 파일 다운로드</h4>
         <div class="file-list">
           <div th:each="file : ${boardDTO.BoardFileList}"
                th:if="${file.isZip == 'N'}"
@@ -146,8 +152,9 @@
 
     <!-- JavaScript 코드 제거하고 스크립트 태그만 남김 -->
     <script th:inline="javascript">
-        // boardId를 전역 변수로 선언하여 boardGet.js에서 사용할 수 있게 함
+        // boardId와 함께 필요한 데이터를 전역 변수로 선언
         const boardId = [[${boardDTO.boardId}]];
+        const boardFiles = [[${boardDTO.BoardFileList}]];
     </script>
   </div>
 </div>

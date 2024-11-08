@@ -87,6 +87,17 @@ public class CalendarRestController {
     }
   }
 
+  @PutMapping("/events/drag/{id}")
+  public ResponseEntity<ScheduleDTO> dragUpdateEvent(@PathVariable String id, @RequestBody ScheduleDTO scheduleDTO) {
+    try {
+      scheduleDTO.setId(id);
+      ScheduleDTO updatedSchedule = scheduleService.dragUpdateSchedule(id, scheduleDTO);
+      return ResponseEntity.ok(updatedSchedule);
+    } catch (Exception e) {
+      return ResponseEntity.badRequest().build();
+    }
+  }
+
   @DeleteMapping("/events/delete/{id}")
   public ResponseEntity<Void> deleteEvent(@PathVariable String id) {
     try {
