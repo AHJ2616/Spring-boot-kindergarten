@@ -115,13 +115,6 @@
     </div>
 
     <div class="board-footer">
-      <!--  <a th:if="${boardDTO.boardWriter == #authentication.name}"
-           th:href="@{/board/modify/{boardId}(boardId=${boardDTO.boardId})}"
-           class="btn btn-primary">수</a>
-
-        <button th:if="${boardDTO.boardWriter == #authentication.name}"
-                onclick="deleteBoard([[${boardDTO.boardId}]])"
-                class="btn btn-danger">삭제</button>-->
       <a th:href="@{/board/modify/{boardId}(boardId=${boardDTO.boardId})}"
          class="btn btn-primary">수정</a>
 
