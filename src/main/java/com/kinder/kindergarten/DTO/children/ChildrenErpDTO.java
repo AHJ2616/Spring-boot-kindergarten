@@ -1,23 +1,27 @@
 package com.kinder.kindergarten.DTO.children;
 
 import com.kinder.kindergarten.entity.children.ClassRoom;
+import jakarta.persistence.Column;
 import jakarta.persistence.Lob;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ChildrenErpDTO {
 
     // ERP 에서 등록하는 유아 정보
 
     // 유아 이름, 생년월일, 학부모 이름, 알레르기 정보, 병력 정보, 학부모 정보, 성별, 혈액형..
 
+    private Long childrenId ; // 원아의 고유 ID
 
     @NotBlank(message = "원아의 이름은 필수값 입니다.")
     private String childrenName;    // 원아의 이름
@@ -44,6 +48,12 @@ public class ChildrenErpDTO {
     @NotNull(message = "학부모 정보는 필수입니다.")
     private Long parentId;
 
+    private Long classRoomId; // 반 ID (외래키)
+
     @DateTimeFormat(pattern = "yyyy-MM-dd") // 날짜 형식 지정
+    @Builder.Default
     private LocalDate enrollmentDate = LocalDate.now(); // 원아 등록 일자
+
+
+
 }

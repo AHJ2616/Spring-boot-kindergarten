@@ -16,7 +16,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
   String uploadPath2;
 
   @Override
-  public void addResourceHandlers(ResourceHandlerRegistry registry){
+  public void addResourceHandlers(ResourceHandlerRegistry registry) {
 
     registry.addResourceHandler("/upload/**")
             .addResourceLocations(uploadPath2);
@@ -27,10 +27,14 @@ public class WebMvcConfig implements WebMvcConfigurer {
     // Summernote 이미지 경로 추가
     registry.addResourceHandler("/images/summernote/**")
             .addResourceLocations(uploadPath2 + "summernote/");
-    
-      // No static resource css/bootstrap.min.css.map 오류 해결
+
+    // No static resource css/bootstrap.min.css.map 오류 해결
     registry.addResourceHandler("/static/**")
             .addResourceLocations("classpath:/static/");
+
+    registry.addResourceHandler("/js/**")
+            .addResourceLocations("classpath:/static/js/");  // js 폴더 전체를 static resource로 설정
+
 
   }
 }

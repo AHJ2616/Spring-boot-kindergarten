@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity // 테이블 담당한다.
@@ -32,11 +33,20 @@ public class ClassRoom extends ChildrenBaseEntity {
 
   private String classRoomDescription; // 반 설명 및 비고
 
-  @OneToMany(mappedBy = "assignedClass")
-  private List<Children> children;  // 반에 배정된 원아들
+  @Builder.Default
+  @OneToMany(mappedBy = "assignedClass", cascade = CascadeType.ALL)
+  private List<Children> children = new ArrayList<>();  // 반에 배정된 원아들
 
   @Builder.Default
   private Integer currentStudents = 0;  // 현재 원아 수
+
+  public Integer getCurrentStudents() {
+    return currentStudents != null ? currentStudents : 0;
+  }
+
+  public void setCurrentStudents(Integer currentStudents) {
+    this.currentStudents = currentStudents != null ? currentStudents : 0;
+  }
 
  /* private LocalDate ClassCreatedDate = LocalDate.now(); // 반 등록일
 
