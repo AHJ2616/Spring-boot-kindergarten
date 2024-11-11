@@ -120,6 +120,7 @@ public class ClassRoomService {
                 .maxChildren(classRoom.getMaxChildren())
                 .currentStudents(classRoom.getCurrentStudents())
                 .employeeName(classRoom.getEmployeeName())
+                .classRoomDescription(classRoom.getClassRoomDescription())
                 .build();
     }
 

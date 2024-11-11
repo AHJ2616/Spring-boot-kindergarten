@@ -1,17 +1,15 @@
 package com.kinder.kindergarten.DTO.parent;
 
-import com.kinder.kindergarten.constant.parent.Children_Role;
+
 import com.kinder.kindergarten.constant.parent.ParentType;
-import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
-
+import org.hibernate.validator.constraints.Length;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -27,6 +25,8 @@ public class ParentErpDTO {
     @NotBlank(message = "이메일은 필수 입력 값 입니다.")
     @Email(message = "이메일 형식이 올바르지 않습니다.")
     private String parentEmail;    // 학부모 이메일(학부모 구분을 위해 유니크 설정)
+
+    private String parentPassword; //학부모 비밀번호(자동 생성용)
 
     @NotBlank(message = "연락처는 필수 입력값입니다.")
     private String parentPhone;   //학부모 핸드폰 번호
@@ -44,4 +44,6 @@ public class ParentErpDTO {
 
     // 자녀 정보
     private List<Long> childrenIds;    // 자녀의 ID 목록 (자녀 엔티티와 연결)
+
+    private String tempPassword;// 임시 비밀번호(화면 표시용)
 }
