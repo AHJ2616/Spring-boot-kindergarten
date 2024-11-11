@@ -1,10 +1,15 @@
 package com.kinder.kindergarten.service.parent;
 
 import com.kinder.kindergarten.DTO.parent.ParentErpDTO;
+import com.kinder.kindergarten.DTO.parent.ParentUpdateDTO;
 import com.kinder.kindergarten.entity.parent.Parent;
 import com.kinder.kindergarten.repository.parent.ParentRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.SecureRandom;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Log4j2
 public class ParentService {
@@ -20,6 +25,8 @@ public class ParentService {
     private final ParentRepository parentRepository;
 
     private final PasswordEncoder passwordEncoder;
+
+    private final ModelMapper modelMapper;
 
     public Long parentRegister(ParentErpDTO parentErpDTO) {
         // erp에서 직원이 학부모 등록하는 서비스 메서드
@@ -53,7 +60,7 @@ public class ParentService {
                 .parentEmail(parentErpDTO.getParentEmail())
                 .parentPhone(parentErpDTO.getParentPhone())
                 .parentAddress(parentErpDTO.getParentAddress())
-                .childrenEmergencyPhone(parentErpDTO.getEmergencyContact())
+                .childrenEmergencyPhone(parentErpDTO.getChildrenEmergencyPhone())
                 .parentType(parentErpDTO.getParentType())
                 .parentPassword(encodedPassword) // 암호화된 비밀번호 저장
                 .isErpRegistered(true)  // ERP를 통한 등록임을 표시
@@ -123,5 +130,74 @@ public class ParentService {
         // 배열의 문자열 리턴한다.
     }
 
+    public Page<ParentErpDTO> getAllParents(Pageable pageable) {
+        // 등록된 부모 조회(리스트) 하는 메서드
 
+        Page<Parent> parentPage = parentRepository.findAll(pageable);
+        // 레포지토리에서 등록된 학부모의 모든 정보를 다 가져오고 PAGE 처리 한다.
+
+        return parentPage.map(parent -> modelMapper.map(parent, ParentErpDTO.class));
+        // modelMapper으로 맵 형식으로 학부모의 정보와 DTO를 리턴한다.
+    }
+
+    public ParentErpDTO getParentDetail(Long parentId) {
+        // 학부모의 상세 보기 기능을 하는 서비스 메서드
+
+        Parent parent = parentRepository.findById(parentId).orElseThrow(() ->
+                new EntityNotFoundException("학부모의 정보를 찾을 수 없습니다."));
+        // 레포지토리에서 학부모의 ID를 이용하여 학부모의 정보를 가져오고 정보가 없으면 메세지를 출력한다.
+
+        return modelMapper.map(parent, ParentErpDTO.class);
+        // modelMapper으로 맵 형식으로 학부모의 정보와 DTO를 리턴한다.
+    }
+
+    public Page<ParentErpDTO> searchParents(String keyword, Pageable pageable) {
+        // 등록된 학부모 조회할 때 검색창에서 학부모 검색하는 서비스 메서드
+
+        Page<Parent> parentPage = parentRepository.findByParentNameContaining(keyword, pageable);
+        // 학부모의 엔티티를 Page 처리로 만들고 레포지토리에서 부모의 이름으로 검색하는 쿼리메서드를 가져온다.
+
+        return parentPage.map(parent -> modelMapper.map(parent, ParentErpDTO.class));
+        // modelMapper로 이용해서 맵형식으로 학부모의 엔티티 + DTO를 리턴한다.
+    }
+
+    @Transactional
+    public void updateParent(ParentUpdateDTO parentUpdateDTO) {
+        // 학부모 정보 수정하는 서비스 메서드
+
+        log.info("ParentService.updateParent 메서드 실행 중   - - - -" + parentUpdateDTO);
+
+            Parent parent = parentRepository.findById(parentUpdateDTO.getParentId()).orElseThrow(() ->
+                    new EntityNotFoundException("학부모의 정보를 찾을 수 없습니다."));
+            // 레포지토리에 학부모의 ID를 이용해서 학부모의 정보를 찾으며 없으면 메세지를 보낸다.
+
+        log.info("부모 객체 : " + parent);
+
+            parent.setParentName(parentUpdateDTO.getParentName());
+            parent.setParentPhone(parentUpdateDTO.getParentPhone());
+            parent.setChildrenEmergencyPhone(parentUpdateDTO.getChildrenEmergencyPhone());
+            parent.setParentAddress(parentUpdateDTO.getParentAddress());
+            parent.setParentType(parentUpdateDTO.getParentType());
+            // Parent 엔티티의 성함, 연락처, 긴급연락처, 주소, 법정보호자인 필드를 parentUpdateDTO에다가 설정한다.
+
+        log.info("업데이트된 Parent 엔티티 : " + parent);
+
+        Parent savedParent = parentRepository.save(parent);
+        //수정한 데이터를 레포지토리를 통하여 DB로 보내고 savedParent변수에 저장한다.
+
+        log.info("저장된 Parent 엔티티 : " + savedParent);
+
+    }
+
+    @Transactional
+    public void deleteParent(Long parentId) {
+        // 학부모 데이터를 삭제하는 서비스 메서드
+
+        Parent parent = parentRepository.findById(parentId)
+                .orElseThrow(() -> new EntityNotFoundException("학부모의 정보를 찾을 수 없습니다. ID :" + parentId));
+        // 레포지토리에서 부모의ID를 찾는 검사를 한다. 없으면 메세지를 보낸다.
+
+        parentRepository.delete(parent);
+        // 삭제한 부모를 DB에 전달
+    }
 }

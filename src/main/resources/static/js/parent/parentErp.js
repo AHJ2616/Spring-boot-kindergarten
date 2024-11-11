@@ -77,8 +77,63 @@ $(document).ready(function() {
         // 입력된 값에서 숫자가 아닌 문자를 모두 제거
         $(this).val(function(_, value) {
             return value.replace(/[^0-9]/g, '');
-        });
+        });// $(this) value END
     });//  $('input[maxlength]').on('input', function() END
 
+    window.search = function() {
+        const keyword = $('input[name="keyword"]').val();
+        location.href = '/erp/parent/list?page=0&keyword=' + encodeURIComponent(keyword);
+    };//  window.search = function END
+
+    // Enter 키 이벤트 처리
+    $('input[name="keyword"]').on('keypress', function(e) {
+        if (e.which === 13) {
+            e.preventDefault();
+            search();
+        }
+    });//  $('input[name="keyword"]').on('keypress', function END
+
+    window.movePage = function (page) {
+        // paretnList에서 페이지 번호 클릭 시 실행되는 함수
+
+        if (page < 0) {
+            alert("첫 페이지 입니다.");
+            return;
+        }// if - page END
+
+        const totalPages = $('#totalPages').val();
+
+        if (page >= totalPages) {
+            alert("마지막 페이지 입니다.");
+            return;
+        }// if - totalPages END
+
+        const keyword = $('input[name="keyword"]').val();
+        location.href = '/erp/parent/list?page=' + page + (keyword ? '&keyword=' + keyword : '');
+    }// window.movePage = function END
+
+    window.deleteParent = function (parentId) {
+        // 삭제 버튼 눌렀을 때 실행되는 함수
+
+        if (confirm('정말 삭제하시겠습니까?')) {
+
+            $.ajax({
+                url: '/erp/parent/delete/' + parentId,
+                type: 'POST',
+                success: function (response) {
+                    if (response.success) {
+                        alert('정상적으로 삭제 되었습니다.');
+                        location.href = '/erp/parent/list';
+                    } else  {
+                        alert(response.message || '삭제 중 오류가 발생했습니다.');
+                    }// if-else END
+                },// success END
+                error: function(xhr, status, error) {
+                    alert('삭제 중 오류가 발생했습니다.');
+                }// error END
+            });// $.ajax END
+        }// if (confirm) END
+    }// window.deleteParent = function END
 
 });// $(document).ready(function() END
+

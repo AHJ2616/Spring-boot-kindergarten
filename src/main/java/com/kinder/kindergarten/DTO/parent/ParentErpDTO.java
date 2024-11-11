@@ -19,6 +19,8 @@ public class ParentErpDTO {
 
     // ERP 에서 등록하는 학부모 정보
 
+    private Long parentId; //학부모 고유 ID (PK)
+
     @NotBlank(message = "성함은 필수 입력 값 입니다.")
     private String parentName; // 학부모 성함
 
@@ -34,7 +36,7 @@ public class ParentErpDTO {
     @NotBlank(message = "주소는 필수 입력 값 입니다.")
     private String parentAddress; //학부모 주소
 
-    private String emergencyContact;    // 비상 연락처
+    private String childrenEmergencyPhone;    // 비상 연락처
 
     @Enumerated(EnumType.STRING)
     private ParentType parentType;  // 자녀와의 관계
