@@ -98,8 +98,6 @@ Esrc/main/java/com/kinder/kindergarten/controller/ErrorController.java,6\3\6389
 l
 <src/main/java/com/kinder/kindergarten/util/SecurityUtil.java,6\c\6c24beadf515a2f3966335b4af0f16ed1d40db27
 m
-=src/main/java/com/kinder/kindergarten/constant/BoardType.java,3\a\3a52477ba3af2fe0d72de4004a189c282e9f084e
-m
 =src/main/java/com/kinder/kindergarten/util/HtmlSanitizer.java,9\0\9034460d10a29bad33120d86d91d53a142903b18
 f
 6src/main/java/com/kinder/kindergarten/util/Hangul.java,d\0\d0ca73f0f0aeef2a26eb142988619162aef2feb4

@@ -7,7 +7,7 @@ import com.google.common.cache.LoadingCache;
 import com.kinder.kindergarten.DTO.board.BoardDTO;
 import com.kinder.kindergarten.DTO.board.BoardFileDTO;
 import com.kinder.kindergarten.DTO.board.BoardFormDTO;
-import com.kinder.kindergarten.constant.BoardType;
+import com.kinder.kindergarten.constant.board.BoardType;
 import com.kinder.kindergarten.entity.board.BoardEntity;
 import com.kinder.kindergarten.entity.board.BoardFileEntity;
 import com.kinder.kindergarten.repository.board.BoardFileRepository;
@@ -22,7 +22,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -66,10 +68,19 @@ import java.util.zip.ZipOutputStream;
           public Page<BoardDTO> getBoardsByType(BoardType boardType, Pageable pageable) {
             log.info("페이지 불러오기 - BoardService.getBoardsByType() 실행. boardType: " + boardType + ", pageable 정보: " + pageable);
 
-            // 페이징 처리
-            Page<BoardEntity> boardPage = boardRepository.findByBoardType(boardType, pageable);
+            // fetch join을 사용하는 메서드 호출
+            Page<BoardEntity> boardPage = boardRepository.findByBoardTypeWithFiles(boardType, pageable);
 
-            return boardPage.map(boardEntity -> modelMapper.map(boardEntity, BoardDTO.class));
+            return boardPage.map(board -> {
+                BoardDTO dto = modelMapper.map(board, BoardDTO.class);
+                // 이미 fetch join으로 가져온 데이터를 사용
+                List<BoardFileDTO> fileList = board.getBoardFiles().stream()
+                    .map(file -> modelMapper.map(file, BoardFileDTO.class))
+                    .collect(Collectors.toList());
+                dto.setBoardFileList(fileList);
+                dto.setFileCount(fileList.size());
+                return dto;
+            });
           }
 
           @Transactional
@@ -138,15 +149,23 @@ import java.util.zip.ZipOutputStream;
 
           //페이지 상세보기 board_id로 찾아서 ModelMapper사용(entity -> DTO 로)
           @Transactional(readOnly = true)
-          public BoardDTO getBoard(String board_id){
-            Optional<BoardDTO> optionalBoardDTO = boardRepository.findById(board_id).map(boardEntity -> modelMapper.map(boardEntity,BoardDTO.class));
-            BoardDTO boardDTO = optionalBoardDTO.get();
+          public BoardDTO getBoard(String board_id) {
+            BoardEntity boardEntity = boardRepository.findById(board_id)
+                    .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+            
+            BoardDTO boardDTO = new BoardDTO();
+            boardDTO.setBoardId(boardEntity.getBoardId());
+            boardDTO.setBoardTitle(boardEntity.getBoardTitle());
+            boardDTO.setBoardContents(boardEntity.getBoardContents());
+            boardDTO.setBoardType(boardEntity.getBoardType());
+            boardDTO.setBoardWriter(boardEntity.getBoardWriter());
+            boardDTO.setViews(boardEntity.getViews());
+            boardDTO.setRegiDate(boardEntity.getRegiDate());
+            boardDTO.setModiDate(boardEntity.getModiDate());
 
-            List<BoardFileEntity> fileEntities = boardFileRepository.findByBoardEntity_BoardId(board_id);
-            log.info("파일정보1 : " + fileEntities);
-            if (!fileEntities.isEmpty()) {
-              List<BoardFileDTO> fileDTOs = fileEntities.stream()
-                      .map(fileEntity -> {
+            // 첨부파일 정보 설정
+            List<BoardFileDTO> fileDTOs = boardEntity.getBoardFiles().stream()
+                    .map(fileEntity -> {
                         BoardFileDTO fileDTO = new BoardFileDTO();
                         fileDTO.setFileId(fileEntity.getFileId());
                         fileDTO.setOrignalName(fileEntity.getOriginalName());
@@ -155,13 +174,12 @@ import java.util.zip.ZipOutputStream;
                         fileDTO.setBoardId(board_id);
                         fileDTO.setIsZip(fileEntity.getIsZip());
                         return fileDTO;
-                      })
-                      .collect(Collectors.toList());
+                    })
+                    .collect(Collectors.toList());
 
-              boardDTO.setBoardFileList(fileDTOs);
-              log.info("파일정보 : " + fileDTOs);
-            }
-
+            boardDTO.setBoardFileList(fileDTOs);
+            boardDTO.setFileCount(fileDTOs.size());
+            
             return boardDTO;
           }
 
@@ -237,7 +255,7 @@ import java.util.zip.ZipOutputStream;
                 String filePath = fileService.getFullPath(savedFileName);
 
 
-                // BoardFileEntity 설정
+                // BoardFileEntity 정
                 Ulid ulid = UlidCreator.getUlid();
                 boardFile.setFileId(ulid.toString());
                 boardFile.setOriginalName(originalFilename);
@@ -429,7 +447,7 @@ import java.util.zip.ZipOutputStream;
             directory.delete();
           }
 
-          // 게시판 타입별 검색 메서드 추가
+          // 게시판 타입별 검색 서드 추가
           public Page<BoardDTO> searchBoardsByType(BoardType boardType, String keyword, Pageable pageable) {
               try {
                   // 캐시 키 생성 (게시판 타입, 검색어, 페이지 정보 조합)
@@ -474,5 +492,38 @@ import java.util.zip.ZipOutputStream;
               } catch (Exception e) {
                   throw new RuntimeException("검색 중 오류가 발생했습니다.", e);
               }
+          }
+
+          public Page<BoardDTO> getBoardList(int page, String type, String keyword) {
+            Pageable pageable = PageRequest.of(page - 1, 10, Sort.by(Sort.Direction.DESC, "regiDate"));
+            Page<BoardEntity> boardEntities;
+            
+            if (keyword != null && !keyword.isEmpty()) {
+                boardEntities = boardRepository.findByBoardTypeInAndBoardTitleContaining(
+                    Arrays.asList(BoardType.valueOf(type), BoardType.ABSOLUTE),
+                    keyword, 
+                    pageable
+                );
+            } else {
+                boardEntities = boardRepository.findByBoardTypeIn(
+                    Arrays.asList(BoardType.valueOf(type), BoardType.ABSOLUTE),
+                    pageable
+                );
+            }
+            
+            // ABSOLUTE 타입을 상단으로 정렬
+            List<BoardDTO> sortedBoards = boardEntities.getContent().stream()
+                .sorted((b1, b2) -> {
+                    if (b1.getBoardType() == BoardType.ABSOLUTE && b2.getBoardType() != BoardType.ABSOLUTE) {
+                        return -1;
+                    } else if (b1.getBoardType() != BoardType.ABSOLUTE && b2.getBoardType() == BoardType.ABSOLUTE) {
+                        return 1;
+                    }
+                    return b2.getRegiDate().compareTo(b1.getRegiDate());
+                })
+                .map(entity -> modelMapper.map(entity, BoardDTO.class))
+                .collect(Collectors.toList());
+
+            return new PageImpl<>(sortedBoards, pageable, boardEntities.getTotalElements());
           }
         }

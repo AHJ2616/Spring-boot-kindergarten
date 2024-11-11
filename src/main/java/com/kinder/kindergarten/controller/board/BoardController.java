@@ -4,10 +4,12 @@ import com.kinder.kindergarten.DTO.board.BoardDTO;
 import com.kinder.kindergarten.DTO.board.BoardFileDTO;
 import com.kinder.kindergarten.DTO.board.BoardFormDTO;
 import com.kinder.kindergarten.DTO.board.CommentsDTO;
-import com.kinder.kindergarten.constant.BoardType;
+import com.kinder.kindergarten.DTO.survey.SurveyDTO;
+import com.kinder.kindergarten.constant.board.BoardType;
 import com.kinder.kindergarten.repository.QueryDSL;
 import com.kinder.kindergarten.service.board.BoardService;
 import com.kinder.kindergarten.service.board.CommentsService;
+import com.kinder.kindergarten.service.board.SurveyService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +17,10 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +38,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -49,6 +54,8 @@ public class BoardController {
   private final BoardService boardService;
 
   private final CommentsService commentsService;
+  private final SurveyService surveyService;
+
   private final QueryDSL queryDSL;
 
   @GetMapping(value="/list/{type}")
@@ -58,18 +65,48 @@ public class BoardController {
     try {
       BoardType boardType = BoardType.valueOf(type.toUpperCase(Locale.ROOT));
       pageNum = pageNum == 0 ? 0 : (pageNum - 1);
-      Pageable pageable = PageRequest.of(pageNum, 10); // 한 페이지당 10개의 게시글
-
+      Pageable pageable = PageRequest.of(pageNum, 10);
+      
+      // ABSOLUTE 타입의 게시글 조회
+      List<BoardDTO> absoluteBoards = boardService.getBoardsByType(BoardType.ABSOLUTE, PageRequest.of(0, 10)).getContent();
+      
+      // 요청된 타입의 게시글 조회
       Page<BoardDTO> boardDtoPage = boardService.getBoardsByType(boardType, pageable);
+      List<BoardDTO> combinedBoards = new ArrayList<>();
+      
+      // ABSOLUTE 게시글을 먼저 추가
+      combinedBoards.addAll(absoluteBoards);
+      // 기존 게시글 추가
+      combinedBoards.addAll(boardDtoPage.getContent());
 
-      model.addAttribute("boards", boardDtoPage);
+      // 파일 카운트 설정 - 4개 이상일 경우 총합에서 -1
+      combinedBoards.forEach(board -> {
+          if (board.getBoardFileList() != null) {
+              int fileCount = board.getBoardFileList().size();
+              if (fileCount >= 4) {
+                  board.setFileCount(fileCount - 1);
+              } else {
+                  board.setFileCount(fileCount);
+              }
+          } else {
+              board.setFileCount(0);
+          }
+      });
+
+      // Page 객체 재생성
+      Page<BoardDTO> newBoardDtoPage = new PageImpl<>(
+          combinedBoards, 
+          pageable,
+          boardDtoPage.getTotalElements() + absoluteBoards.size()
+      );
+
+      model.addAttribute("boards", newBoardDtoPage);
       model.addAttribute("currentPage", pageNum);
-      model.addAttribute("totalPages", boardDtoPage.getTotalPages());
-      // 처리 로직
+      model.addAttribute("totalPages", newBoardDtoPage.getTotalPages());
+      
     } catch (IllegalArgumentException e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid board type");
     }
-
 
     return "board/basic";
   }
@@ -93,7 +130,6 @@ public class BoardController {
       // 테스트용 작성자 설정 (나중에 실제 인증 정보로 변경)
       boardFormDTO.setBoardWriter("테스트작성자");
 
-      String boardId;
       // 파일 존재 여부와 ZIP 생성 옵션에 따른 처리
       if (boardFileList != null && !boardFileList.isEmpty() && !boardFileList.get(0).isEmpty()) {
         if (boardFileList.size() >= 3) {  // 파일이 3개 이상일 경우
@@ -109,8 +145,9 @@ public class BoardController {
       String redirectUrl = switch(boardFormDTO.getBoardType()) {
         case COMMON -> "/board/list/common";
         case DIARY -> "/board/list/diary";
-        case RESEARCH -> "/board/list/research";
+        case SURVEY -> "/board/list/survey";
         case NOTIFICATION -> "/board/list/notification";
+        case ABSOLUTE -> "/board/list/notification";
       };
 
       Map<String, Object> response = new HashMap<>();
@@ -126,15 +163,27 @@ public class BoardController {
     }
   }
 
-  @GetMapping(value="/{board_id}")
-  public String getBoard(@PathVariable String board_id, Model model, HttpServletRequest request){
-    queryDSL.increaseViews(board_id,request);//조회수 1 증가시키기
-    BoardDTO boardDTO = boardService.getBoard(board_id);
-    log.info("BoardService.getBoard() 실행 : " + boardDTO);
-    List<CommentsDTO> comments = commentsService.getCommentsByBoardId(board_id);
-
+  @GetMapping("/{id}")
+  public String getBoard(@PathVariable String id, Model model, HttpServletRequest request) {
+    queryDSL.increaseViews(id,request);//조회수 1 증가시키기
+    BoardDTO boardDTO = boardService.getBoard(id);
     model.addAttribute("boardDTO", boardDTO);
+    
+    // 설문조사 데이터 조회
+    try {
+        SurveyDTO surveyDTO = surveyService.getSurveyByBoardId(id);
+        if (surveyDTO != null) {
+            model.addAttribute("surveyDTO", surveyDTO);
+        }
+    } catch (Exception e) {
+        // 설문조사가 없는 경우 무시
+        log.debug("No survey found for board id: " + id);
+    }
+    
+    // 댓글 목록 조회
+    List<CommentsDTO> comments = commentsService.getCommentsByBoardId(id);
     model.addAttribute("comments", comments);
+    
     return "board/get";
   }
 
@@ -182,7 +231,7 @@ public class BoardController {
       model.addAttribute("boardFormDTO", boardFormDTO);
       return "board/write";
     } catch (Exception e) {
-      model.addAttribute("errorMessage", "게시글을 불러오는 중 에러가 발생했습니다.");
+      model.addAttribute("errorMessage", "게시글을 불러오는 중 에러가 발생했습다.");
       return "redirect:/board/" + boardId;
     }
   }
@@ -239,11 +288,42 @@ public class BoardController {
         page = page == 0 ? 0 : (page - 1);
         Pageable pageable = PageRequest.of(page, 10);
 
+        // ABSOLUTE 타입의 게시글 먼저 검색
+        List<BoardDTO> absoluteBoards = boardService.searchBoardsByType(BoardType.ABSOLUTE, keyword, PageRequest.of(0, 10)).getContent();
+        
+        // 요청된 타입의 게시글 검색
         Page<BoardDTO> searchResults = boardService.searchBoardsByType(boardType, keyword, pageable);
+        List<BoardDTO> combinedBoards = new ArrayList<>();
+        
+        // ABSOLUTE 게시글을 먼저 추가
+        combinedBoards.addAll(absoluteBoards);
+        // 검색된 게시글 추가
+        combinedBoards.addAll(searchResults.getContent());
 
-        model.addAttribute("boards", searchResults);
+        // 파일 카운트 설정 - 4개 이상일 경우 총합에서 -1
+        combinedBoards.forEach(board -> {
+            if (board.getBoardFileList() != null) {
+                int fileCount = board.getBoardFileList().size();
+                if (fileCount >= 4) {
+                    board.setFileCount(fileCount - 1);
+                } else {
+                    board.setFileCount(fileCount);
+                }
+            } else {
+                board.setFileCount(0);
+            }
+        });
+
+        // Page 객체 재생성
+        Page<BoardDTO> newSearchResults = new PageImpl<>(
+            combinedBoards,
+            pageable,
+            searchResults.getTotalElements() + absoluteBoards.size()
+        );
+
+        model.addAttribute("boards", newSearchResults);
         model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", searchResults.getTotalPages());
+        model.addAttribute("totalPages", newSearchResults.getTotalPages());
         model.addAttribute("keyword", keyword);
         model.addAttribute("type", type.toLowerCase());
 

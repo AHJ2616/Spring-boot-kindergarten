@@ -6,11 +6,26 @@ $(document).ready(function() {
 
 
 function initializeSummernote() {
+    // Summernote 커스텀 버튼 정의
+    var SurveyButton = function(context) {
+        var ui = $.summernote.ui;
+        
+        var button = ui.button({
+            contents: '<i class="fas fa-poll"></i> 설문조사',
+            tooltip: '설문조사 추가',
+            click: function() {
+                openSurveyModal();
+            }
+        });
+        
+        return button.render();
+    };
+
     $('#summernote').summernote({
         height: 300,
         lang: 'ko-KR',
-        sanitize: true, // HTML sanitize 활성화
-        disableDragAndDrop: true, // 드래그 앤 드롭 비활성화
+        sanitize: true,
+        disableDragAndDrop: true,
         toolbar: [
             ['fontname', ['fontname']],
             ['fontsize', ['fontsize']],
@@ -19,6 +34,7 @@ function initializeSummernote() {
             ['para', ['ul', 'ol', 'paragraph']],
             ['height', ['height']],
             ['insert', ['picture', 'link', 'video']],
+            ['mybutton', ['survey']], // 설문조사 버튼 추가
             ['view', ['fullscreen','help']]
         ],
         fontNames: ['Arial', '맑은 고딕', '궁서', '굴림', '굴림체', '돋움체', 'sans-serif'],
@@ -30,17 +46,10 @@ function initializeSummernote() {
                 }
             }
         },
-        emoji: {
-            dropdown: true,
-            container: 'body',
-            categories: [
-                'people', 'nature', 'food', 'activity',
-                'travel', 'objects', 'symbols', 'flags'
-            ],
-            showCategory: true,
-            recentCount: 36,
-            useLocalStorage: true
-        },
+        // 커스텀 버튼 등록
+        buttons: {
+            survey: SurveyButton
+        }
     });
 }
 
@@ -73,29 +82,44 @@ function initializeFileUpload() {
 }
 
 function initializeFormSubmit() {
-    document.querySelector('form').addEventListener('submit', function(e) {
+    document.querySelector('form').addEventListener('submit', async function(e) {
         e.preventDefault();
 
         const formData = new FormData(this);
+        
+        // 설문조사 데이터가 있다면 추가
+        if (typeof getSurveyData === 'function') {
+            const surveyData = getSurveyData();
+            if (surveyData) {
+                formData.append('surveyData', JSON.stringify(surveyData));
+            }
+        }
 
-        $.ajax({
-            url: this.action,
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function(response) {
-                if (response.success) {
-                    window.location.href = response.redirectUrl;
-                } else {
-                    window.location.href = '/board/list/common';
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('Error:', error);
-                alert('파일 업로드 중 오류가 발생했습니다.');
+        try {
+            const response = await $.ajax({
+                url: this.action,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false
+            });
+
+            if (response.success) {
+                window.location.href = response.redirectUrl;
+            } else {
                 window.location.href = '/board/list/common';
             }
-        });
+        } catch (error) {
+            console.error('Error:', error);
+            alert('파일 업로드 중 오류가 발생했습니다.');
+            window.location.href = '/board/list/common';
+        }
     });
+}
+
+function openSurveyModal() {
+    // Bootstrap 모달 열기
+    const surveyModal = new bootstrap.Modal(document.getElementById('surveyModal'));
+    surveyModal.show();
+
 }

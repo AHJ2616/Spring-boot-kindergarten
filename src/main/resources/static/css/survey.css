@@ -1,0 +1,121 @@
+/* 설문조사 컨테이너 스타일 */
+.survey-container {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px auto;
+    width: 70%;
+    max-width: 800px;
+}
+
+/* 설문조사 제목 스타일 */
+.survey-container h3 {
+    color: #212529;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+/* 설문조사 설명 스타일 */
+.survey-container > p {
+    color: #6c757d;
+    margin-bottom: 20px;
+}
+
+/* 질문 스타일 */
+.survey-question {
+    background-color: white;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.survey-question p {
+    color: #495057;
+    font-size: 1.1em;
+    margin-bottom: 12px;
+}
+
+/* 선택지 스타일 */
+.form-check {
+    margin: 8px 0;
+    padding-left: 25px;
+}
+
+.form-check-input {
+    margin-top: 6px;
+}
+
+.form-check-label {
+    color: #495057;
+    margin-left: 5px;
+}
+
+/* 주관식 답변 텍스트영역 스타일 */
+.survey-question textarea {
+    width: 100%;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 10px;
+    margin-top: 8px;
+}
+
+/* 설문조사 응답 버튼 스타일 */
+.survey-submit-btn {
+    background-color: #0d6efd;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    margin-top: 15px;
+    cursor: pointer;
+}
+
+.survey-submit-btn:hover {
+    background-color: #0b5ed7;
+}
+
+/* 모바일 반응형 스타일 */
+@media (max-width: 768px) {
+    .survey-container {
+        padding: 15px;
+    }
+
+    .survey-question {
+        padding: 12px;
+    }
+}
+
+.survey-section {
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    width: calc(100% - 400px);
+    margin-left: 200px;
+}
+
+.question-item {
+    margin-bottom: 20px;
+}
+
+.question-text {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.options {
+    margin-left: 20px;
+}
+
+.option-item {
+    margin: 5px 0;
+}
+
+.text-answer textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}

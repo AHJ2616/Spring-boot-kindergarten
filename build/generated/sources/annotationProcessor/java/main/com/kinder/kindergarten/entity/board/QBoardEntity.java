@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
+import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
@@ -23,11 +24,13 @@ public class QBoardEntity extends EntityPathBase<BoardEntity> {
 
     public final StringPath boardContents = createString("boardContents");
 
+    public final ListPath<BoardFileEntity, QBoardFileEntity> boardFiles = this.<BoardFileEntity, QBoardFileEntity>createList("boardFiles", BoardFileEntity.class, QBoardFileEntity.class, PathInits.DIRECT2);
+
     public final StringPath boardId = createString("boardId");
 
     public final StringPath boardTitle = createString("boardTitle");
 
-    public final EnumPath<com.kinder.kindergarten.constant.BoardType> boardType = createEnum("boardType", com.kinder.kindergarten.constant.BoardType.class);
+    public final EnumPath<com.kinder.kindergarten.constant.board.BoardType> boardType = createEnum("boardType", com.kinder.kindergarten.constant.board.BoardType.class);
 
     public final StringPath boardWriter = createString("boardWriter");
 
