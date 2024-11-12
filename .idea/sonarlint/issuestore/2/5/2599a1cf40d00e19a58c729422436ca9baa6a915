@@ -1,39 +1,45 @@
 
-c	java:S112µ"FDefine and throw a dedicated exception instead of using a generic one.(×›´8±£ÿª¯2
-h	java:S112®"FDefine and throw a dedicated exception instead of using a generic one.(ãÍåüÿÿÿÿ8²£ÿª¯2
-h	java:S112Û"FDefine and throw a dedicated exception instead of using a generic one.(ãÍåüÿÿÿÿ8ê¦å®°2
-n	java:S117"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(“ÏÔÚ8º£ÿª¯2
+c	java:S112Ç"FDefine and throw a dedicated exception instead of using a generic one.(×›´8±£ÿª¯2
+h	java:S112À"FDefine and throw a dedicated exception instead of using a generic one.(ãÍåüÿÿÿÿ8²£ÿª¯2
+h	java:S112í"FDefine and throw a dedicated exception instead of using a generic one.(ãÍåüÿÿÿÿ8ê¦å®°2
+‰
+java:S1192š"fDefine a constant instead of duplicating this literal "ê²Œì‹œê¸€ì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤." 3 times.(¾ÎÚ¤øÿÿÿÿ8òĞ«Ğ±2
+n	java:S117˜"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(“ÏÔÚ8º£ÿª¯2
 l
-java:S2259·"NA "NullPointerException" could be thrown; "originalFileName" is nullable here.(ê ‚8ªÛÈ¯¯2
+java:S2259É"NA "NullPointerException" could be thrown; "originalFileName" is nullable here.(ê ‚8ªÛÈ¯¯2
+o
+java:S6204O"RReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()'(ª™¨¹8ÉÛÈ¯¯2
 Z
-java:S1854k"=Remove this useless assignment to local variable "extension".(°æ¾…8¿ÛÈ¯¯2
+java:S1854v"=Remove this useless assignment to local variable "extension".(°æ¾…8¿ÛÈ¯¯2
 N
-java:S1481e"1Remove this unused "isFirstImage" local variable.(Ü¾‘¶8ÂÛÈ¯¯2
+java:S1481p"1Remove this unused "isFirstImage" local variable.(Ü¾‘¶8ÂÛÈ¯¯2
 K
-java:S1481k".Remove this unused "extension" local variable.(°æ¾…8ÃÛÈ¯¯2
+java:S1481v".Remove this unused "extension" local variable.(°æ¾…8ÃÛÈ¯¯2
 p
-java:S6204Ÿ"RReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()'(ª™¨¹8ÉÛÈ¯¯2
+java:S6204²"RReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()'(ª™¨¹8ÜÈ¯¯2
 a
-java:S1117½">Rename "uploadPath" which hides the field declared at line 60.(ûÑš‰üÿÿÿÿ8áÛÈ¯¯2
+java:S1117Ï">Rename "uploadPath" which hides the field declared at line 62.(ûÑš‰üÿÿÿÿ8áÛÈ¯¯2
 O
-java:S1481å"1Remove this unused "isFirstImage" local variable.(Ü¾‘¶8ûÛÈ¯¯2
+java:S1481÷"1Remove this unused "isFirstImage" local variable.(Ü¾‘¶8ûÛÈ¯¯2
 p
-java:S6204š"RReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()'(ª™¨¹8ÜÈ¯¯2
+java:S6204¬"RReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()'(ª™¨¹8Œªå®°2
 O
-java:S1481Õ"1Remove this unused "isFirstImage" local variable.(Ü¾‘¶8™ÜÈ¯¯2
+java:S1481ç"1Remove this unused "isFirstImage" local variable.(Ü¾‘¶8™ÜÈ¯¯2
 L
-java:S1481Û".Remove this unused "extension" local variable.(°æ¾…8šÜÈ¯¯2
+java:S1481í".Remove this unused "extension" local variable.(°æ¾…8šÜÈ¯¯2
 I
-java:S1075ô"&Remove this hard-coded path-delimiter.(ÀÉŸôüÿÿÿÿ8ÜÈ¯¯2
+java:S1075†"&Remove this hard-coded path-delimiter.(ÀÉŸôüÿÿÿÿ8ÜÈ¯¯2
 M
-java:S2093Ó"*Change this "try" to a try-with-resources.(¡»¢üùÿÿÿÿ8§ÜÈ¯¯2
-]	java:S899©";Do something with the "boolean" value returned by "delete".(²Œ­ûÿÿÿÿ8ªÜÈ¯¯2
+java:S2093å"*Change this "try" to a try-with-resources.(¡»¢üùÿÿÿÿ8§ÜÈ¯¯2
+]	java:S899»";Do something with the "boolean" value returned by "delete".(²Œ­ûÿÿÿÿ8ªÜÈ¯¯2
 q
-java:S4042©"NUse "java.nio.file.Files#delete" here for better messages on error conditions.(²Œ­ûÿÿÿÿ8ªÜÈ¯¯2
-]	java:S899­";Do something with the "boolean" value returned by "delete".(²­¡Øûÿÿÿÿ8¨¦ÿª¯2
+java:S4042»"NUse "java.nio.file.Files#delete" here for better messages on error conditions.(²Œ­ûÿÿÿÿ8ªÜÈ¯¯2
+]	java:S899¿";Do something with the "boolean" value returned by "delete".(²­¡Øûÿÿÿÿ8¨¦ÿª¯2
 q
-java:S4042­"NUse "java.nio.file.Files#delete" here for better messages on error conditions.(²­¡Øûÿÿÿÿ8¨¦ÿª¯2
+java:S4042¿"NUse "java.nio.file.Files#delete" here for better messages on error conditions.(²­¡Øûÿÿÿÿ8¨¦ÿª¯2
 p
-java:S6204Ä"RReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()'(ª™¨¹8Œªå®°2
+java:S6204Ö"RReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()'(ª™¨¹8Ô«Ğ±2
+p
+java:S6204"RReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()'(ª™¨¹8ŠÔ«Ğ±2
 N
-java:S1144†"0Remove this unused private "isImageFile" method.(ÂØ‹Ö8¬ÜÈ¯¯2
+java:S1144‘"0Remove this unused private "isImageFile" method.(ÂØ‹Ö8¬ÜÈ¯¯2

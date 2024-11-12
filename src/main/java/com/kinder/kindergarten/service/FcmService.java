@@ -1,6 +1,8 @@
 package com.kinder.kindergarten.service;
 
 import com.google.gson.Gson;
+import com.kinder.kindergarten.entity.MemberEntity;
+import com.kinder.kindergarten.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import okhttp3.*;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Log4j2
@@ -57,5 +60,6 @@ public class FcmService {
       System.out.println("Notification sent successfully: " + response.body().string());
     }
   }
+
 
 }

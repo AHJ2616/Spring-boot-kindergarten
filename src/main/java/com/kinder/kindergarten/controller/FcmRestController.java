@@ -1,11 +1,9 @@
 package com.kinder.kindergarten.controller;
 
 import com.kinder.kindergarten.service.FcmService;
+import com.kinder.kindergarten.service.MemberService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
@@ -15,6 +13,8 @@ import java.io.IOException;
 public class FcmRestController {
 
   private final FcmService fcmService;
+  private final MemberService memberService;
+
 
   @PostMapping(value="/send")
   public String sendNotification(@RequestParam String targetToken, @RequestParam String title,@RequestParam String body){
@@ -25,5 +25,10 @@ public class FcmRestController {
       e.printStackTrace();
       return "Failed to send notification";
     }
+  }
+
+  @GetMapping(value="/{email}",headers = "FCM-TOKEN")
+  public void pushAlram(@PathVariable("email") String email, @RequestHeader("FCM-TOKEN") String token){
+    memberService.addFCMToken(email,token);
   }
 }
