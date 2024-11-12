@@ -13,9 +13,8 @@ import java.time.LocalDateTime;
 @MappedSuperclass   // 직접적으로 테이블을 생성하지 않는 Entity
 @EntityListeners(value = {AuditingEntityListener.class})    // 등록, 수정을 감시한다.
 @Getter
-public class ChildrenBaseEntity {
+public abstract class ChildrenBaseEntity {
 
-    // 학부모와 원아 엔티티에 대한 공통 엔티티(학부모는 아직 별개 구분)
 
     @CreatedDate    // 생성시간
     @Column(name = "createdDate", updatable = false)    // 한번 등록하면 수정할수 없게 한다.

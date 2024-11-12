@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>원아 목록</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .table th, .table td {
+            vertical-align: middle;
+        }
+        .container {
+            margin-top: 2rem;
+        }
+        .dropdown-menu {
+            min-width: 100px;
+        }
+        .dropdown-item {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+        .search-box {
+            margin-bottom: 20px;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px auto;
+            width: 100%;
+        }
+        .pagination .page-item {
+            margin: 0 2px;  /* 페이지 번호 사이 간격 */
+        }
+        .pagination .page-link {
+            padding: 0.5rem 0.75rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 class="mb-4">등록된 원아 목록</h2>
+
+    <!-- 검색 폼 -->
+    <div class="search-box">
+        <form th:action="@{/erp/children/list}" method="get" class="row g-3">
+            <div class="col-auto">
+                <select class="form-select" name="searchType">
+                    <option value="">선택</option>
+                    <option value="name" th:selected="${param.searchType == 'name'}">이름</option>
+                    <option value="class" th:selected="${param.searchType == 'class'}">반</option>
+                    <option value="parent" th:selected="${param.searchType == 'parent'}">보호자</option>
+                </select>
+            </div>
+            <div class="col-auto">
+                <input type="text" class="form-control" name="keyword" th:value="${param.keyword}" placeholder="검색어를 입력하세요">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">검색</button>
+            </div>
+        </form>
+    </div>
+
+    <table class="table table-hover">
+        <thead class="table-light">
+        <tr>
+            <th>번호</th>
+            <th>이름</th>
+            <th>반</th>
+            <th>등록일</th>
+            <th>수정일</th>
+            <th>관리</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="child, status : ${children}">
+            <td th:text="${children.number * children.size + status.count}"></td>
+            <td th:text="${child.childrenName}"></td>
+            <td th:text="${child.classRoomName}"></td>
+            <td th:text="${#temporals.format(child.enrollmentDate, 'yyyy-MM-dd')}"></td>
+            <td th:text="${#temporals.format(child.getChildrenModifyDate(), 'yyyy-MM-dd')}"></td>
+            <td>
+                <div class="dropdown">
+                    <button class="btn btn-primary btn-sm dropdown-toggle"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                        관리
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item"
+                               th:href="@{/erp/children/detail/{id}(id=${child.childrenId})}">
+                                상세
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item"
+                               th:href="@{/erp/children/modify/{id}(id=${child.childrenId})}">
+                                수정
+                            </a>
+                        </li>
+                        <li>
+                            <form th:action="@{/erp/children/delete/{id}(id=${child.childrenId})}"
+                                  method="post"
+                                  style="display: inline;">
+                                <button type="submit"
+                                        class="dropdown-item text-danger"
+                                        onclick="return confirm('정말 삭제하시겠습니까?')">
+                                    삭제
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- 페이지네이션 부분만 수정 -->
+    <div class="pagination" th:if="${children.totalPages > 0}">
+        <ul class="pagination justify-content-center">
+            <!-- 이전 버튼 -->
+            <li class="page-item" th:classappend="${children.first} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/erp/children/list(
+                           page=${children.first ? 0 : children.number - 1},
+                           searchType=${param.searchType},
+                           keyword=${param.keyword}
+                       )}">이전</a>
+            </li>
+
+            <!-- 페이지 번호들 -->
+            <th:block th:with="
+                    start=${T(java.lang.Math).floor(children.number/10)*10 + 1},
+                    end=${(T(java.lang.Math).floor(children.number/10) + 1) * 10 < children.totalPages ? (T(java.lang.Math).floor(children.number/10) + 1) * 10 : children.totalPages}">
+
+                <li class="page-item" th:each="page : ${#numbers.sequence(start, end)}"
+                    th:classappend="${page == children.number + 1} ? 'active'">
+                    <a class="page-link" th:href="@{/erp/children/list(page=${page - 1}, searchType=${param.searchType}, keyword=${param.keyword})}"
+                       th:text="${page}"></a>
+                </li>
+            </th:block>
+
+            <!-- 다음 버튼 -->
+            <li class="page-item" th:classappend="${children.last} ? 'disabled'">
+                <a class="page-link" th:href="${children.last} ? '#' : @{/erp/children/list(page=${children.number + 1}, searchType=${param.searchType}, keyword=${param.keyword})}">다음</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/children/childrenErp.js"></script>
+</body>
+</html>

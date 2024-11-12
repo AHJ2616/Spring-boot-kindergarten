@@ -2,19 +2,24 @@ package com.kinder.kindergarten.DTO.parent;
 
 
 import com.kinder.kindergarten.constant.parent.ParentType;
+import com.kinder.kindergarten.entity.children.ChildrenBaseEntity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDate;
 import java.util.List;
 
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ParentErpDTO {
 
     // ERP 에서 등록하는 학부모 정보
@@ -41,8 +46,13 @@ public class ParentErpDTO {
     @Enumerated(EnumType.STRING)
     private ParentType parentType;  // 자녀와의 관계
 
-    // 생성 날짜
+    @Builder.Default
+    @DateTimeFormat(pattern = "yyyy-MM-dd") // 날짜 형식 지정
     private LocalDate parentCreateDate = LocalDate.now();  // 학부모 등록일
+
+    @Builder.Default
+    @DateTimeFormat(pattern = "yyyy-MM-dd") // 날짜 형식 지정
+    private LocalDate parentModifyDate = LocalDate.now();   // 학부모 수정일
 
     // 자녀 정보
     private List<Long> childrenIds;    // 자녀의 ID 목록 (자녀 엔티티와 연결)

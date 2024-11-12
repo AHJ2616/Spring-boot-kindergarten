@@ -1,9 +1,15 @@
 package com.kinder.kindergarten.controller.children;
 
 import com.kinder.kindergarten.DTO.children.ChildrenErpDTO;
+import com.kinder.kindergarten.DTO.children.ChildrenUpdateDTO;
 import com.kinder.kindergarten.service.children.ChildrenService;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -84,6 +90,90 @@ public class ChildrenController {
             log.error("Error registering children: ", e);
             model.addAttribute("errorMessage", "원아 등록 중 오류가 발생했습니다: " + e.getMessage());
             return "children/childrenErpForm";
+        }
+    }
+
+    @GetMapping("/list")
+    public String ChildrenList(@RequestParam(required = false) String searchType, @RequestParam(required = false) String keyword,
+                               @RequestParam(defaultValue = "0") int page, Model model) {
+
+        Page<ChildrenErpDTO> childrenPage = childrenService.getChildrenList(searchType, keyword, page);
+
+        model.addAttribute("children", childrenPage);
+
+        return "children/childrenList";
+    }
+
+    @GetMapping("/detail/{childrenId}")
+    public String childrenDetail(@PathVariable Long childrenId, Model model) {
+
+        ChildrenErpDTO childrenErpDTO = childrenService.getChildrenById(childrenId);
+
+        model.addAttribute("children", childrenErpDTO);
+
+        return "children/childrenDetail";
+    }
+
+    @GetMapping("/modify/{childrenId}")
+    public String modifyForm(@PathVariable Long childrenId, Model model) {
+
+        try {
+            ChildrenErpDTO childrenErpDTO = childrenService.getChildrenById(childrenId);
+            ChildrenUpdateDTO updateDTO = new ChildrenUpdateDTO();
+
+            updateDTO.setChildrenId(childrenErpDTO.getChildrenId());
+            updateDTO.setChildrenName(childrenErpDTO.getChildrenName());
+            updateDTO.setChildrenBirthDate(childrenErpDTO.getChildrenBirthDate());
+            updateDTO.setChildrenGender(childrenErpDTO.getChildrenGender().equals("FEMALE") ? "여자" : "남자");
+            updateDTO.setChildrenBloodType(childrenErpDTO.getChildrenBloodType());
+            updateDTO.setChildrenAllergies(childrenErpDTO.getChildrenAllergies());
+            updateDTO.setChildrenMedicalHistory(childrenErpDTO.getChildrenMedicalHistory());
+            updateDTO.setChildrenNotes(childrenErpDTO.getChildrenNotes());
+            log.info("원아 정보 DTO : " + updateDTO);
+
+            model.addAttribute("children", updateDTO);
+
+            return "children/childrenModifyForm";
+
+        } catch (Exception e) {
+
+            log.error("원아 정보 조회 중 오류 발생 " + e.getMessage());
+
+            return "redirect:/erp/children/list";
+        }
+
+    }
+
+    @PostMapping("/modify/{childrenId}")
+    public String modifyChildren(@PathVariable Long childrenId,
+                                 @ModelAttribute("children") @Valid ChildrenUpdateDTO updateDTO,  // @ModelAttribute 추가
+                                 BindingResult bindingResult,
+                                 Model model) {
+        if (bindingResult.hasErrors()) {
+            return "children/childrenModifyForm";
+        }
+
+        try {
+            childrenService.updateChildren(childrenId, updateDTO);
+            return "redirect:/erp/children/detail/" + childrenId;
+        } catch (Exception e) {
+            log.error("원아 정보 수정 중 오류 발생: ", e);
+            model.addAttribute("errorMessage", "원아 정보 수정 중 오류가 발생했습니다.");
+            return "children/childrenModifyForm";
+        }
+    }
+
+    @PostMapping("/delete/{childrenId}")
+    public String deleteChildren(@PathVariable Long childrenId, Model model) {
+        try {
+            childrenService.deleteChildren(childrenId);
+            return "redirect:/erp/children/list";
+        } catch (EntityNotFoundException e) {
+            model.addAttribute("errorMessage", "원아를 찾을 수 없습니다.");
+            return "redirect:/erp/children/list";
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "삭제 중 오류가 발생했습니다.");
+            return "redirect:/erp/children/list";
         }
     }
 }

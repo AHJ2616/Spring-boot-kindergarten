@@ -92,7 +92,7 @@
 </head>
 <body>
 <div class="container">
-    <h2>등록된 학부모 조회</h2>
+    <h2>등록된 학부모 목록</h2>
 
     <!-- 검색 폼 -->
     <div class="search-form d-flex">
@@ -114,11 +114,9 @@
         <tr>
             <th>번호</th>
             <th>성함</th>
-            <th>연락처</th>
-            <th>주소</th>
-            <th>비상 연락처</th>
             <th>자녀와의 관계</th>
             <th>등록일</th>
+            <th>수정일</th>
             <th>관리</th>
         </tr>
         </thead>
@@ -129,11 +127,9 @@
         <tr th:each="parent, status : ${parents.content}">
             <td th:text="${status.count + (parents.number * parents.size)}"></td>
             <td th:text="${parent.parentName}"></td>
-            <td th:text="${parent.parentPhone}"></td>
-            <td th:text="${parent.parentAddress}"></td>
-            <td th:text="${parent.childrenEmergencyPhone}"></td>
             <td th:text="${parent.parentType?.displayName}"></td>
             <td th:text="${#temporals.format(parent.parentCreateDate, 'yyyy-MM-dd')}"></td>
+            <td th:text="${#temporals.format(parent.parentModifyDate, 'yyyy-MM-dd')}"></td>
             <td>
                 <a th:href="@{'/erp/parent/detail/' + ${parent.parentId}}" class="btn btn-sm btn-primary">상세</a>
                 <a th:href="@{'/erp/parent/modify/' + ${parent.parentId}}" class="btn btn-sm btn-secondary">수정</a>

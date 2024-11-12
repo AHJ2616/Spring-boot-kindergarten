@@ -10,7 +10,7 @@ import lombok.ToString;
 @ToString
 public class ParentUpdateDTO {
 
-    // 부모 정보를 수정하는 DTO
+    // ERP에 등록된 학부모의 정보를 수정하는 DTO
 
     private Long parentId; //학부모 고유 ID (PK)
 

@@ -2,6 +2,7 @@ package com.kinder.kindergarten.service.children;
 
 import com.kinder.kindergarten.DTO.children.ChildrenClassRoomDTO;
 import com.kinder.kindergarten.DTO.children.ChildrenErpDTO;
+import com.kinder.kindergarten.DTO.children.ChildrenUpdateDTO;
 import com.kinder.kindergarten.DTO.parent.ParentErpDTO;
 import com.kinder.kindergarten.entity.children.Children;
 import com.kinder.kindergarten.entity.children.ClassRoom;
@@ -9,8 +10,12 @@ import com.kinder.kindergarten.entity.parent.Parent;
 import com.kinder.kindergarten.repository.children.ChildrenRepository;
 import com.kinder.kindergarten.repository.children.ClassRoomRepository;
 import com.kinder.kindergarten.repository.parent.ParentRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -82,10 +87,95 @@ public class ChildrenService {
         // Children 엔티티를 DTO로 변환하는 메서드
 
         return ChildrenErpDTO.builder()
-                .childrenId(children.getChildrenId())
-                .childrenName(children.getChildrenName())
-                .childrenBirthDate(children.getChildrenBirthDate())
-                .childrenGender(children.getChildrenGender())
+                .childrenId(children.getChildrenId())// 원아ID
+                .childrenName(children.getChildrenName())// 원아 이름
+                .childrenBirthDate(children.getChildrenBirthDate())// 원아 생년월일
+                .childrenGender(children.getChildrenGender())// 원아 성별
+                .enrollmentDate(children.getCreatedDate().toLocalDate())// 원아 생성일
+                .childrenModifyDate(children.getUpdatedDate().toLocalDate())// 원아 수정일
+                .childrenBloodType(children.getChildrenBloodType())// 원아 혈액형
+                .childrenAllergies(children.getChildrenAllergies())// 원아 알레르기
+                .childrenMedicalHistory(children.getChildrenMedicalHistory())// 원아 병력정보
+                .childrenNotes(children.getChildrenNotes())// 원아 특이사항
+                .classRoomName(children.getAssignedClass() != null ? children.getAssignedClass().getClassRoomName() : "*미 배 정*")
+                .parentName(children.getParent() != null ? children.getParent().getParentName() : "*미 등 록*")
                 .build();
+    }
+
+    public List<ChildrenErpDTO> getAllChildren() {
+
+        return childrenRepository.findAll().stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    public ChildrenErpDTO getChildrenById(Long childrenId) {
+
+        Children children = childrenRepository.findById(childrenId).orElseThrow(()
+        -> new EntityNotFoundException("원아를 찾을 수 없습니다."));
+
+        return convertToDTO(children);
+    }
+
+    public Page<ChildrenErpDTO> getChildrenList(String searchType, String keyword, int page) {
+
+        Pageable pageable = PageRequest.of(page, 10);
+
+        Page<Children> childrenPage;
+
+        if (searchType != null && keyword != null && !keyword.trim().isEmpty()) {
+
+            switch (searchType) {
+                case "name" :
+                    childrenPage = childrenRepository.findByChildrenNameContaining(keyword, pageable);
+                    break;
+
+                case "class" :
+                    childrenPage = childrenRepository.findByAssignedClass_ClassRoomNameContaining(keyword, pageable);
+                    break;
+
+                case "parent" :
+                    childrenPage = childrenRepository.findByParent_ParentNameContaining(keyword, pageable);
+                    break;
+
+                default:
+                    childrenPage = childrenRepository.findAll(pageable);
+            }// switch END
+
+        } else {
+            childrenPage = childrenRepository.findAll(pageable);
+        }
+
+        return childrenPage.map(this::convertToDTO);
+
+    }
+
+    @Transactional
+    public void updateChildren(Long childrenId, ChildrenUpdateDTO updateDTO) {
+
+        Children children = childrenRepository.findById(childrenId).orElseThrow(()->
+                new EntityNotFoundException("원아를 찾을 수 없습니다."));
+
+        children.setChildrenName(updateDTO.getChildrenName());
+        children.setChildrenBirthDate(updateDTO.getChildrenBirthDate());
+        children.setChildrenBloodType(updateDTO.getChildrenBloodType());
+        children.setChildrenGender(updateDTO.getChildrenGender());
+        children.setChildrenAllergies(updateDTO.getChildrenAllergies());
+        children.setChildrenMedicalHistory(updateDTO.getChildrenMedicalHistory());
+        children.setChildrenNotes(updateDTO.getChildrenNotes());
+
+        childrenRepository.save(children);
+    }
+
+    @Transactional
+    public void deleteChildren(Long childrenId) {
+
+        Children children = childrenRepository.findById(childrenId).orElseThrow(
+                ()-> new EntityNotFoundException("해당 원아를 찾을 수 없습니다."));
+
+        if (children.getAssignedClass() != null) {
+            children.setAssignedClass(null);
+        }
+
+        childrenRepository.delete(children);
+
     }
 }

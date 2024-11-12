@@ -36,7 +36,9 @@ public class ChildrenErpDTO {
     private String childrenBloodType ;  // 원아의 혈액형
 
     @NotNull(message = "원아의 반 정보는 필수값 입니다.")
-    private String className;   // 원아가 속해있는 반 정보
+    private String classRoomName;   // 원아가 속해있는 반 정보
+
+    private String parentName; // 학부모 성함(보호자)
 
     private String childrenAllergies; // 원아의 알레르기 정보
 
@@ -53,6 +55,10 @@ public class ChildrenErpDTO {
     @DateTimeFormat(pattern = "yyyy-MM-dd") // 날짜 형식 지정
     @Builder.Default
     private LocalDate enrollmentDate = LocalDate.now(); // 원아 등록 일자
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd") // 날짜 형식 지정
+    @Builder.Default
+    private LocalDate childrenModifyDate = LocalDate.now(); // 원아 수정 일자
 
 
 

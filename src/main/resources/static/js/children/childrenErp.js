@@ -1,3 +1,28 @@
+function deleteChildren(childrenId) {
+
+    if (confirm('정말 삭제하겠습니까?')) {
+        fetch('/erp/children/delete/${childrenId}', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert('삭제되었습니다.');
+                    window.location.reload();
+                } else {
+                    response.text().then(text => alert(text));
+                }
+            })
+            .catch(error => {
+                console.error('Error', error);
+                alert('삭제 중 오류가 발생했습니다.');
+            });
+    }
+}
+
+
 // 원아 등록에서 초기 폼은 1개로 설정
 let childCount = 1;
 
@@ -84,3 +109,32 @@ $(document).ready(function() {
     console.log('childrenForms 개수:', $('#childrenForms').children().length);
 
 });// $(document).ready(function() END
+
+function removeChildForm(button) {
+
+    const formToRemove = button.parentElement;
+    formToRemove.remove();
+
+    const container = document.getElementById('childrenContainer');
+
+    const forms = container.getElementsByClassName('chlid-form');
+
+    Array.from(forms).forEach((form, index) => {
+        form.querySelector('h4').textContent = `자녀 ${index + 1}`;
+        updateFormInputNames(form, index);
+    });
+}
+
+function updateFormInputNames(form, index) {
+
+    const inputs = form.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+
+        const name = input.getAttribute('name');
+
+        if (name) {
+
+            input.setAttribute('name', name.replace(/\[\d+\]/, `[${index}]`));
+        }
+    });
+}

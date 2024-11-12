@@ -200,4 +200,19 @@ public class ParentService {
         parentRepository.delete(parent);
         // 삭제한 부모를 DB에 전달
     }
+
+
+    private ParentErpDTO convertToDTO(Parent parent) {
+        return ParentErpDTO.builder()
+                .parentId(parent.getParentId())
+                .parentName(parent.getParentName())
+                .parentEmail(parent.getParentEmail())
+                .parentPhone(parent.getParentPhone())
+                .parentAddress(parent.getParentAddress())
+                .childrenEmergencyPhone(parent.getChildrenEmergencyPhone())
+                .parentType(parent.getParentType())
+                .parentCreateDate(parent.getCreatedDate().toLocalDate())
+                .parentModifyDate(parent.getUpdatedDate().toLocalDate())
+                .build();
+    }
 }
