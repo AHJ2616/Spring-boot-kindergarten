@@ -5,7 +5,10 @@ import com.kinder.kindergarten.DTO.board.BoardFileDTO;
 import com.kinder.kindergarten.DTO.board.BoardFormDTO;
 import com.kinder.kindergarten.DTO.board.CommentsDTO;
 import com.kinder.kindergarten.DTO.survey.SurveyDTO;
+import com.kinder.kindergarten.annotation.CurrentUser;
+import com.kinder.kindergarten.config.PrincipalDetails;
 import com.kinder.kindergarten.constant.board.BoardType;
+import com.kinder.kindergarten.entity.Member;
 import com.kinder.kindergarten.repository.QueryDSL;
 import com.kinder.kindergarten.service.board.BoardService;
 import com.kinder.kindergarten.service.board.CommentsService;
@@ -20,11 +23,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -121,14 +123,13 @@ public class BoardController {
   @PostMapping(value="/write")
   public ResponseEntity<?> postWriteBoard(@Valid BoardFormDTO boardFormDTO,
                                           BindingResult bindingResult,
-                                          @RequestParam(value = "boardFile", required = false) List<MultipartFile> boardFileList) {
+                                          @RequestParam(value = "boardFile", required = false) List<MultipartFile> boardFileList,@AuthenticationPrincipal PrincipalDetails principalDetails) {
     try {
       if (bindingResult.hasErrors()) {
         return ResponseEntity.badRequest().body("입력값이 올바르지 않습니다.");
       }
 
-      // 테스트용 작성자 설정 (나중에 실제 인증 정보로 변경)
-      boardFormDTO.setBoardWriter("테스트작성자");
+      boardFormDTO.setBoardWriter(principalDetails.getUsername());
 
       // 파일 존재 여부와 ZIP 생성 옵션에 따른 처리
       if (boardFileList != null && !boardFileList.isEmpty() && !boardFileList.get(0).isEmpty()) {
@@ -164,27 +165,37 @@ public class BoardController {
   }
 
   @GetMapping("/{id}")
-  public String getBoard(@PathVariable String id, Model model, HttpServletRequest request) {
-    queryDSL.increaseViews(id,request);//조회수 1 증가시키기
-    BoardDTO boardDTO = boardService.getBoard(id);
-    model.addAttribute("boardDTO", boardDTO);
+  public String getBoard(@PathVariable String id, 
+                      @CurrentUser Member member,  // @AuthenticationPrincipal 대신 @CurrentUser 사용
+                      Model model, 
+                      HttpServletRequest request) {
+    queryDSL.increaseViews(id, request); // 조회수 1 증가시키기
     
-    // 설문조사 데이터 조회
     try {
-        SurveyDTO surveyDTO = surveyService.getSurveyByBoardId(id);
-        if (surveyDTO != null) {
-            model.addAttribute("surveyDTO", surveyDTO);
+        BoardDTO boardDTO = boardService.getBoard(id);
+        model.addAttribute("boardDTO", boardDTO);
+        model.addAttribute("isAuthenticated", member != null);
+        
+        // 설문조사 데이터 조회
+        try {
+            SurveyDTO surveyDTO = surveyService.getSurveyByBoardId(id);
+            if (surveyDTO != null) {
+                model.addAttribute("surveyDTO", surveyDTO);
+            }
+        } catch (Exception e) {
+            // 설문조사가 없는 경우 무시
+            log.debug("No survey found for board id: " + id);
         }
+        
+        // 댓글 목록 조회
+        List<CommentsDTO> comments = commentsService.getCommentsByBoardId(id);
+        model.addAttribute("comments", comments);
+        
+        return "board/get";
     } catch (Exception e) {
-        // 설문조사가 없는 경우 무시
-        log.debug("No survey found for board id: " + id);
+        log.error("Error while getting board: ", e);
+        return "redirect:/board/list/common";
     }
-    
-    // 댓글 목록 조회
-    List<CommentsDTO> comments = commentsService.getCommentsByBoardId(id);
-    model.addAttribute("comments", comments);
-    
-    return "board/get";
   }
 
   //파일다운로드
@@ -225,7 +236,7 @@ public class BoardController {
       boardFormDTO.setBoardTitle(boardDTO.getBoardTitle());
       boardFormDTO.setBoardContents(boardDTO.getBoardContents());
       boardFormDTO.setBoardType(boardDTO.getBoardType());
-      boardFormDTO.setBoardWriter(boardDTO.getBoardWriter());
+      boardFormDTO.setBoardWriter(boardDTO.getEmail());
       boardFormDTO.setBoardFileList(boardDTO.getBoardFileList());
 
       model.addAttribute("boardFormDTO", boardFormDTO);
@@ -259,12 +270,12 @@ public class BoardController {
   }
   @DeleteMapping("/delete/{boardId}")
   public ResponseEntity<?> deleteBoard(@PathVariable String boardId,
-                                       Authentication authentication) {
+                                       @AuthenticationPrincipal PrincipalDetails principal) {
     try {
       BoardDTO board = boardService.getBoard(boardId);
 
       // 작성자와 로그인한 사용자가 같은지 확인
-      if (!board.getBoardWriter().equals(authentication.getName())) {
+      if (!board.getEmail().equals(principal.getUsername())) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body("삭제 권한이 없습니다.");
       }

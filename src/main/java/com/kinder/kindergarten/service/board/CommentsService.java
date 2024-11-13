@@ -5,8 +5,10 @@ import com.github.f4b6a3.ulid.UlidCreator;
 import com.kinder.kindergarten.DTO.board.CommentsDTO;
 import com.kinder.kindergarten.entity.board.BoardEntity;
 import com.kinder.kindergarten.entity.board.CommentsEntity;
+import com.kinder.kindergarten.entity.Member;
 import com.kinder.kindergarten.repository.board.BoardRepository;
 import com.kinder.kindergarten.repository.board.CommentsRepository;
+import com.kinder.kindergarten.repository.MemberRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
 public class CommentsService {
   private final CommentsRepository commentsRepository;
   private final BoardRepository boardRepository;
+  private final MemberRepository memberRepository;
 
   private final ModelMapper modelMapper;
 
@@ -50,9 +53,11 @@ public class CommentsService {
     BoardEntity board = boardRepository.findById(commentsDTO.getBoardId())
             .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
 
+    Member memberWriter = memberRepository.findByEmail(writer);
+
     CommentsEntity comment = new CommentsEntity();
     comment.setBoardId(board);
-    comment.setWriter(writer);
+    comment.setWriter(memberWriter);
     comment.setContents(commentsDTO.getContents());
     Ulid ulid = UlidCreator.getUlid();
     comment.setCommentsId(ulid.toString());
@@ -73,7 +78,7 @@ public class CommentsService {
     CommentsEntity comment = commentsRepository.findById(commentId)
             .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
 
-    if (!comment.getWriter().equals(writer)) {
+    if (!comment.getWriter().getEmail().equals(writer)) {
       throw new RuntimeException("댓글 삭제 권한이 없습니다.");
     }
 
@@ -84,7 +89,7 @@ public class CommentsService {
     CommentsEntity comment = commentsRepository.findById(commentId)
             .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
 
-    if (!comment.getWriter().equals(writer)) {
+    if (!comment.getWriter().getEmail().equals(writer)) {
       throw new RuntimeException("댓글 수정 권한이 없습니다.");
     }
 

@@ -60,7 +60,7 @@ public class QBoardFileEntity extends EntityPathBase<BoardFileEntity> {
 
     public QBoardFileEntity(Class<? extends BoardFileEntity> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.boardEntity = inits.isInitialized("boardEntity") ? new QBoardEntity(forProperty("boardEntity")) : null;
+        this.boardEntity = inits.isInitialized("boardEntity") ? new QBoardEntity(forProperty("boardEntity"), inits.get("boardEntity")) : null;
     }
 
 }

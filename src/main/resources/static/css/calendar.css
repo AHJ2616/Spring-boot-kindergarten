@@ -399,3 +399,20 @@ select.filter {
 .fc-scrollgrid-sync-inner a {
     text-decoration: none !important;
 }
+
+.calendar-filters {
+    margin: 20px 0;
+}
+
+.calendar-filters .btn-group {
+    width: 100%;
+}
+
+.calendar-filters .btn {
+    flex: 1;
+}
+
+.calendar-filters .btn.active {
+    background-color: #0d6efd;
+    color: white;
+}

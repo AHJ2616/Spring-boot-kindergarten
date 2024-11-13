@@ -32,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -65,7 +66,7 @@ import java.util.zip.ZipOutputStream;
           private String summerImage;
 
           public Page<BoardDTO> getBoardsByType(BoardType boardType, Pageable pageable) {
-            log.info("페이지 불러오기 - BoardService.getBoardsByType() 실행. boardType: " + boardType + ", pageable 정보: " + pageable);
+            log.info("페이지 불러오기 - BoardService.getBoardsByType() 행. boardType: " + boardType + ", pageable 정보: " + pageable);
 
             // fetch join을 사용하는 메서드 호출
             Page<BoardEntity> boardPage = boardRepository.findByBoardTypeWithFiles(boardType, pageable);
@@ -157,27 +158,41 @@ import java.util.zip.ZipOutputStream;
             boardDTO.setBoardTitle(boardEntity.getBoardTitle());
             boardDTO.setBoardContents(boardEntity.getBoardContents());
             boardDTO.setBoardType(boardEntity.getBoardType());
-            boardDTO.setBoardWriter(boardEntity.getBoardWriter());
+            
+            // Member null 체크 추가
+            if (boardEntity.getMember() != null) {
+                boardDTO.setWriter(boardEntity.getMember().getName());
+                boardDTO.setEmail(boardEntity.getMember().getEmail());
+            } else {
+                boardDTO.setWriter("알 수 없음");
+                boardDTO.setEmail("anonymous@example.com");
+            }
+            
             boardDTO.setViews(boardEntity.getViews());
             boardDTO.setRegiDate(boardEntity.getRegiDate());
             boardDTO.setModiDate(boardEntity.getModiDate());
 
             // 첨부파일 정보 설정
-            List<BoardFileDTO> fileDTOs = boardEntity.getBoardFiles().stream()
-                    .map(fileEntity -> {
-                        BoardFileDTO fileDTO = new BoardFileDTO();
-                        fileDTO.setFileId(fileEntity.getFileId());
-                        fileDTO.setOrignalName(fileEntity.getOriginalName());
-                        fileDTO.setModifiedName(fileEntity.getModifiedName());
-                        fileDTO.setFilePath(fileEntity.getFilePath());
-                        fileDTO.setBoardId(board_id);
-                        fileDTO.setIsZip(fileEntity.getIsZip());
-                        return fileDTO;
-                    })
-                    .collect(Collectors.toList());
+            if (boardEntity.getBoardFiles() != null) {
+                List<BoardFileDTO> fileDTOs = boardEntity.getBoardFiles().stream()
+                        .map(fileEntity -> {
+                            BoardFileDTO fileDTO = new BoardFileDTO();
+                            fileDTO.setFileId(fileEntity.getFileId());
+                            fileDTO.setOrignalName(fileEntity.getOriginalName());
+                            fileDTO.setModifiedName(fileEntity.getModifiedName());
+                            fileDTO.setFilePath(fileEntity.getFilePath());
+                            fileDTO.setBoardId(board_id);
+                            fileDTO.setIsZip(fileEntity.getIsZip());
+                            return fileDTO;
+                        })
+                        .collect(Collectors.toList());
 
-            boardDTO.setBoardFileList(fileDTOs);
-            boardDTO.setFileCount(fileDTOs.size());
+                boardDTO.setBoardFileList(fileDTOs);
+                boardDTO.setFileCount(fileDTOs.size());
+            } else {
+                boardDTO.setBoardFileList(new ArrayList<>());
+                boardDTO.setFileCount(0);
+            }
             
             return boardDTO;
           }
@@ -266,71 +281,58 @@ import java.util.zip.ZipOutputStream;
               }
             }
 
-            // 게시글 정보 업데이트
+            // 게시글 정보 업데트
             board.setBoardTitle(boardFormDTO.getBoardTitle());
             board.setBoardContents(boardFormDTO.getBoardContents());
             board.setBoardType(boardFormDTO.getBoardType());
           }
 
           //게시글 삭제
-          public void deleteBoard(String boardId){
+          @Transactional
+          public void deleteBoard(String boardId) {
+            // 게시글에 연관된 파일 엔티티들을 먼저 조회
+            BoardEntity board = boardRepository.findById(boardId)
+                    .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+            
+            List<BoardFileEntity> files = boardFileRepository.findByBoardEntity(board);
+            
+            // 각 파일 삭제
+            for (BoardFileEntity file : files) {
+                // 실제 파일 삭제
+                File fileToDelete = new File(file.getFilePath());
+                if (fileToDelete.exists()) {
+                    // 파일이 디렉토리인 경우
+                    if (fileToDelete.isDirectory()) {
+                        deleteDirectory(fileToDelete);
+                    } else {
+                        fileToDelete.delete();
+                    }
+                }
+            }
+            
+            // DB에서 게시글 삭제 (연관된 파일 엔티티들도 cascade로 함께 삭제됨)
             boardRepository.deleteByBoardId(boardId);
           }
-          //게시글 검색
-          public Page<BoardDTO> searchBoards(String keyword, Pageable pageable) {
-            try {
-              // 캐시 키 생성 (검색어와 페이지 정보 조합)
-              String cacheKey = keyword + "_" + pageable.getPageNumber();
 
-              // 캐시에서 결과 조회 시도ㅏ
-              return searchCache.get(cacheKey, () -> {
-                // 초성 검색인지 확인
-                boolean isChosung = keyword.matches("^[ㄱ-ㅎ]+$");
-
-                if (isChosung) {
-                  // 초성 검색 로직
-                  List<BoardEntity> allBoards = boardRepository.findAll();
-                  List<BoardDTO> matchedBoards = allBoards.stream()
-                          .filter(entity ->
-                                  Hangul.matchesChosung(entity.getBoardTitle(), keyword) ||
-                                          Hangul.matchesChosung(entity.getBoardContents(), keyword) ||
-                                          Hangul.matchesChosung(entity.getBoardWriter(), keyword))
-                          .map(this::convertToDTO)
-                          .collect(Collectors.toList());
-
-                  // List를 Page로 변환
-                  int start = (int) pageable.getOffset();
-                  int end = Math.min((start + pageable.getPageSize()), matchedBoards.size());
-
-                  return new PageImpl<>(
-                          matchedBoards.subList(start, end),
-                          pageable,
-                          matchedBoards.size()
-                  );
-                } else {
-                  // 일반 검색 로직
-                  return boardRepository
-                          .findByBoardTitleContainingOrBoardContentsContainingOrBoardWriterContaining(
-                                  keyword, keyword, keyword, pageable)
-                          .map(this::convertToDTO);
+              // 디렉토리와 그 내용을 삭제하는 헬퍼 메소드
+              private void deleteDirectory(File directory) {
+                File[] files = directory.listFiles();
+                if (files != null) {
+                  for (File file : files) {
+                    if (file.isDirectory()) {
+                      deleteDirectory(file);
+                    } else {
+                      file.delete();
+                    }
+                  }
                 }
-              });
-            } catch (Exception e) {
-              throw new RuntimeException("검색 중 오류가 발생했습니다.", e);
-            }
-          }
-
-          private BoardDTO convertToDTO(BoardEntity entity) {
-            BoardDTO dto = new BoardDTO();
-            dto.setBoardId(entity.getBoardId());
-            dto.setBoardTitle(entity.getBoardTitle());
-            dto.setBoardContents(entity.getBoardContents());
-            dto.setBoardType(entity.getBoardType());
-            dto.setBoardWriter(entity.getBoardWriter());
-            dto.setViews(entity.getViews());
-            dto.setRegiDate(entity.getRegiDate());
-            dto.setModiDate(entity.getModiDate());
-            return dto;
+                directory.delete();
+              }
+              
+          //게시글 검색
+          public Page<BoardDTO> searchBoards(BoardType boardType, String keyword, Pageable pageable) {
+            Page<BoardEntity> boardEntities = boardRepository.searchBoards(boardType, keyword, pageable);
+            return boardEntities.map(this::convertToDTO);
           }
 
           @Transactional
@@ -431,20 +433,7 @@ import java.util.zip.ZipOutputStream;
             }
           }
 
-          // 디렉토리와 그 내용을 삭제하는 헬퍼 메소드
-          private void deleteDirectory(File directory) {
-            File[] files = directory.listFiles();
-            if (files != null) {
-              for (File file : files) {
-                if (file.isDirectory()) {
-                  deleteDirectory(file);
-                } else {
-                  file.delete();
-                }
-              }
-            }
-            directory.delete();
-          }
+      
 
           // 게시판 타입별 검색 서드 추가
           public Page<BoardDTO> searchBoardsByType(BoardType boardType, String keyword, Pageable pageable) {
@@ -464,7 +453,7 @@ import java.util.zip.ZipOutputStream;
                                   .filter(entity ->
                                           Hangul.matchesChosung(entity.getBoardTitle(), keyword) ||
                                           Hangul.matchesChosung(entity.getBoardContents(), keyword) ||
-                                          Hangul.matchesChosung(entity.getBoardWriter(), keyword))
+                                          Hangul.matchesChosung(entity.getMember().getName(), keyword))
                                   .map(this::convertToDTO)
                                   .collect(Collectors.toList());
 
@@ -478,13 +467,8 @@ import java.util.zip.ZipOutputStream;
                                   matchedBoards.size()
                           );
                       } else {
-                          // 일반 검색 로직 - 게시판 타입과 검색어를 함께 사용
-                          return boardRepository
-                                  .findByBoardTypeAndBoardTitleContainingOrBoardTypeAndBoardContentsContainingOrBoardTypeAndBoardWriterContaining(
-                                          boardType, keyword, 
-                                          boardType, keyword, 
-                                          boardType, keyword, 
-                                          pageable)
+                          // 일반 검색 로직 수정
+                          return boardRepository.searchBoards(boardType, keyword, pageable)
                                   .map(this::convertToDTO);
                       }
                   });
@@ -524,5 +508,10 @@ import java.util.zip.ZipOutputStream;
                 .collect(Collectors.toList());
 
             return new PageImpl<>(sortedBoards, pageable, boardEntities.getTotalElements());
+          }
+
+          // convertToDTO 메소드 추가
+          private BoardDTO convertToDTO(BoardEntity entity) {
+              return modelMapper.map(entity, BoardDTO.class);
           }
         }

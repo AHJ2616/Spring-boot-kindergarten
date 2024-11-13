@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
             editEvent(info.event);
         },
 
-        // 날짜 선택
+        // 짜 선택
         select: function(info) {
             const startDate = moment(info.start).format('YYYY-MM-DD HH:mm');
             const endDate = moment(info.end).format('YYYY-MM-DD HH:mm');
@@ -168,6 +168,32 @@ document.addEventListener('DOMContentLoaded', function() {
             $("#contextMenu").hide();
         }
     });
+
+    // 필터 버튼 이벤트 처리
+    $('.calendar-filters .btn').on('click', function() {
+        $('.calendar-filters .btn').removeClass('active');
+        $(this).addClass('active');
+        
+        const filterType = $(this).data('filter');
+        
+        if (filterType === 'all') {
+            // 모든 이벤트를 다시 표시
+            const events = calendar.getEvents();
+            events.forEach(event => {
+                event.setProp('display', 'auto');  // 모든 이벤트를 보이게 설정
+            });
+        } else {
+            // 선택된 카테고리의 이벤트만 표시
+            const events = calendar.getEvents();
+            events.forEach(event => {
+                if (event.extendedProps.type === filterType) {
+                    event.setProp('display', 'auto');  // 해당 카테고리 이벤트는 보이게
+                } else {
+                    event.setProp('display', 'none');  // 다른 카테고리 이벤트는 숨김
+                }
+            });
+        }
+    });
 });
 
 // 이벤트 날짜 업데이트 함수
@@ -191,3 +217,13 @@ function updateEventDates(event, revertFunc) {
         }
     });
 }
+
+$(document).ready(function() {
+    // 색상 선택 시 선택된 옵션의 스타일 변경
+    $('#edit-color').on('change', function() {
+        $(this).css('color', $(this).val());
+    });
+    
+    // 초기 로드 시 이미 선택된 색상이 있다면 적용
+    $('#edit-color').css('color', $('#edit-color').val());
+});

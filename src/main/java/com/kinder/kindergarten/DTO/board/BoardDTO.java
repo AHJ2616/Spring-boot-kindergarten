@@ -1,5 +1,6 @@
 package com.kinder.kindergarten.DTO.board;
 
+import com.kinder.kindergarten.DTO.MemberDTO;
 import com.kinder.kindergarten.constant.board.BoardType;
 import lombok.Data;
 
@@ -23,7 +24,10 @@ public class BoardDTO {
   private BoardType boardType;
 
   //작성자
-  private String boardWriter;
+  private String email; //MemberDTO.email
+
+  //작성자 이름
+  private String writer;
 
   private int views;
 

@@ -15,11 +15,11 @@ public class FcmTokenEntity {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name= "member_email")
-  private MemberEntity member;
+  private Member member;
 
   private String token;
 
-  public FcmTokenEntity(MemberEntity member,String token){
+  public FcmTokenEntity(Member member, String token){
     this.id = UlidCreator.getUlid().toString();
     this.member = member;
     this.token = token;

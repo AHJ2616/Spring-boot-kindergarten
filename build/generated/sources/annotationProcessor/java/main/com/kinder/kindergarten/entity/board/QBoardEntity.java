@@ -18,6 +18,8 @@ public class QBoardEntity extends EntityPathBase<BoardEntity> {
 
     private static final long serialVersionUID = 1277026430L;
 
+    private static final PathInits INITS = PathInits.DIRECT2;
+
     public static final QBoardEntity boardEntity = new QBoardEntity("boardEntity");
 
     public final com.kinder.kindergarten.entity.QTimeEntity _super = new com.kinder.kindergarten.entity.QTimeEntity(this);
@@ -32,7 +34,7 @@ public class QBoardEntity extends EntityPathBase<BoardEntity> {
 
     public final EnumPath<com.kinder.kindergarten.constant.board.BoardType> boardType = createEnum("boardType", com.kinder.kindergarten.constant.board.BoardType.class);
 
-    public final StringPath boardWriter = createString("boardWriter");
+    public final com.kinder.kindergarten.entity.QMember member;
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> modiDate = _super.modiDate;
@@ -43,15 +45,24 @@ public class QBoardEntity extends EntityPathBase<BoardEntity> {
     public final NumberPath<Integer> views = createNumber("views", Integer.class);
 
     public QBoardEntity(String variable) {
-        super(BoardEntity.class, forVariable(variable));
+        this(BoardEntity.class, forVariable(variable), INITS);
     }
 
     public QBoardEntity(Path<? extends BoardEntity> path) {
-        super(path.getType(), path.getMetadata());
+        this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
     public QBoardEntity(PathMetadata metadata) {
-        super(BoardEntity.class, metadata);
+        this(metadata, PathInits.getFor(metadata, INITS));
+    }
+
+    public QBoardEntity(PathMetadata metadata, PathInits inits) {
+        this(BoardEntity.class, metadata, inits);
+    }
+
+    public QBoardEntity(Class<? extends BoardEntity> type, PathMetadata metadata, PathInits inits) {
+        super(type, metadata, inits);
+        this.member = inits.isInitialized("member") ? new com.kinder.kindergarten.entity.QMember(forProperty("member")) : null;
     }
 
 }

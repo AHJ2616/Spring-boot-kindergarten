@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 @Table(name = "member")
-public class MemberEntity {
+public class Member {
   @Id
   @Column(name="member_email")
   private String email;

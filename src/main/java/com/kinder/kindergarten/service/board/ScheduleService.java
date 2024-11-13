@@ -93,4 +93,11 @@ public class ScheduleService {
   public void deleteSchedule(String id) {
     scheduleRepository.deleteById(id);
   }
+
+  public List<ScheduleDTO> findSchedulesByType(String type) {
+    List<ScheduleEntity> schedules = scheduleRepository.findByType(type);
+    return schedules.stream()
+            .map(schedule -> modelMapper.map(schedule, ScheduleDTO.class)) 
+            .collect(Collectors.toList());
+  }
 }

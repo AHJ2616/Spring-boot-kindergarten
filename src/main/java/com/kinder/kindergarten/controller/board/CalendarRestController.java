@@ -3,11 +3,13 @@ package com.kinder.kindergarten.controller.board;
 import com.github.f4b6a3.ulid.Ulid;
 import com.github.f4b6a3.ulid.UlidCreator;
 import com.kinder.kindergarten.DTO.board.ScheduleDTO;
+import com.kinder.kindergarten.config.PrincipalDetails;
 import com.kinder.kindergarten.service.board.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -45,7 +47,7 @@ public class CalendarRestController {
   }
 
   @PostMapping("/events/add")
-  public ResponseEntity<ScheduleDTO> createEvent(@RequestBody ScheduleDTO scheduleDTO) {
+  public ResponseEntity<ScheduleDTO> createEvent(@RequestBody ScheduleDTO scheduleDTO,@AuthenticationPrincipal PrincipalDetails principal) {
     try {
       log.info("일정 저장 요청 데이터: {}", scheduleDTO);
       
@@ -57,6 +59,7 @@ public class CalendarRestController {
       // ID 생성
       Ulid ulid = UlidCreator.getUlid();
       scheduleDTO.setId(ulid.toString());
+      scheduleDTO.setUsername(principal.getName());
       
       // 기본값 설정
       if (scheduleDTO.getDescription() == null) {
@@ -106,5 +109,11 @@ public class CalendarRestController {
     } catch (Exception e) {
       return ResponseEntity.badRequest().build();
     }
+  }
+
+  @GetMapping("/api/schedules/type/{type}")
+  public ResponseEntity<List<ScheduleDTO>> getSchedulesByType(@PathVariable String type) {
+    List<ScheduleDTO> schedules = scheduleService.findSchedulesByType(type);
+    return ResponseEntity.ok(schedules);
   }
 }
