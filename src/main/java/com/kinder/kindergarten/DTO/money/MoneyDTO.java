@@ -26,6 +26,8 @@ public class MoneyDTO {
 
     private String moneyStatus; // 수입 지출 상태
 
+    private String moneyApproval; // 돈 승인 여부
+
     // TimeEntity 대응
     private String regiDate;
 

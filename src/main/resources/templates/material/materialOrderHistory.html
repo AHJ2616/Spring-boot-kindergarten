@@ -1,0 +1,65 @@
+<div class="order-history-container">
+  <div th:each="history : ${orderHistories}" class="history-item"
+       th:onclick="showOrderDetail([[${history.id}]])">
+    <span th:text="${history.materialName}"></span>
+    <span th:text="${history.status}"></span>
+    <span th:text="${history.statusChangeDate}"></span>
+  </div>
+</div>
+
+<!-- 모달 -->
+<div class="modal fade" id="orderDetailModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">주문 상세 정보</h5>
+        <button type="button" class="close" data-dismiss="modal">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="orderDetailContent"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" onclick="deleteOrderHistory()">삭제</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentOrderId = null;
+
+  function showOrderDetail(orderId) {
+    currentOrderId = orderId;
+    fetch(`/api/material/order-history/${orderId}`)
+            .then(response => response.json())
+            .then(data => {
+              document.getElementById('orderDetailContent').innerHTML = `
+                <p>주문번호: ${data.id}</p>
+                <p>상품명: ${data.materialName}</p>
+                <p>상태: ${data.status}</p>
+                <p>주문일: ${data.orderDate}</p>
+                <p>상태변경일: ${data.statusChangeDate}</p>
+                <p>상세정보: ${data.orderDetails}</p>
+            `;
+              $('#orderDetailModal').modal('show');
+            });
+  }
+
+  function deleteOrderHistory() {
+    if(!currentOrderId) return;
+
+    if(confirm('이 주문 이력을 삭제하시겠습니까?')) {
+      fetch(`/api/material/order-history/delete/${currentOrderId}`, {
+        method: 'DELETE'
+      }).then(response => {
+        if(response.ok) {
+          $('#orderDetailModal').modal('hide');
+          location.reload();
+        }
+      });
+    }
+  }
+</script>

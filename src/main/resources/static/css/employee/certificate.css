@@ -1,0 +1,115 @@
+/* 자격증 목록 스타일 */
+.container {
+    padding: 20px;
+    margin-top: 80px; /* 상단 헤더 높이만큼 여백 */
+    width: calc(100% - 80px); /* 사이드바 너비만큼 여백을 뺀 너비 */
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+h2 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.btn {
+    padding: 10px 15px;
+    background-color: #313443;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background-color 0.3s;
+    display: inline-block;
+}
+
+.btn:hover {
+    background-color: #22252E;
+}
+
+/* 테이블 스타일 */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+    color: #333;
+}
+
+td {
+    color: #555;
+}
+
+/* 관리 버튼 스타일 */
+td a {
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 14px;
+    margin-right: 10px;
+    transition: background-color 0.3s;
+}
+
+td a:hover {
+    background-color: #0056b3;
+}
+
+/* 삭제 버튼 */
+td a:nth-child(2) {
+    background-color: #dc3545;
+}
+
+td a:nth-child(2):hover {
+    background-color: #c82333;
+}
+
+/* 확인 팝업 스타일 (삭제 확인) */
+a[onclick] {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+/* 반응형 스타일 */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+
+    table {
+        font-size: 12px;
+    }
+
+    th, td {
+        padding: 8px 10px;
+    }
+
+    h2 {
+        font-size: 20px;
+    }
+
+    .btn {
+        font-size: 12px;
+        padding: 8px 12px;
+    }
+
+    td a {
+        padding: 4px 8px;
+        font-size: 12px;
+    }
+}

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>원아 정보 수정</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        .container {
+            margin-top: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 0.8rem;
+        }
+
+        input[type="date"] {
+            padding: 0.375rem 0.75rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2 class="mb-4">원아 정보 수정</h2>
+
+   <form th:action="@{/erp/children/modify/{childrenId}(childrenId=${children.childrenId})}"
+    th:object="${children}"
+    method="post">
+
+       <input type="hidden" th:field="*{childrenId}" />
+
+       <div class="form-group">
+           <label for="childrenName">이름</label>
+           <input type="text" class="form-control" id="childrenName"
+                  th:field="*{childrenName}"
+                  th:value="${children.childrenName}"
+                  required>
+       </div>
+
+       <div class="form-group">
+           <label for="childrenBirthDate">생년월일</label>
+           <input type="date" class="form-control" id="childrenBirthDate"
+                  name="childrenBirthDate"
+                  th:value="${#temporals.format(children.childrenBirthDate, 'yyyy-MM-dd')}"
+                  max="2024-12-31"
+                  min="2010-01-01"
+                  required>
+       </div>
+
+       <div class="form-group">
+           <label for="childrenGender">성별</label>
+           <select class="form-control" id="childrenGender" name="childrenGender">
+               <option value="">성별 선택</option>
+               <option value="남자" th:selected="${children.childrenGender == '남자'}">남자</option>
+               <option value="여자" th:selected="${children.childrenGender == '여자'}">여자</option>
+           </select>
+       </div>
+
+       <div class="form-group">
+           <label for="childrenBloodType">혈액형</label>
+           <select class="form-control" id="childrenBloodType"
+                   th:field="*{childrenBloodType}">
+               <option value="">혈액형 선택</option>
+               <option value="A" th:selected="${children.childrenBloodType == 'A'}">A형</option>
+               <option value="B" th:selected="${children.childrenBloodType == 'B'}">B형</option>
+               <option value="O" th:selected="${children.childrenBloodType == 'O'}">O형</option>
+               <option value="AB" th:selected="${children.childrenBloodType == 'AB'}">AB형</option>
+           </select>
+       </div>
+
+       <div class="form-group">
+           <label for="childrenAllergies">알레르기</label>
+           <textarea class="form-control" id="childrenAllergies"
+                     th:field="*{childrenAllergies}"
+                     th:text="${children.childrenAllergies}"
+                     rows="2"></textarea>
+       </div>
+
+       <div class="form-group">
+           <label for="childrenMedicalHistory">병력사항</label>
+           <textarea class="form-control" id="childrenMedicalHistory"
+                     th:field="*{childrenMedicalHistory}"
+                     th:text="${children.childrenMedicalHistory}"
+                     rows="2"></textarea>
+       </div>
+
+       <div class="form-group">
+           <label for="childrenNotes">특이사항</label>
+           <textarea class="form-control" id="childrenNotes"
+                     th:field="*{childrenNotes}"
+                     th:text="${children.childrenNotes}"
+                     rows="3"></textarea>
+       </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary">수정</button>
+            <a th:href="@{/erp/children/detail/{id}(id=${children.childrenId})}"
+               class="btn btn-secondary">취소</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>

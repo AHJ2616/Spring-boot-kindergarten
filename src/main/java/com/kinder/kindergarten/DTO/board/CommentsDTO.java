@@ -1,6 +1,5 @@
 package com.kinder.kindergarten.DTO.board;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

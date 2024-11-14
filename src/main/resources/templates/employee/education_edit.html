@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout}">
+<head>
+    <link rel="stylesheet" href="/css/employee/educationReg.css">
+    <meta charset="UTF-8">
+    <title>교육이력 수정</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container">
+        <h2>교육이력 수정</h2>
+        <form th:action="@{'/education/edit/' + ${educationDTO.ed_id}}"
+              method="post"
+              enctype="multipart/form-data">
+            <div class="form-group">
+                <label>교육명</label>
+                <input type="text" name="ed_name" th:value="${educationDTO.ed_name}" required>
+            </div>
+            <div class="form-group">
+                <label>시작일</label>
+                <input type="date" name="ed_start" th:value="${educationDTO.ed_start}" required>
+            </div>
+            <div class="form-group">
+                <label>종료일</label>
+                <input type="date" name="ed_end" th:value="${educationDTO.ed_end}" required>
+            </div>
+            <div class="form-group">
+                <label>수료증</label>
+                <div th:if="${educationDTO.ed_path != null}" class="current-file">
+                    <p>현재 파일: <span th:text="${educationDTO.ed_path}"></span></p>
+                    <a th:href="@{'/education/download/' + ${educationDTO.ed_id}}"
+                       target="_blank">현재 파일 보기</a>
+                </div>
+                <input type="file" name="file" accept="application/pdf" class="form-control">
+                <small class="form-text text-muted">
+                    새 파일을 업로드하지 않으면 기존 파일이 유지됩니다.
+                </small>
+            </div>
+            <div class="error-message" th:if="${error != null}">
+                <p th:text="${error}" style="color: red;"></p>
+            </div>
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">수정</button>
+                <a th:href="@{/education/history}" class="btn btn-secondary">취소</a>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

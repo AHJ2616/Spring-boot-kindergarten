@@ -1,6 +1,5 @@
 package com.kinder.kindergarten.DTO.board;
 
-import com.kinder.kindergarten.DTO.MemberDTO;
 import com.kinder.kindergarten.constant.board.BoardType;
 import lombok.Data;
 

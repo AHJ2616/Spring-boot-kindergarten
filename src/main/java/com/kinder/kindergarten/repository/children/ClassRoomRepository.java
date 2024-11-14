@@ -10,6 +10,7 @@ import java.util.Optional;
 public interface ClassRoomRepository extends JpaRepository<ClassRoom, Long> {
 
     // ClassRoom의 레포지토리
+
     Optional<ClassRoom> findByClassRoomName(String className);
     // 반 이름으로 반 정보를 조회하는 메서드
     boolean existsByClassRoomName(String className);

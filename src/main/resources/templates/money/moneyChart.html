@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/header}">
+<head>
+  <meta charset="UTF-8">
+  <title>수입/지출 현황</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div layout:fragment="content">
+  <div class="chart-container">
+    <h2>수입/지출 현황</h2>
+
+    <!-- 검색 폼 -->
+    <div class="search-form">
+      <input type="month" id="searchMonth" class="form-control">
+      <button onclick="searchMonthlyData()" class="btn btn-primary">검색</button>
+    </div>
+
+    <!-- 차트 캔버스 -->
+    <div class="chart-wrapper">
+      <canvas id="moneyChart"></canvas>
+    </div>
+
+    <!-- 통계 요약 -->
+    <div class="statistics-summary">
+      <div class="stat-item">
+        <h4>총 수입</h4>
+        <p id="totalIncome">0원</p>
+      </div>
+      <div class="stat-item">
+        <h4>총 지출</h4>
+        <p id="totalExpenditure">0원</p>
+      </div>
+      <div class="stat-item">
+        <h4>순이익</h4>
+        <p id="netProfit">0원</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script layout:fragment="script" th:inline="javascript">
+  let moneyChart;
+
+  function initChart(data) {
+    const ctx = document.getElementById('moneyChart').getContext('2d');
+
+    if (moneyChart) {
+      moneyChart.destroy();
+    }
+
+    moneyChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: data.labels,
+        datasets: [
+          {
+            label: '수입',
+            data: data.incomeData,
+            backgroundColor: 'rgba(75, 192, 192, 0.5)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1
+          },
+          {
+            label: '지출',
+            data: data.expenditureData,
+            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+            borderColor: 'rgba(255, 99, 132, 1)',
+            borderWidth: 1
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: function(value) {
+                return value.toLocaleString() + '원';
+              }
+            }
+          }
+        },
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return context.dataset.label + ': ' +
+                        context.raw.toLocaleString() + '원';
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function updateStatistics(data) {
+    const totalIncome = data.incomeData.reduce((a, b) => a + b, 0);
+    const totalExpenditure = data.expenditureData.reduce((a, b) => a + b, 0);
+    const netProfit = totalIncome - totalExpenditure;
+
+    document.getElementById('totalIncome').textContent =
+            totalIncome.toLocaleString() + '원';
+    document.getElementById('totalExpenditure').textContent =
+            totalExpenditure.toLocaleString() + '원';
+    document.getElementById('netProfit').textContent =
+            netProfit.toLocaleString() + '원';
+  }
+
+  function searchMonthlyData() {
+    const searchMonth = document.getElementById('searchMonth').value;
+    if (!searchMonth) {
+      alert('월을 선택해주세요.');
+      return;
+    }
+
+    fetch(`/money/api/chart-data?month=${searchMonth}`)
+            .then(response => response.json())
+            .then(data => {
+              initChart(data);
+              updateStatistics(data);
+            })
+            .catch(error => {
+              console.error('Error fetching data:', error);
+              alert('데이터 조회 중 오류가 발생했습니다.');
+            });
+  }
+
+  // 페이지 로드시 현재 월 데이터 조회
+  document.addEventListener('DOMContentLoaded', function() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    document.getElementById('searchMonth').value = `${year}-${month}`;
+    searchMonthlyData();
+  });
+</script>
+
+<style>
+  .chart-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .search-form {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+  }
+
+  .chart-wrapper {
+    margin-bottom: 30px;
+  }
+
+  .statistics-summary {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 30px;
+    text-align: center;
+  }
+
+  .stat-item {
+    padding: 15px;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    min-width: 200px;
+  }
+
+  .stat-item h4 {
+    margin-bottom: 10px;
+    color: #495057;
+  }
+
+  .stat-item p {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin: 0;
+  }
+</style>
+</body>
+</html>

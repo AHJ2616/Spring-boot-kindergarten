@@ -1,29 +1,35 @@
 package com.kinder.kindergarten.DTO.material;
 
+import jdk.jshell.Snippet;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-@Getter @Setter
+@Getter
+@Setter
+@Builder
 public class MaterialDTO {
 
-    private String id; // 자재 코드
+    private String materialId; // 자재 코드
 
-    private String material_name; // 자재 이름
+    private String materialName; // 자재 이름
 
-    private String material_detail; // 자재 설명
+    private String materialDetail; // 자재 설명
 
-    private String material_category; // 자재 분류
+    private String materialCategory; // 자재 분류
 
-    private Integer material_price; // 자재 가격
+    private Integer materialPrice; // 자재 가격
 
-    private Integer material_ea; // 자재 재고
+    private Integer materialEa; // 자재 재고
 
-    private String material_remark; // 비고란
+    private String materialRemark; // 비고란
 
-    private String material_status; // 자재 상태
+    private String materialStatus; // 자재 상태
 
-    private LocalDate material_regdate; // 자재 입고일
+    private LocalDate materialRegdate; // 자재 입고일
+
+    private String materialWriter; // 글작성자
 
     // TimeEntity 대응
     private String regiDate;

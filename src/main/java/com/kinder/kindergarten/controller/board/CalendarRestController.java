@@ -59,8 +59,9 @@ public class CalendarRestController {
       // ID 생성
       Ulid ulid = UlidCreator.getUlid();
       scheduleDTO.setId(ulid.toString());
-      scheduleDTO.setUsername(principal.getName());
-      
+      /*scheduleDTO.setUsername(principal.getName());*/
+      scheduleDTO.setUsername(principal.getUsername()); // 위코드 오류나서 이렇게 수정해 남깁니다. 2024 11 13
+
       // 기본값 설정
       if (scheduleDTO.getDescription() == null) {
         scheduleDTO.setDescription("");

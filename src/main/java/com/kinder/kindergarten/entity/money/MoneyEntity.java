@@ -43,6 +43,9 @@ public class MoneyEntity extends TimeEntity {
     @Enumerated(EnumType.STRING) // 수입 지출
     private MoneyStatus moneyStatus; // 수입 지출 상태
 
+    @Column(nullable = false)
+    private String moneyApproval; // 돈 승인 여부
+
     // update 회계
     public void updateMoney(MoneyFormDTO moneyFormDTO){
 
@@ -53,7 +56,8 @@ public class MoneyEntity extends TimeEntity {
         this.moneyName = moneyFormDTO.getMoneyName();
         this.moneyHowMuch = moneyFormDTO.getMoneyHowMuch();
         this.moneyStatus = moneyFormDTO.getMoneyStatus();
-        
+        this.moneyApproval = moneyFormDTO.getMoneyApproval();
+
     }
 
     

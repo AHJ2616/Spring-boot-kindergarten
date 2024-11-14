@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout}">
+<head>
+    <link rel="stylesheet" href="/css/employee/user.css">
+    <meta charset="UTF-8">
+    <title>교사 대시보드</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="dashboard-container">
+
+        <!-- 통계 카드 섹션 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>담당 원아 수</h3>
+                <div class="number">15명</div>
+            </div>
+            <div class="stat-card">
+                <h3>오늘 출석 현황</h3>
+                <div class="number">14명</div>
+            </div>
+            <div class="stat-card">
+                <h3>금주 행사</h3>
+                <div class="number">2건</div>
+            </div>
+            <div class="stat-card">
+                <h3>학부모 상담</h3>
+                <div class="number">3건</div>
+            </div>
+        </div>
+
+        <!-- 일정 섹션 -->
+        <div class="schedule-section">
+            <h3>오늘의 일정</h3>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>시간</th>
+                    <th>활동</th>
+                    <th>장소</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>09:00</td>
+                    <td>등원지도</td>
+                    <td>정문</td>
+                </tr>
+                <!-- 추가 일정... -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 반 정보 -->
+        <div class="class-info">
+            <div class="notice-board">
+                <h3>공지사항</h3>
+                <!-- 공지사항 목록 -->
+            </div>
+            <div class="notice-board">
+                <h3>학부모 연락사항</h3>
+                <!-- 연락사항 목록 -->
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

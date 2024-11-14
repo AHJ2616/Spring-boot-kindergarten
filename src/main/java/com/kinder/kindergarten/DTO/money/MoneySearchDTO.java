@@ -1,6 +1,5 @@
 package com.kinder.kindergarten.DTO.money;
 
-
 import com.kinder.kindergarten.constant.money.MoneyStatus;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,7 +10,7 @@ public class MoneySearchDTO {
 
     private String searchDateType;              // 현재 시간과 비교하여 상품 데이터를 조회함
 
-    private MoneyStatus moneySearchStatus;      // 지출상태를 기준으로 상품 데이터를 조회
+    private MoneyStatus searchMoneyStatus;      // 지출상태를 기준으로 상품 데이터를 조회
 
     private String searchBy;                    // 어떤 유형으로 조회할 지 선택
 

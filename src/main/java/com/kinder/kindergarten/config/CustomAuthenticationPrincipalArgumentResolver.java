@@ -1,9 +1,6 @@
 package com.kinder.kindergarten.config;
 
 import com.kinder.kindergarten.annotation.CurrentUser;
-
-import java.lang.annotation.Annotation;
-
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.security.core.Authentication;
@@ -13,6 +10,8 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
+
+import java.lang.annotation.Annotation;
 
 public class CustomAuthenticationPrincipalArgumentResolver implements HandlerMethodArgumentResolver {
 

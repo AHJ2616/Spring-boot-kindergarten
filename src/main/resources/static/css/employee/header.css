@@ -1,3 +1,4 @@
+@charset "UTF-8";
 * {
   margin: 0;
   padding: 0;
@@ -8,7 +9,7 @@
 
 body {
   background-color: #F5F6F8;
-  overflow: hidden;
+  overflow: auto;
 }
 
 .sidebar-navigation {
@@ -16,23 +17,38 @@ body {
   min-height: 100vh;
   width: 80px;
   background-color: #313443;
-  float: left;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 1000;
 }
+
+.content-wrapper {
+  margin-left: 80px;
+  margin-top: 80px;
+  padding: 20px;
+  height: 100vh;
+  overflow-y: auto;
+  position: relative;
+}
+
 .sidebar-navigation ul {
   text-align: center;
   color: white;
 }
-.sidebar-navigation ul li {
+
+.sidebar-navigation li {
   padding: 28px 0;
   cursor: pointer;
   transition: all ease-out 120ms;
 }
-.sidebar-navigation ul li i {
+.sidebar-navigation li i {
   display: block;
   font-size: 24px;
   transition: all ease 450ms;
 }
-.sidebar-navigation ul li .tooltip {
+.sidebar-navigation li .tooltip {
   display: inline-block;
   position: absolute;
   background-color: #313443;
@@ -44,8 +60,11 @@ body {
   visibility: hidden;
   font-size: 13px;
   letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.sidebar-navigation ul li .tooltip:before {
+.sidebar-navigation li .tooltip:before {
   content: "";
   display: block;
   position: absolute;
@@ -56,18 +75,269 @@ body {
   height: 10px;
   background-color: inherit;
 }
-.sidebar-navigation ul li:hover {
+.sidebar-navigation li:hover {
   background-color: #22252E;
 }
-.sidebar-navigation ul li:hover .tooltip {
+.sidebar-navigation li:hover .tooltip {
   visibility: visible;
   opacity: 1;
 }
-.sidebar-navigation ul li.active {
+.sidebar-navigation li.active {
   background-color: #22252E;
 }
-.sidebar-navigation ul li.active i {
+.sidebar-navigation li.active i {
   color: #98D7EC;
+}
+
+/* 사이드 메뉴 스타일 */
+.side-menu {
+  position: absolute; /* 서브 메뉴가 부모 li 요소에 상대적으로 위치하도록 설정 */
+  top: 0;
+  left: 100%; /* 메뉴가 오른쪽으로 확장 */
+  display: none; /* 기본적으로 숨겨짐 */
+  list-style: none;
+  background-color: #444; /* 서브 메뉴의 배경색 */
+  width: 200px; /* 서브 메뉴의 고정 너비 */
+  padding: 0;
+  margin: 0;
+  border-radius: 4px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease; /* 서브 메뉴가 부드럽게 나타나고 사라지도록 설정 */
+}
+
+.side-menu li {
+  padding: 10px;
+}
+
+.side-menu li a {
+  color: white;
+  text-decoration: none;
+  display: block;
+  transition: background-color 0.3s;
+}
+
+/* 메뉴 항목에 마우스를 올렸을 때 서브 메뉴가 보이도록 */
+.sidebar-navigation .ui-menu-item:hover .side-menu {
+  display: block;
+}
+
+/* 서브 메뉴가 자연스럽게 나타나도록 */
+.sidebar-navigation .ui-menu-item {
+  position: relative; /* 서브 메뉴가 이 li를 기준으로 위치하도록 설정 */
+}
+
+.sidebar-navigation .ui-menu-item .side-menu {
+  opacity: 0;
+  left: 110%; /* 메뉴가 처음에는 오른쪽으로 밀려 있음 */
+  transition: left 0.3s ease-out, opacity 0.3s ease-out;
+}
+
+.sidebar-navigation .ui-menu-item:hover .side-menu {
+  opacity: 1;
+  left: 100%; /* 서브 메뉴가 오른쪽으로 나타날 때 */
+}
+
+/* 헤더 스타일 */
+.top-header {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 80px; /* 사이드바 너비만큼 여백 */
+  height: 60px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0 30px;
+}
+
+.header-tools {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.icon-button {
+  position: relative;
+  color: #666;
+  font-size: 20px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.icon-button:hover {
+  color: #313443;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #ff4757;
+  color: white;
+  font-size: 10px;
+  padding: 2px 5px;
+  border-radius: 10px;
+  min-width: 15px;
+  text-align: center;
+}
+
+/* 프로필 섹션 */
+.profile-section {
+  display: flex;
+  width: 200px; /* 고정된 너비 */
+  cursor: pointer;
+  flex-direction: row; /* 세로가 아니라 가로로 배치 */
+  align-items: center; /* 아이템들이 수직으로 정렬되도록 */
+  gap: 12px; /* 프로필 사진과 텍스트 사이의 간격 */
+  padding-left: 24px;
+  border-left: 1px solid #eee;
+}
+
+.profile-image {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column; /* 이름과 직위를 세로로 배치 */
+}
+
+.profile-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.profile-role {
+  font-size: 12px;
+  color: #666;
+}
+
+.main-content {
+  margin-left: 80px; /* 사이드바 너비만큼 여백 */
+  padding: 80px 30px 30px; /* 상단 헤더 높이만큼 패딩 */
+  width: calc(100% - 80px);
+  min-height: calc(100vh - 110px);
+}
+
+/* 드롭다운 메뉴 */
+.dropdown-menu {
+  display: none; /* 기본적으로 숨겨짐 */
+  position: absolute; /* 메뉴가 프로필 아래에 나타나도록 설정 */
+  top: 100%; /* 프로필 세션 바로 아래에 위치 */
+  right: 0;
+  width: 200px; /* 드롭다운 메뉴의 고정된 너비 */
+  z-index: 1000; /* 다른 요소 위에 표시되도록 */
+  background-color: white; /* 배경색 */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+  border-radius: 4px; /* 둥근 모서리 */
+  padding: 10px 0;
+  max-height: 0; /* 기본적으로 높이를 0으로 설정하여 숨김 */
+  overflow: hidden; /* 높이가 0일 때 콘텐츠는 숨겨짐 */
+  transition: max-height 0.3s ease-out; /* 부드럽게 펼쳐지고 닫히는 애니메이션 */
+}
+
+/* 드롭다운 항목 스타일 */
+.dropdown-menu li {
+  list-style: none;
+  margin: 5px 0;
+}
+
+.dropdown-menu a {
+  text-decoration: none;
+  color: #333;
+  padding: 10px 15px;
+  display: block;
+  transition: background-color 0.3s;
+  border-radius: 4px;
+}
+
+.dropdown-menu a:hover {
+  background-color: #f0f0f0; /* hover 시 배경색 변경 */
+}
+
+/* 프로필 클릭 시 드롭다운 메뉴 표시 */
+.profile-section.active + .dropdown-menu {
+  display: block;
+  max-height: 500px; /* 메뉴가 펼쳐질 때의 최대 높이 */
+  padding: 10px 0; /* 패딩을 추가하여 메뉴가 자연스럽게 펼쳐지게 */
+}
+
+/*세션 타이머 스타일*/
+.session-timer {
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+  padding: 5px 10px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+}
+
+.session-timer i {
+  margin-right: 5px;
+  color: #6c757d;
+}
+
+#sessionTimer {
+  font-family: monospace;
+  font-size: 14px;
+  color: #495057;
+  margin-right: 10px;
+}
+
+.extend-session-btn {
+  border: none;
+  background-color: #007bff;
+  color: white;
+  padding: 3px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.extend-session-btn:hover {
+  background-color: #0056b3;
+}
+
+.notification-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 300px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.notification-header {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notification-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.notification-item {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+}
+
+.notification-item:hover {
+  background-color: #f5f5f5;
 }
 
 /*# sourceMappingURL=header.css.map */

@@ -1,6 +1,8 @@
 package com.kinder.kindergarten.repository.parent;
 
 import com.kinder.kindergarten.entity.parent.Parent;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
 
@@ -8,7 +10,7 @@ import java.util.Optional;
 
 public interface ParentRepository extends JpaRepository<Parent, Long> {
 
-    // Parent Repository
+    // Parent Repository(JpaRepository에서 기본적인 CRUD 메서드 제공한다.)
 
     /*  Repository에서는 Optional<>을 사용하는 것이 일반적이기 때문에 jpa 메서드는 기본적으로 Optional을 반환 한다.
      Repository 작성할 때 find하면 여러 목록이 나오는데 이때, 엔티티의 필드명과 메서드이름을 일치하도록 작성해야 한다!
@@ -23,5 +25,7 @@ public interface ParentRepository extends JpaRepository<Parent, Long> {
     Optional<Parent> findByParentEmail(@Param("email") String email);
     // 회원 가입 시 중복된 회원이 있는지 검사하기 위해 이메일로 회원 검사하는 메서드
 
+    Page<Parent> findByParentNameContaining(String keyword, Pageable pageable);
+    // 학부모 성함으로 검색하는 메서드
 
 }

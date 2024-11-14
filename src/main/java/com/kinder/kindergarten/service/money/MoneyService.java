@@ -2,7 +2,6 @@ package com.kinder.kindergarten.service.money;
 
 import com.github.f4b6a3.ulid.Ulid;
 import com.github.f4b6a3.ulid.UlidCreator;
-
 import com.kinder.kindergarten.DTO.money.MoneyFileDTO;
 import com.kinder.kindergarten.DTO.money.MoneyFormDTO;
 import com.kinder.kindergarten.DTO.money.MoneySearchDTO;
@@ -24,10 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriUtils;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -139,10 +135,20 @@ public class MoneyService {
         return moneyRepository.getMoneyPage(moneySearchDTO, pageable);
     }
 
-
+    // 회계 Money 상세보기
     @Transactional(readOnly = true)
     public MoneyFormDTO getMoneyDtl(String moneyId){
+
         Optional<MoneyFormDTO> optionalMoneyFormDTO = moneyRepository.findById(moneyId).map(moneyEntity -> modelMapper.map(moneyEntity,MoneyFormDTO.class));
+        if (optionalMoneyFormDTO.isPresent()) {
+            MoneyFormDTO money = optionalMoneyFormDTO.get();
+            // money 객체 사용
+        } else {
+            // 값이 없을 때의 처리 (예: 예외 던지기, 기본값 반환 등)
+            throw new NoSuchElementException("No value present for ID: " + moneyId);
+        }
+
+
         MoneyFormDTO moneyFormDTO = optionalMoneyFormDTO.get();
 
         List<MoneyFileEntity> fileEntities = moneyFileRepository.findByMoneyEntity_moneyId(moneyId);
@@ -192,6 +198,24 @@ public class MoneyService {
         MoneyEntity moneyEntity = moneyRepository.findById(moneyId)
                 .orElseThrow(() -> new EntityNotFoundException("자재를 찾을 수 없습니다."));
         moneyRepository.delete(moneyEntity);
+    }
+    
+    // Count 회계 결재상태에 따른 수 카운트
+    public Map<String, Long> countByApprovalStatus() {
+        Map<String, Long> statusCount = new HashMap<>();
+        statusCount.put("요청", moneyRepository.countByMoneyApproval("요청"));
+        statusCount.put("진행중", moneyRepository.countByMoneyApproval("진행중"));
+        statusCount.put("반려", moneyRepository.countByMoneyApproval("반려"));
+        statusCount.put("완료", moneyRepository.countByMoneyApproval("완료"));
+
+        return statusCount;
+    }
+
+    // 회계 리스트 전체 불러오기 - 2024 11 09
+    public List<MoneyFormDTO> getAllMoneyData() {
+        return moneyRepository.findAll().stream()
+                .map(moneyEntity -> modelMapper.map(moneyEntity, MoneyFormDTO.class))
+                .collect(Collectors.toList());
     }
 
 

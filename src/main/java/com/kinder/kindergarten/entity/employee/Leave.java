@@ -35,6 +35,9 @@ public class Leave {
     @Enumerated(EnumType.STRING)
     private DayOff type; // 휴가 유형
 
+    @Column(name = "leave_title")
+    private String title; // 신청 제목
+
     @Column(name = "leave_status")
     private String status; // 승인여부
 

@@ -5,11 +5,10 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
-import java.text.NumberFormat;
 import java.time.LocalDate;
-import java.util.Locale;
 
 @Getter @Setter
 public class EmployeeDTO {
@@ -51,6 +50,9 @@ public class EmployeeDTO {
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate hireDate;
+
+    private String profileImageUrl;
+    private MultipartFile profileImage; // 프로필 이미지 파일 업로드용
 
     // 잔여 연차
     private double annualLeave;

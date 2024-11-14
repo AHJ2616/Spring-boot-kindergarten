@@ -1,6 +1,5 @@
 package com.kinder.kindergarten.repository.money;
 
-
 import com.kinder.kindergarten.DTO.money.MoneySearchDTO;
 import com.kinder.kindergarten.constant.money.MoneyStatus;
 import com.kinder.kindergarten.entity.money.MoneyEntity;
@@ -66,7 +65,7 @@ public class MoneyRepositoryCustomImpl implements MoneyRepositoryCustom{
         List<MoneyEntity> content = queryFactory
                 .selectFrom(QMoneyEntity.moneyEntity) // 자재 데이터 지정
                 .where(regDtsAfter(moneySearchDTO.getSearchDateType()),  //조건 절 ',' 가 and 조건
-                        searchMoneyStatusEq(moneySearchDTO.getMoneySearchStatus()),
+                        searchMoneyStatusEq(moneySearchDTO.getSearchMoneyStatus()),
                         searchByLike(moneySearchDTO.getSearchBy(),
                                 moneySearchDTO.getSearchQuery()))
                 .orderBy(QMoneyEntity.moneyEntity.moneyId.desc())
@@ -76,7 +75,7 @@ public class MoneyRepositoryCustomImpl implements MoneyRepositoryCustom{
 
         long total = queryFactory.select(Wildcard.count).from(QMoneyEntity.moneyEntity)
                 .where(regDtsAfter(moneySearchDTO.getSearchDateType()),
-                        searchMoneyStatusEq(moneySearchDTO.getMoneySearchStatus()),
+                        searchMoneyStatusEq(moneySearchDTO.getSearchMoneyStatus()),
                         searchByLike(moneySearchDTO.getSearchBy(), moneySearchDTO.getSearchQuery()))
                 .fetchOne();
 

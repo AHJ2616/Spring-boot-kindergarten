@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>장바구니</title>
+
+
+</head>
+<body>
+<h2>장바구니</h2>
+<form th:action="@{/material/order}" method="post">
+  <table class="table">
+    <thead>
+    <tr>
+      <th>자재명</th>
+      <th>현재 수량</th>
+      <th>주문 수량</th>
+      <th>삭제</th> <!-- 삭제 열 추가 -->
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="material : ${materials}">
+      <td th:text="${material.materialName}"></td>
+      <td th:text="${material.materialEa}"></td>
+      <td>
+        <input type="number" th:name="'quantities[' + ${material.materialId} + ']'"
+               min="1" value="1" class="form-control">
+        <input type="hidden" th:name="'materialIds'" th:value="${material.materialId}">
+        <input type="hidden" name="_csrf" th:value="${_csrf.token}" id="csrfToken">
+      </td>
+      <td>
+        <button type="button" class="btn btn-danger" onclick="deleteFromCart([[${material.materialId}]])">x</button>
+      </td> <!-- 삭제 버튼 추가 -->
+    </tr>
+    </tbody>
+  </table>
+  <button type="submit" class="btn btn-primary">주문하기</button>
+</form>
+
+<div class="cart-container">
+  <div class="cart-header">
+    <input type="checkbox" id="selectAll" th:onclick="selectAllItems()">
+    <button class="btn btn-danger" onclick="deleteSelectedItems()">선택 삭제</button>
+  </div>
+
+  <div class="cart-items" th:each="item : ${cartItems}">
+    <input type="checkbox" class="item-checkbox" th:value="${item.id}">
+    <span th:text="${item.materialName}"></span>
+    <button class="btn btn-sm btn-danger" th:onclick="deleteCartItem([[${item.id}]])">삭제</button>
+  </div>
+</div>
+
+<script>
+  function selectAllItems() {
+    const mainCheckbox = document.getElementById('selectAll');
+    const itemCheckboxes = document.getElementsByClassName('item-checkbox');
+    Array.from(itemCheckboxes).forEach(checkbox => {
+      checkbox.checked = mainCheckbox.checked;
+    });
+  }
+
+  function deleteSelectedItems() {
+    const selectedItems = Array.from(document.getElementsByClassName('item-checkbox'))
+            .filter(checkbox => checkbox.checked)
+            .map(checkbox => checkbox.value);
+
+    if(selectedItems.length === 0) {
+      alert('삭제할 항목을 선택해주세요.');
+      return;
+    }
+
+    fetch('/api/material/cart/delete-selected', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(selectedItems)
+    }).then(response => {
+      if(response.ok) {
+        location.reload();
+      }
+    });
+  }
+
+  function deleteCartItem(itemId) {
+    if(confirm('이 항목을 삭제하시겠습니까?')) {
+      fetch(`/api/material/cart/delete/${itemId}`, {
+        method: 'DELETE'
+      }).then(response => {
+        if(response.ok) {
+          location.reload();
+        }
+      });
+    }
+  }
+</script>
+
+
+</body>
+</html>

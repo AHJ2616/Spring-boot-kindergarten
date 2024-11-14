@@ -51,10 +51,10 @@ public class MaterialRepositoryCustomImpl implements MaterialRepositoryCustom{
 
     private BooleanExpression searchByLike(String searchBy, String searchQuery){ // 특정 조건 검색 "like" 이용
 
-        if(StringUtils.equals("material_name", searchBy)){     // 이름
-            return QMaterialEntity.materialEntity.material_name.like("%" + searchQuery + "%");
-        } else if(StringUtils.equals("id", searchBy)){       // id
-            return QMaterialEntity.materialEntity.id.like("%" + searchQuery + "%");
+        if(StringUtils.equals("materialName", searchBy)){     // 이름
+            return QMaterialEntity.materialEntity.materialName.like("%" + searchQuery + "%");
+        } else if(StringUtils.equals("materialId", searchBy)){       // id
+            return QMaterialEntity.materialEntity.materialId.like("%" + searchQuery + "%");
         }
 
         return null;
@@ -68,7 +68,7 @@ public class MaterialRepositoryCustomImpl implements MaterialRepositoryCustom{
                         searchMaterialStatusEq(materialSearchDTO.getSearchMaterialStatus()),
                         searchByLike(materialSearchDTO.getSearchBy(),
                                 materialSearchDTO.getSearchQuery()))
-                .orderBy(QMaterialEntity.materialEntity.id.desc())
+                .orderBy(QMaterialEntity.materialEntity.materialId.desc())
                 .offset(pageable.getOffset())   // 한번에 가지고올 시작 인덱스
                 .limit(pageable.getPageSize())  // 한번에 가지고올 최대 개수
                 .fetch();

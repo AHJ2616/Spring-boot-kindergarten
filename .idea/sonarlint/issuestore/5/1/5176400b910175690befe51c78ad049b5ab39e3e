@@ -1,5 +1,3 @@
 
-€
-java:S1192/"cDefine a constant instead of duplicating this literal "ì¼ì •ì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤." 3 times.(ğ‘ÆÎ8Òü˜Ì°2
 o
-java:S6204("RReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()'(ª™¨¹8£ı˜Ì°2
+java:S6204"RReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()'(ª™¨¹8òÃÛ¯2
