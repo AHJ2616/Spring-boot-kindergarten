@@ -1,5 +1,6 @@
 package com.kinder.kindergarten.entity.board;
 
+import com.kinder.kindergarten.entity.Member;
 import com.kinder.kindergarten.entity.TimeEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -18,8 +19,10 @@ public class CommentsEntity extends TimeEntity {
   @Column(name="comments_id")
   private String commentsId;
 
-  @Column(nullable = false) //나중에 변경
-  private String writer;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name="writer", referencedColumnName = "member_email")
+  private Member writer;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name="board_id")

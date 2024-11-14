@@ -17,7 +17,7 @@ public class ScheduleDTO {
   //일정 내용
   private String description;
 
-  private String type;
+  private String type; //카테고리
 
   private String username;
 

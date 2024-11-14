@@ -94,9 +94,19 @@ dependencies {
     // jsoup : XXS 취약점에 대한 html 보안(HTML sanitize)
     implementation group: 'org.jsoup', name: 'jsoup', version: '1.18.1'
 
+    //web push 에 필요한 firebase 설치
+    implementation 'com.google.firebase:firebase-admin:9.1.1'
+
+    // okhttp : http통신을 도와주는 라이브러리
+    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
 
 
-    // 기타 필요한 의존성들은 유지
+    // gson
+    implementation group: 'com.google.code.gson', name: 'gson', version: '2.10.1'
+
+
+
+    // 설문조사용 추가
     implementation 'org.webjars:bootstrap:5.2.3'  // Bootstrap 5로 업데이트
     implementation 'org.webjars:select2:4.0.13'
     implementation 'org.webjars:momentjs:2.29.1'

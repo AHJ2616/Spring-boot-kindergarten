@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Page;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
@@ -22,6 +24,20 @@ public class CacheConfig {
               @Override
               public Page<BoardDTO> load(String key) {
                 return null; // 실제 검색은 서비스에서 수행
+              }
+            });
+  }
+
+  @Bean
+  public LoadingCache<String, byte[]> imageCache() {
+    return CacheBuilder.newBuilder()
+            .maximumSize(200) // 최대 200개의 이미지를 캐시
+            .expireAfterWrite(24, TimeUnit.HOURS) //24시간 후 캐시 만료
+            .recordStats() // 캐시 통계 기록
+            .build(new CacheLoader<>() {
+              @Override
+              public byte[] load(String imagePath) throws Exception {
+                return Files.readAllBytes(Paths.get(imagePath));
               }
             });
   }

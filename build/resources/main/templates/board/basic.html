@@ -7,7 +7,8 @@
   <meta charset="UTF-8">
   <title>게시판</title>
   <link rel="stylesheet" th:href="@{/css/board.css}">
-  <script th:src="@{/js/board.js}"></script>
+  <script th:src="@{/js/board/board.js}"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
 <div layout:fragment="content">
@@ -34,18 +35,28 @@
     <table class="board-table">
       <thead>
       <tr>
-        <th>제목</th>
-        <th>작성자</th>
-        <th>작성일</th>
-        <th>조회</th>
+        <th style="width:35%">제목</th>
+        <th style="width:25%">작성자</th>
+        <th style="width:20%">작성일</th>
+        <th style="width:20%">조회</th>
       </tr>
       </thead>
       <tbody>
-      <tr th:each="board, status : ${boards.content}">
+      <tr th:each="board, status : ${boards.content}" th:class="${board.boardType == T(com.kinder.kindergarten.constant.board.BoardType).ABSOLUTE ? 'absolute-post' : ''}">
         <td class="title">
-          <a th:href="@{/board/{id}(id=${board.boardId})}" th:text="${board.boardTitle}">제목</a>
+          <th:block th:if="${board.boardType.name() == 'ABSOLUTE'}">
+              <span class="must-read">필독</span>
+          </th:block>
+          <a th:href="@{/board/{id}(id=${board.boardId})}" 
+             th:text="${board.boardTitle}"
+             th:class="${board.boardType == T(com.kinder.kindergarten.constant.board.BoardType).ABSOLUTE ? 'absolute-title' : ''}">
+          </a>
+          <span th:if="${board.fileCount > 0}" class="file-count">
+              <i class="fas fa-file-alt"></i>
+              <span th:text="${board.fileCount}"></span>
+          </span>
         </td>
-        <td th:text="${board.boardWriter}">작성자</td>
+        <td th:text="${board.writer}">작성자</td>
         <td th:text="${#temporals.format(board.regiDate,'yyyy.MM.dd HH:mm')}">작성일</td>
         <td th:text="${board.views}">조회수</td>
       </tr>
@@ -58,7 +69,7 @@
 
   <div class="pagination" th:if="${boards.totalPages > 0}">
         <span th:each="pageNum : ${#numbers.sequence(0, boards.totalPages - 1)}">
-            <a th:href="@{${keyword != null ? '/board/search' : '/board/basic'}(page=${pageNum + 1}, keyword=${keyword})}"
+            <a th:href="@{/board/list/common(page=${pageNum +1}, keyword=${keyword})}"
                th:text="${pageNum + 1}"
                th:class="${pageNum == currentPage} ? 'active' : ''">
             </a>

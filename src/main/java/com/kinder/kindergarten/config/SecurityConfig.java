@@ -1,6 +1,6 @@
 package com.kinder.kindergarten.config;
 
-import com.kinder.kindergarten.service.employee.EmployeeService;
+import com.kinder.kindergarten.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +20,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-  private final EmployeeService employeeService;
+  private final MemberService memberService;
   private final CustomAuthenticationSuccessHandler successHandler;
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
@@ -41,6 +41,8 @@ public class SecurityConfig {
                     .requestMatchers("/teacher/**").hasRole("USER") // 사용자만 /teacher/** 경로 접근 가능
                     .requestMatchers("/employee/**").hasAnyRole("ADMIN", "MANAGER", "USER") // 직원은 모든 역할 접근 가능
                     .requestMatchers("/parent/**").hasRole("Parent")
+                    .requestMatchers("/board/get/**", "/board/list/**").permitAll()
+                    .requestMatchers("/board/**").authenticated()
                     .anyRequest().authenticated()
             )
             .formLogin(form -> form
@@ -75,9 +77,9 @@ public class SecurityConfig {
     // DaoAuthenticationProvider 인스턴스를 생성
     DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
     // employeeService 를 설정하여 사용자 정보를 가져오는 방법을 정의
-    provider.setUserDetailsService(employeeService); // UserDetailsService 설정
     // 비밀번호를 검증할 때 사용할 비밀번호 인코더를 설정
     provider.setPasswordEncoder(passwordEncoder()); // 비밀번호 암호화기 설정
+    provider.setUserDetailsService(memberService); // UserDetailsService 설정
     return provider;
   }
 

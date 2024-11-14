@@ -9,9 +9,10 @@
   <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
   <title>글 보기</title>
   <link rel="stylesheet" th:href="@{/css/board.css}">
+  <link rel="stylesheet" th:href="@{/css/survey.css}">
   <!-- JS 파일 연결 -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="/js/boardGet.js"></script>
+  <script src="/js/board/boardGet.js"></script>
 </head>
 <body>
 <div layout:fragment="content">
@@ -22,7 +23,7 @@
       </div>
       <div class="info-section">
         <div class="left-info">
-          <span class="writer" th:text="${boardDTO.boardWriter}"></span>
+          <span class="writer" th:text="${boardDTO.writer}"></span>
           <span class="separator">|</span>
           <span class="date" th:text="${#temporals.format(boardDTO.regiDate, 'yyyy.MM.dd HH:mm')}"></span>
         </div>
@@ -31,32 +32,52 @@
                     <i class="fas fa-eye"></i>
                     <span th:text="${boardDTO.views}"></span>
                 </span>
+          <div class="dropdown">
+            <a href="#" class="zip-download-btn" th:if="${boardDTO.hasZipFile}">
+              <i class="fas fa-ellipsis-v"></i>
+            </a>
+            <div class="dropdown-content">
+              <div th:each="file : ${boardDTO.BoardFileList}"
+                   th:if="${file.isZip == 'Y'}"
+                   class="dropdown-item">
+                <a th:href="@{/board/download/{fileId}(fileId=${file.fileId})}"
+                   class="file-link">압축파일 다운로드</a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
     <!-- 이미지 갤러리 섹션 -->
     <div class="image-gallery-container" th:if="${boardDTO.BoardFileList != null and not #lists.isEmpty(boardDTO.BoardFileList)}">
       <!-- 썸네일 목록 -->
-      <div class="thumbnail-list">
-        <div th:each="file : ${boardDTO.BoardFileList}"
-             th:if="${#strings.toLowerCase(file.orignalName).endsWith('.jpg') or
-                 #strings.toLowerCase(file.orignalName).endsWith('.jpeg') or
-                 #strings.toLowerCase(file.orignalName).endsWith('.png') or
-                 #strings.toLowerCase(file.orignalName).endsWith('.PNG') or
-                 #strings.toLowerCase(file.orignalName).endsWith('.gif')}"
-             class="thumbnail-item">
-          <img th:src="@{'/images/' +${file.modifiedName}}"
-               alt="썸네일 이미지"
-               class="thumbnail">
+      <div class="thumbnail-wrapper">
+        <div class="thumbnail-list">
+          <div th:each="file : ${boardDTO.BoardFileList}"
+               th:if="${#strings.toLowerCase(file.orignalName).endsWith('.jpg') or
+                   #strings.toLowerCase(file.orignalName).endsWith('.jpeg') or
+                   #strings.toLowerCase(file.orignalName).endsWith('.png') or
+                   #strings.toLowerCase(file.orignalName).endsWith('.PNG') or
+                   #strings.toLowerCase(file.orignalName).endsWith('.gif')}"
+               class="thumbnail-item">
+            <img th:src="@{'/images/' + ${file.modifiedName}}"
+                 th:data-filename="${file.orignalName}"
+                 alt="썸네일 이미지"
+                 class="thumbnail"
+                 onclick="updatePreview(this)">
+          </div>
         </div>
       </div>
 
       <!-- 큰 이미지 프리뷰 -->
       <div class="preview-container">
-        <img id="preview-image"
-             th:if="${boardDTO.BoardFileList != null and not #lists.isEmpty(boardDTO.BoardFileList)}"
-             th:src="@{'/upload/' + ${boardDTO.BoardFileList[0].filePath}}"
-             alt="이미지 프리뷰">
+        <div class="preview-content">
+          <img id="preview-image"
+               th:if="${boardDTO.BoardFileList != null and not #lists.isEmpty(boardDTO.BoardFileList)}"
+               th:src="@{'/images/' + ${boardDTO.BoardFileList[0].modifiedName}}"
+               alt="이미지 프리뷰">
+          <div class="preview-filename" th:text="${boardDTO.BoardFileList[0].orignalName}"></div>
+        </div>
       </div>
     </div>
     <!-- 게시글 내용 부분은 유지 -->
@@ -65,7 +86,6 @@
     </div>
 
     <div class="button-group">
-      <a href="javascript:history.back()" class="btn btn-secondary">뒤로가기</a>
       <button id="toggleComments" class="btn btn-primary">댓글보기</button>
     </div>
 
@@ -85,7 +105,7 @@
             <span class="comment-date" th:text="${#temporals.format(comment.regiDate, 'yyyy.MM.dd HH:mm')}"></span>
           </div>
           <div class="comment-content" th:text="${comment.contents}"></div>
-         <!-- <div class="comment-actions" th:if="${comment.writer == #authentication.name}">-->
+          <!-- <div class="comment-actions" th:if="${comment.writer == #authentication.name}">-->
           <div class="comment-actions">
             <button th:onclick="'editComment(${comment.commentsId})'" class="btn btn-sm btn-primary">수정</button>
             <button th:onclick="'deleteComment(${comment.commentsId})'" class="btn btn-sm btn-danger">삭제</button>
@@ -95,41 +115,21 @@
     </div>
 
     <div class="board-footer">
-    <!--  <a th:if="${boardDTO.boardWriter == #authentication.name}"
-         th:href="@{/board/modify/{boardId}(boardId=${boardDTO.boardId})}"
-         class="btn btn-primary">수정</a>
-
-      <button th:if="${boardDTO.boardWriter == #authentication.name}"
-              onclick="deleteBoard([[${boardDTO.boardId}]])"
-              class="btn btn-danger">삭제</button>-->
       <a th:href="@{/board/modify/{boardId}(boardId=${boardDTO.boardId})}"
          class="btn btn-primary">수정</a>
 
       <button onclick="deleteBoard([[${boardDTO.boardId}]])"
               class="btn btn-danger">삭제</button>
+      <a href="javascript:history.back()" class="btn btn-secondary">뒤로가기</a>
     </div>
 
     <!-- 첨부파일이 있는 경우 표시 -->
     <div class="file-container" th:if="${boardDTO.BoardFileList != null and not #lists.isEmpty(boardDTO.BoardFileList)}">
       <h3>첨부파일</h3>
 
-      <!-- ZIP 파일 다운로드 섹션 -->
-      <div class="zip-download" th:if="${boardDTO.hasZipFile}">
-        <h4>압축 파일 다운로드</h4>
-        <div class="file-list">
-          <div th:each="file : ${boardDTO.BoardFileList}"
-               th:if="${file.isZip == 'Y'}"
-               class="file-item">
-            <a th:href="@{/board/download/{fileId}(fileId=${file.fileId})}"
-               th:text="|${file.orignalName} (압축파일)|"
-               class="file-link zip-file"></a>
-          </div>
-        </div>
-      </div>
-
       <!-- 개별 파일 다운로드 섹션 -->
       <div class="individual-download">
-        <h4>개별 파일 다운로드</h4>
+        <h4>개 파일 다운로드</h4>
         <div class="file-list">
           <div th:each="file : ${boardDTO.BoardFileList}"
                th:if="${file.isZip == 'N'}"
@@ -144,10 +144,105 @@
       </div>
     </div>
 
-    <!-- JavaScript 코드 제거하고 스크립트 태그만 남김 -->
+    <!-- survey-section div 수정 -->
+    <div class="survey-section" th:if="${surveyDTO != null}">
+        <h3>설문조사</h3>
+        <form id="surveyForm">
+            <div class="questions" th:each="question, qStat : ${surveyDTO.questions}">
+                <div class="question-item">
+                    <p class="question-text" th:text="${qStat.count + '. ' + question.questionText}"></p>
+                    <!-- 라디오 버튼 옵션 -->
+                    <div class="options" th:if="${question.questionType == 'RADIO'}">
+                        <div th:each="option, optionStat : ${question.options}" class="option-item">
+                            <input type="radio" 
+                                   th:name="'question_' + ${question.questionId}"
+                                   th:value="${option}"
+                                   th:id="'option_' + ${question.questionId} + '_' + ${optionStat.index}">
+                            <label th:for="'option_' + ${question.questionId} + '_' + ${optionStat.index}"
+                                   th:text="${option}"></label>
+                        </div>
+                    </div>
+                    <!-- 텍스트 입력 옵션 -->
+                    <div class="text-answer" th:if="${question.questionType == 'TEXT'}">
+                        <textarea th:name="'question_' + ${question.questionId}"
+                                  rows="3" 
+                                  class="form-control"></textarea>
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="submitSurvey()">설문 제출하기</button>
+        </form>
+    </div>
+
+    <!-- script 섹션 수정 -->
     <script th:inline="javascript">
-        // boardId를 전역 변수로 선언하여 boardGet.js에서 사용할 수 있게 함
+        // 기존 변수 선언 유지
         const boardId = [[${boardDTO.boardId}]];
+        const boardFiles = [[${boardDTO.BoardFileList}]];
+        
+        // 설문 제출 함수 추가
+        function submitSurvey() {
+            const form = document.getElementById('surveyForm');
+            const answers = [];
+            
+            // CSRF 토큰 가져오기
+            const token = document.querySelector("meta[name='_csrf']").content;
+            const header = document.querySelector("meta[name='_csrf_header']").content;
+            
+            // 모든 질문에 대한 답변 수집
+            document.querySelectorAll('.question-item').forEach(questionDiv => {
+                const questionId = questionDiv.querySelector('input, textarea').name.split('_')[1];
+                let answer;
+                
+                if (questionDiv.querySelector('input[type="radio"]')) {
+                    const selectedRadio = questionDiv.querySelector('input[type="radio"]:checked');
+                    answer = selectedRadio ? selectedRadio.value : null;
+                } else {
+                    answer = questionDiv.querySelector('textarea').value;
+                }
+                
+                if (answer) {
+                    answers.push({
+                        questionId: questionId,
+                        answerText: answer
+                    });
+                }
+            });
+            
+            // 모든 필수 항목이 답변되었는지 확인
+            if (answers.length < document.querySelectorAll('.question-item').length) {
+                alert('모든 항목에 답변해주세요.');
+                return;
+            }ㅎ
+            
+            // 서버로 답변 전송
+            fetch('/api/survey/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [header]: token
+                },
+                body: JSON.stringify({
+                    boardId: boardId,
+                    answers: answers
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('설문 제출에 실패했습니다.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('설문이 성공적으로 제출되었습니다.');
+                // 설문 폼 비활성화
+                document.querySelectorAll('#surveyForm input, #surveyForm textarea, #surveyForm button')
+                    .forEach(element => element.disabled = true);
+            })
+            .catch(error => {
+                alert(error.message);
+            });
+        }
     </script>
   </div>
 </div>
