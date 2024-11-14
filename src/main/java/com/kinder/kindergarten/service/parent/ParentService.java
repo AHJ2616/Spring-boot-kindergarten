@@ -1,5 +1,6 @@
 package com.kinder.kindergarten.service.parent;
 
+import com.kinder.kindergarten.DTO.children.ChildrenErpDTO;
 import com.kinder.kindergarten.DTO.parent.ParentErpDTO;
 import com.kinder.kindergarten.DTO.parent.ParentUpdateDTO;
 import com.kinder.kindergarten.entity.parent.Parent;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -136,8 +138,17 @@ public class ParentService {
         Page<Parent> parentPage = parentRepository.findAll(pageable);
         // 레포지토리에서 등록된 학부모의 모든 정보를 다 가져오고 PAGE 처리 한다.
 
-        return parentPage.map(parent -> modelMapper.map(parent, ParentErpDTO.class));
-        // modelMapper으로 맵 형식으로 학부모의 정보와 DTO를 리턴한다.
+        return parentPage.map(parent -> {
+
+            ParentErpDTO parentErpDTO = modelMapper.map(parent, ParentErpDTO.class);
+
+            parentErpDTO.setChildrenIds(parent.getChildren().stream().map(child ->
+                    modelMapper.map(child, ChildrenErpDTO.class))
+                    .collect(Collectors.toList()));
+
+            return parentErpDTO;
+        });
+        // modelMapper 이용하여 학부모DTO, 원아DTO를 맵 + 리스트로 변환해준다.
     }
 
     public ParentErpDTO getParentDetail(Long parentId) {
@@ -147,7 +158,13 @@ public class ParentService {
                 new EntityNotFoundException("학부모의 정보를 찾을 수 없습니다."));
         // 레포지토리에서 학부모의 ID를 이용하여 학부모의 정보를 가져오고 정보가 없으면 메세지를 출력한다.
 
-        return modelMapper.map(parent, ParentErpDTO.class);
+        ParentErpDTO parentErpDTO = modelMapper.map(parent, ParentErpDTO.class);
+
+        parentErpDTO.setChildrenIds(parent.getChildren().stream()
+                .map(child -> modelMapper.map(child, ChildrenErpDTO.class))
+                .collect(Collectors.toList()));
+
+        return parentErpDTO;
         // modelMapper으로 맵 형식으로 학부모의 정보와 DTO를 리턴한다.
     }
 

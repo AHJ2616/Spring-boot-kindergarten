@@ -99,6 +99,8 @@ public class ChildrenService {
                 .childrenNotes(children.getChildrenNotes())// 원아 특이사항
                 .classRoomName(children.getAssignedClass() != null ? children.getAssignedClass().getClassRoomName() : "*미 배 정*")
                 .parentName(children.getParent() != null ? children.getParent().getParentName() : "*미 등 록*")
+                .employeeName(children.getAssignedClass() != null && children.getAssignedClass().getEmployeeName() !=null ?
+                        children.getAssignedClass().getEmployeeName() : "미 등 록")
                 .build();
     }
 

@@ -52,6 +52,8 @@ public class ChildrenErpDTO {
 
     private Long classRoomId; // 반 ID (외래키)
 
+    private String employeeName; // 담당 교사
+
     @DateTimeFormat(pattern = "yyyy-MM-dd") // 날짜 형식 지정
     @Builder.Default
     private LocalDate enrollmentDate = LocalDate.now(); // 원아 등록 일자

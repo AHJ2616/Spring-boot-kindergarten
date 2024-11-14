@@ -4,6 +4,7 @@ import com.kinder.kindergarten.DTO.parent.ParentErpDTO;
 import com.kinder.kindergarten.DTO.parent.ParentUpdateDTO;
 import com.kinder.kindergarten.constant.parent.ParentType;
 import com.kinder.kindergarten.service.parent.ParentService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -218,21 +219,25 @@ public class ParentController {
     }
 
     @PostMapping("/delete/{parentId}")
-    public ResponseEntity<?> deleteParentPost(@PathVariable Long parentId) {
+    public String deleteParentPost(@PathVariable Long parentId, Model model) {
 
         try {
             parentService.deleteParent(parentId);
 
-            return ResponseEntity.ok().body(Map.of("success", true));
+            return "redirect:/erp/parent/list";
+
+        } catch (EntityNotFoundException e) {
+
+            model.addAttribute("errorMessage", "학부모를 찾을 수 없습니다.");
+
+            return "redirect:/erp/parent/list";
 
         } catch (Exception e) {
+            log.error("학부모 삭제 중 오류 발생: ", e);
 
-            log.info("학부모 삭제 중 오류 발생 !" + e.getMessage(), e);
+            model.addAttribute("errorMessage", "삭제 중 오류가 발생했습니다.");
 
-            return ResponseEntity.badRequest().body(Map.of(
-                    "success", false,
-                    "message", "삭제 중 오류가 발생했습니다: " + e.getMessage()
-            ));
+            return "redirect:/erp/parent/list";
         }
     }
 

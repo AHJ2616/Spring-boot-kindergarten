@@ -67,6 +67,7 @@
             <th>번호</th>
             <th>이름</th>
             <th>반</th>
+            <th>담임 교사</th>
             <th>등록일</th>
             <th>수정일</th>
             <th>관리</th>
@@ -77,6 +78,7 @@
             <td th:text="${children.number * children.size + status.count}"></td>
             <td th:text="${child.childrenName}"></td>
             <td th:text="${child.classRoomName}"></td>
+            <td th:text="${child.employeeName}"></td>
             <td th:text="${#temporals.format(child.enrollmentDate, 'yyyy-MM-dd')}"></td>
             <td th:text="${#temporals.format(child.getChildrenModifyDate(), 'yyyy-MM-dd')}"></td>
             <td>

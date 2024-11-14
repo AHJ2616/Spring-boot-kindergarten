@@ -1,6 +1,7 @@
 package com.kinder.kindergarten.DTO.parent;
 
 
+import com.kinder.kindergarten.DTO.children.ChildrenErpDTO;
 import com.kinder.kindergarten.constant.parent.ParentType;
 import com.kinder.kindergarten.entity.children.ChildrenBaseEntity;
 import jakarta.persistence.EnumType;
@@ -55,7 +56,7 @@ public class ParentErpDTO {
     private LocalDate parentModifyDate = LocalDate.now();   // 학부모 수정일
 
     // 자녀 정보
-    private List<Long> childrenIds;    // 자녀의 ID 목록 (자녀 엔티티와 연결)
+    private List<ChildrenErpDTO> childrenIds;    // 자녀의 ID 목록 (자녀 엔티티와 연결)
 
     private String tempPassword;// 임시 비밀번호(화면 표시용)
 }

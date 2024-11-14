@@ -112,28 +112,18 @@ $(document).ready(function() {
         location.href = '/erp/parent/list?page=' + page + (keyword ? '&keyword=' + keyword : '');
     }// window.movePage = function END
 
-    window.deleteParent = function (parentId) {
-        // 삭제 버튼 눌렀을 때 실행되는 함수
+    window.confirmDelete = function() {
+        if (confirm('정말 삭제하시겠습니까? 연관된 자녀 정보도 모두 삭제됩니다.')) {
+            const parentId = $('#parentId').val(); // hidden input으로 parentId를 받아와야 함
+            const form = $('<form>', {
+                'method': 'POST',
+                'action': `/erp/parent/delete/${parentId}`
+            });
 
-        if (confirm('정말 삭제하시겠습니까?')) {
-
-            $.ajax({
-                url: '/erp/parent/delete/' + parentId,
-                type: 'POST',
-                success: function (response) {
-                    if (response.success) {
-                        alert('정상적으로 삭제 되었습니다.');
-                        location.href = '/erp/parent/list';
-                    } else  {
-                        alert(response.message || '삭제 중 오류가 발생했습니다.');
-                    }// if-else END
-                },// success END
-                error: function(xhr, status, error) {
-                    alert('삭제 중 오류가 발생했습니다.');
-                }// error END
-            });// $.ajax END
-        }// if (confirm) END
-    }// window.deleteParent = function END
+            $(document.body).append(form);
+            form.submit();
+        }
+    }
 
 });// $(document).ready(function() END
 
