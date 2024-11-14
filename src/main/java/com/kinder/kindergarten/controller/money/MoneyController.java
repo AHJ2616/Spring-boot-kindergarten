@@ -4,6 +4,8 @@ import com.kinder.kindergarten.DTO.money.MoneyFileDTO;
 import com.kinder.kindergarten.DTO.money.MoneyFormDTO;
 import com.kinder.kindergarten.DTO.money.MoneySearchDTO;
 import com.kinder.kindergarten.entity.money.MoneyEntity;
+import com.kinder.kindergarten.service.money.ExcelExportService;
+import com.kinder.kindergarten.service.money.MoneyChartService;
 import com.kinder.kindergarten.service.money.MoneyService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
@@ -13,7 +15,10 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,11 +26,12 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Optional;
+import java.time.YearMonth;
+import java.util.*;
 
 @Log4j2
 @Controller
@@ -34,13 +40,23 @@ public class MoneyController {
 
     private final MoneyService moneyService;
 
-    public MoneyController(MoneyService moneyService) { this.moneyService = moneyService; }
+    // 차트 만들기 - 테스트 진행중 2024 11 07
+    private final MoneyChartService moneyChartService;
 
-    // 회계 Creat 작성 1
+    // 엑셀 형식 출력 - 테스트 진행중 2024 11 09
+    private final ExcelExportService excelExportService;
+
+    public MoneyController(MoneyService moneyService, MoneyChartService moneyChartService, ExcelExportService excelExportService) { this.moneyService = moneyService;
+        this.moneyChartService = moneyChartService;
+        this.excelExportService = excelExportService;
+    }
+
+    // 회계 Create 작성 1
     @GetMapping(value = "/new")
     public String moneyForm(Model model){
         model.addAttribute("moneyFormDTO", new MoneyFormDTO());
-        return "money/moneyForm"; // materialForm.html의 경로에 보냄
+
+        return "money/moneyForm"; // moneyForm.html의 경로에 보냄
     }
 
     // 회계 Creat 작성 2
@@ -79,7 +95,7 @@ public class MoneyController {
 
     // 회계 파일다운로드
     @GetMapping("/download/{moneyId}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable String moneyId) {
+    public ResponseEntity<Resource> downloadMoneyFile(@PathVariable String moneyId) {
         try {
             MoneyFileDTO fileDTO = moneyService.getMoneyFile(moneyId);
             Path moneyFilePath = Paths.get(fileDTO.getFilePath());
@@ -111,6 +127,9 @@ public class MoneyController {
         model.addAttribute("moneySearchDTO", moneySearchDTO); // 페이지 전환시 기존 검색 조건을 유지
         model.addAttribute("maxPage", 5);   // 상품관리 메뉴 하단에 보여줄 페이지 번호의 최대 개수 5
 
+        // 결재 상태별 건수 추가
+        model.addAttribute("approvalCounts", moneyService.countByApprovalStatus());
+        
         return "money/moneyMng";
         // materialMng.html로 리턴함.
     }
@@ -140,7 +159,7 @@ public class MoneyController {
         }
         moneyService.updateMoney(moneyFormDTO);
 
-        return "redirect:/";
+        return "redirect:/money/moneys";
     }
 
     // Delete 회계 삭제 - moneyNng.html - Ajax 처리
@@ -154,7 +173,65 @@ public class MoneyController {
         return "redirect:/money/moneys";
     }
 
+    // modal 실험 moneyMng.html
+    @GetMapping("/moneyModalRead")
+    @ResponseBody
+    public MoneyFormDTO moneyModalRead(@RequestParam Map<String, Object> param){
+        log.info("모달창 정보 업로드 : MoneyController.moneyModalRead() 메소드");
+        String moneyId = (String) param.get("moneyId");
 
-    
+        MoneyFormDTO dto = moneyService.getMoneyDtl(moneyId);
+
+        return dto;
+    }
+
+    @PostMapping("/moneyModalSave")
+    public String moneyModalSave(MoneyFormDTO moneyFormDTO){
+        log.info("모달창 정보 수정 : MoneyController.moneyModalSave() 메소드");
+
+        log.info("모달창 정보 수정 : moneyFormDTO : " + moneyFormDTO.getMoneyId());
+        log.info("모달창 정보 수정 : moneyFormDTO : " + moneyFormDTO.getMoneyApproval());
+        log.info("모달창 정보 수정 : moneyFormDTO : " + moneyFormDTO.getMoneyName());
+        log.info("모달창 정보 수정 : moneyFormDTO : " + moneyFormDTO.getMoneyCompany());
+
+        moneyService.updateMoney(moneyFormDTO);
+
+
+        return "redirect:/money/moneys";
+    }
+
+    // 차트 만들기 구현중 - 테스트
+    @GetMapping("/chart")
+    public String showChart() {
+        return "money/moneyChart";
+    }
+
+    @GetMapping("/api/chart-data")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getChartData(
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM") YearMonth month) {
+        Map<String, Object> chartData = moneyChartService.getMonthlyChartData(month);
+        return ResponseEntity.ok(chartData);
+    }
+
+
+    // 엑셀 형식으로 다운로드하기
+    @GetMapping("/download/excel")
+    public ResponseEntity<byte[]> downloadExcel() {
+        try {
+            List<MoneyFormDTO> moneyList = moneyService.getAllMoneyData(); // 모든 데이터 가져오기
+            byte[] excelFile = excelExportService.exportMoneyListToExcel(moneyList);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment", "money_management.xlsx");
+
+            return new ResponseEntity<>(excelFile, headers, HttpStatus.OK);
+        } catch (IOException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+
+    }
 
 }

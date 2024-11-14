@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>학부모 등록</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
 </head>
 <body>
 <div class="container mt-5">
@@ -11,48 +13,93 @@
     <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
         <span th:text="${errorMessage}"></span>
     </div>
-    <form th:action="@{/erp/parent/register}" th:object="${parentErpDTO}" method="post">
+
+    <form th:action="@{/erp/parent/register}" th:object="${parentErpDTO}" method="post" enctype="application/x-www-form-urlencoded">
         <div class="form-group">
             <label>성함:</label>
-            <input type="text" class="form-control" th:field="*{parentName}"/>
+            <input type="text" class="form-control" th:field="*{parentName}" required/>
             <span class="text-danger" th:if="${#fields.hasErrors('parentName')}" th:errors="*{parentName}"></span>
         </div>
 
         <div class="form-group">
             <label>이메일:</label>
-            <input type="email" class="form-control" th:field="*{parentEmail}"/>
+            <input type="email" class="form-control" th:field="*{parentEmail}" required/>
             <span class="text-danger" th:if="${#fields.hasErrors('parentEmail')}" th:errors="*{parentEmail}"></span>
         </div>
 
         <div class="form-group">
-            <label>연락처:</label>
-            <input type="text" class="form-control" th:field="*{parentPhone}"/>
+            <label>휴대폰 번호:</label>
+            <div class="input-group">
+                <input type="text" class="form-control" maxlength="3" style="width:80px;" placeholder="입력" required>
+                <span class="input-group-text">-</span>
+                <input type="text" class="form-control" maxlength="4" style="width:90px;" required>
+                <span class="input-group-text">-</span>
+                <input type="text" class="form-control" maxlength="4" style="width:90px;" required>
+                <input type="hidden" th:field="*{parentPhone}">
+            </div>
             <span class="text-danger" th:if="${#fields.hasErrors('parentPhone')}" th:errors="*{parentPhone}"></span>
         </div>
 
         <div class="form-group">
+            <label>비상연락처:</label>
+            <div class="input-group">
+                <input type="text" class="form-control" maxlength="3" style="width:80px;" placeholder="입력">
+                <span class="input-group-text">-</span>
+                <input type="text" class="form-control" maxlength="4" style="width:90px;">
+                <span class="input-group-text">-</span>
+                <input type="text" class="form-control" maxlength="4" style="width:90px;">
+                <input type="hidden" th:field="*{childrenEmergencyPhone}">
+            </div>
+        </div>
+
+        <div class="form-group">
             <label>주소:</label>
-            <input type="text" class="form-control" th:field="*{parentAddress}"/>
+            <input type="text" class="form-control" th:field="*{parentAddress}" required/>
             <span class="text-danger" th:if="${#fields.hasErrors('parentAddress')}" th:errors="*{parentAddress}"></span>
         </div>
 
         <div class="form-group">
-            <label>비상연락처:</label>
-            <input type="text" class="form-control" th:field="*{emergencyContact}"/>
-        </div>
-
-        <div class="form-group">
             <label>자녀와의 관계:</label>
-            <select class="form-control" th:field="*{parentType}">
+            <select class="form-control" th:field="*{parentType}" required>
+                <option value="">관계 선택</option>
                 <option th:each="type : ${T(com.kinder.kindergarten.constant.parent.ParentType).values()}"
                         th:value="${type}"
                         th:text="${type.displayName}">
                 </option>
             </select>
+            <span class="text-danger" th:if="${#fields.hasErrors('parentType')}" th:errors="*{parentType}"></span>
         </div>
 
         <button type="submit" class="btn btn-primary">다음 (원아 등록)</button>
     </form>
 </div>
+
+<div class="modal fade" id="passwordModal" tabindex="-1" role="dialog" aria-labelledby="passwordModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="passwordModalLabel">임시 비밀번호 안내</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>생성된 임시 비밀번호: <strong id="tempPasswordDisplay"></strong></p>
+                <div class="alert alert-warning">
+                    <small>이 비밀번호는 최초 1회만 표시됩니다. 반드시 메모해두시기 바랍니다.</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="confirmPassword">확인</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS와 Popper.js -->
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script th:src="@{/js/parent/parentErp.js}"></script>
 </body>
 </html>

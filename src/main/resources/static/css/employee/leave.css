@@ -1,0 +1,73 @@
+.leave-container {
+    background-color: #ffffff;
+    border-radius: 8px;
+    margin: 0 auto;               /* 페이지의 중앙에 배치 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 30px 40px;
+    max-width: 600px;
+    width: 100%;
+}
+
+.leave-container h2 {
+    font-size: 24px;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.form-group input[type="date"],
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    color: #333;
+    box-sizing: border-box;
+}
+
+#durationDisplay {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    line-height: 1.8;
+    color: #666;
+}
+
+button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+/* 숨김 상태 필드 */
+#endDateField.hidden {
+    display: none;
+}
+
+textarea {
+    width: 100%;                  /* 텍스트 영역 너비를 100%로 설정 */
+    resize: vertical;             /* 수직 크기 조정 가능 */
+}

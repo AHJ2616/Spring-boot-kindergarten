@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>주문 완료</title>
+
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+
+</head>
+<body>
+<h2>주문 완료 목록</h2>
+
+<div class="orders-container">
+    <div th:each="order : ${orders}">
+        <div class="order-item">
+            <span th:text="${order.orderMaterialName}"></span>
+            <span th:text="${order.orderDate}"></span>
+            <span th:text="${order.status}"></span>
+
+            <button th:if="${order.status == 'ORDERED'}"
+                    class="btn btn-warning"
+                    th:onclick="cancelOrder([[${order.id}]])">
+                주문 취소
+            </button>
+        </div>
+    </div>
+</div>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th><input type="checkbox" id="selectAll" onclick="selectAll()"></th>
+        <th>주문번호</th>
+        <th>자재명</th>
+        <th>주문수량</th>
+        <th>상태</th>
+        <th>액션</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="order : ${orders}">
+        <td><input type="checkbox" class="order-checkbox" th:value="${order.orderId}"></td>
+        <td th:text="${order.orderId}"></td>
+        <td th:text="${order.orderMaterialName}"></td>
+        <td th:text="${order.quantity}"></td>
+        <td th:text="${order.status}"></td>
+        <td>
+            <button th:if="${order.status != 'COMPLETED'}"
+                    th:attr="data-order-id=${order.orderId}"
+                    onclick="completeOrder(this.getAttribute('data-order-id'))"
+                    class="btn btn-success">입고완료</button>
+
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<!--Thymeleaf에서 th:onclick을 사용하여 JavaScript 함수에 변수를 전달하려 할 때 발생합니다. Thymeleaf는 onclick 속성에 텍스트(문자열) 데이터를 직접 렌더링하는 것을 허용하지 않음-->
+<script>
+
+    function completeOrder(orderId) {
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+        fetch(`/material/order/complete/${orderId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json(); // 서버가 JSON이 아닌 HTML을 반환할 경우 예외 발생 가능
+            })
+            .then(data => {
+                if (data.success) {
+                    alert("주문이 완료되었습니다.");
+                    location.reload(); // 페이지 새로고침하여 업데이트 반영
+                } else {
+                    alert("주문 완료에 실패했습니다.");
+                }
+            })
+            .catch(error => {
+                console.error("Error completing order:", error);
+                alert("주문 처리 중 오류가 발생했습니다.");
+            });
+    }
+
+    /* 반려 기능 구현중 */
+
+    function cancelOrder(orderId) {
+        if(confirm('이 주문을 취소하시겠습니까?')) {
+            fetch(`/api/material/order/cancel/${orderId}`, {
+                method: 'POST'
+            }).then(response => {
+                if(response.ok) {
+                    location.reload();
+                }
+            });
+        }
+    }
+
+
+</script>
+</body>
+</html>

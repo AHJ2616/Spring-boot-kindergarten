@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout}">
+<head>
+  <link rel="stylesheet" href="/css/employee/certificate.css">
+  <meta charset="UTF-8">
+  <title>내 휴가목록</title>
+</head>
+<body>
+<div layout:fragment="content">
+<div class="container">
+  <h2>내 휴가 현황</h2>
+  <a th:href="@{/leave/request}" class="btn">휴가신청</a>
+  <table>
+    <thead>
+    <tr>
+      <th>제목</th>
+      <th>시작일</th>
+      <th>종료일</th>
+      <th>유형</th>
+      <th>사유</th>
+      <th>반려사유</th>
+      <th>상태</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="leave : ${leaves}">
+      <td th:text="${leave.le_title}"></td>
+      <td th:text="${leave.le_start}"></td>
+      <td th:text="${leave.le_end}"></td>
+      <td th:text="${leave.le_type}"></td>
+      <td th:text="${leave.le_reason}"></td>
+      <td th:text="${leave.rejectReason}"></td>
+      <td th:text="${leave.le_status}"></td>
+    </tr>
+    </tbody>
+    <tfoot>
+    <tr>
+      <td colspan="5" style="text-align: right;"><strong>잔여 휴가:</strong></td>
+      <td th:text="${employeeDTO.getAnnualLeave()}"></td>
+    </tr>
+    </tfoot>
+  </table>
+</div>
+</div>
+</body>
+</html>

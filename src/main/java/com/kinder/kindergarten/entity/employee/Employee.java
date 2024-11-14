@@ -64,22 +64,13 @@ public class Employee {
     @Column(name = "employee_position_level")
     private Integer positionLevel; // 직급 레벨 (결재선용)
 
+    @Column(name = "employee_profile_img")
+    private String profileImageUrl; // 프로필 이미지 URL
+
     @Column(name = "employee_role")
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private Role role = Role.ROLE_MANAGER; // 기본값은 직원
-
-    @OneToMany(mappedBy = "manager", cascade = CascadeType.ALL)
-    @Builder.Default
-    private List<Project> projects = new ArrayList<>(); // 프로젝트 목록
-
-    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
-    @Builder.Default
-    private List<Evaluation> evaluations = new ArrayList<>(); // 인사평가 목록
-
-    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
-    @Builder.Default
-    private List<Approval> approvals = new ArrayList<>(); // 결재 문서 목록
 
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     @Builder.Default
@@ -98,11 +89,16 @@ public class Employee {
         String timeNum = generateAutoNumber().substring(5);
         String cleanup = currentDate + timeNum;
 
+        String profileImageUrl = (employeeDTO.getProfileImageUrl() != null && !employeeDTO.getProfileImageUrl().isEmpty())
+                ? employeeDTO.getProfileImageUrl()
+                : "Default-profile.png";
+
         // 직급별 연차 지정 ENUM
-      Position pos = Position.valueOf(employeeDTO.getPosition().toUpperCase());
+        Position pos = Position.valueOf(employeeDTO.getPosition().toUpperCase());
 
         return Employee.builder()
                 .cleanup(cleanup)
+                .profileImageUrl(profileImageUrl)
                 .name(employeeDTO.getName())
                 .email(employeeDTO.getEmail())
                 .password(passwordEncoder.encode(employeeDTO.getPassword()))

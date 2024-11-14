@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout}">
+<head>
+  <link rel="stylesheet" href="/css/employee/certificate.css">
+  <meta charset="UTF-8">
+  <title>자격증 목록</title>
+</head>
+<body>
+<div layout:fragment="content">
+<div class="container">
+  <h2>자격증 목록</h2>
+  <a th:href="@{/certificate/upload}" class="btn">자격증 등록</a>
+  <table>
+    <thead>
+    <tr>
+      <th>자격증명</th>
+      <th>취득일</th>
+      <th>만료일</th>
+      <th>파일</th>
+      <th>관리</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="cert : ${certificates}">
+      <td th:text="${cert.ce_name}"></td>
+      <td th:text="${cert.ce_issued}"></td>
+      <td th:text="${cert.ce_expri}"></td>
+      <td>
+        <div th:if="${cert.ce_path != null}" class="pdf-preview">
+          <a th:href="@{'/certificate/view/' + ${cert.ce_id}}"
+             class="btn btn-primary" target="_blank">보기</a>
+        </div>
+      </td>
+      <td>
+        <a th:href="@{/certificate/edit/{id}(id=${cert.ce_id})}">수정</a>
+        <form th:action="@{'/certificate/delete/' + ${cert.ce_id}}" method="post" style="display:inline;">
+          <button type="submit" class="btn btn-danger" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
+        </form>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+</div>
+</body>
+</html>

@@ -6,8 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
-
 import org.springframework.transaction.annotation.Transactional;
+
 import java.io.File;
 
 @Entity

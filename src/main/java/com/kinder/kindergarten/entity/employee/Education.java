@@ -35,4 +35,5 @@ public class Education {
     @Column(name = "education_certificate")
     private String certificate; // 수료증 여부
 
+
 }

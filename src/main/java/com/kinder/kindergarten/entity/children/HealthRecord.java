@@ -1,6 +1,5 @@
 package com.kinder.kindergarten.entity.children;
 
-import com.kinder.kindergarten.entity.parent.Parent;
 import jakarta.persistence.*;
 import lombok.*;
 

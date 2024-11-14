@@ -1,13 +1,11 @@
 package com.kinder.kindergarten.entity.parent;
 
-import com.kinder.kindergarten.constant.parent.Children_Role;
 import com.kinder.kindergarten.constant.parent.ParentType;
 import com.kinder.kindergarten.entity.children.Children;
 import com.kinder.kindergarten.entity.children.ChildrenBaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -30,16 +28,19 @@ public class Parent extends ChildrenBaseEntity {
   @Column(nullable = false)
   private String parentName; // 학부모 성함
 
-  @Column(unique = true)
+  @Column(unique = true, nullable = false)
   private String  parentEmail;    // 학부모 이메일(학부모 구분을 위해 유니크 설정)
 
+  @Column(nullable = false)
   private String parentPassword;   // 학부모 비밀번호
 
+  @Column(nullable = false)
   private String parentPhone;    // 학부모 핸드폰 번호
 
   @Column(name = "childrenEmergencyPhone")
   private String childrenEmergencyPhone;//	긴급 연락처	(선택사항)
 
+  @Column(nullable = false)
   private String parentAddress;  // 학부모 주소
 
   /*@Enumerated(EnumType.STRING)

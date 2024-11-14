@@ -31,6 +31,9 @@ public class Certificate {
     @Column(name = "certificate_expri")
     private LocalDate expri; // 자격증 만료일
 
+    @Column(name = "certificate_path")
+    private String path; // 자격증 파일 여부
+
 
 
 }

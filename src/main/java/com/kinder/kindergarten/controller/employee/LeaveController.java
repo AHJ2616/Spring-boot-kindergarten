@@ -22,14 +22,15 @@ public class LeaveController {
 
     private final LeaveService leaveService;
     private final EmployeeService employeeService;
-    @GetMapping("/request/{id}")
-    public String leaveRequestForm(@PathVariable("id") Long id, Model model) {
+    @GetMapping("/request")
+    public String leaveRequestForm(@AuthenticationPrincipal PrincipalDetails principalDetails,
+                                   Model model) {
         // 직원 인적사항
-        EmployeeDTO employeeDTO = employeeService.readEmployee(id);
+        EmployeeDTO employeeDTO = employeeService.readEmployee(principalDetails.getEmployee().getId());
 
         model.addAttribute("leaveDTO", new LeaveDTO());
         model.addAttribute("employeeDTO", employeeDTO);
-        return "employee/request";
+        return "/employee/leave_reg";
     }
 
     @PostMapping("/request")
@@ -38,43 +39,40 @@ public class LeaveController {
                                      @ModelAttribute EmployeeDTO employeeDTO,
                                      @AuthenticationPrincipal PrincipalDetails principalDetails) {
         if (bindingResult.hasErrors()) {
-            return "employee/request"; // 에러가 있을 경우 요청 페이지로 돌아감
+            return "/employee/leave_reg"; // 에러가 있을 경우 요청 페이지로 돌아감
         }
 
         try {
             leaveService.requestLeave(leaveDTO, principalDetails.getEmployee());
         } catch (IllegalStateException e) {
             bindingResult.rejectValue("le_type", "error.leaveDTO", e.getMessage());
-            return "employee/request"; // 에러가 있을 경우 요청 페이지로 돌아감
+            return "/employee/leave_reg"; // 에러가 있을 경우 요청 페이지로 돌아감
         }
 
-        return "redirect:/";
+        // 권한에 따른 리다이렉트 경로 설정
+        String redirectUrl = null;
+        if (principalDetails.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"))) {
+            redirectUrl = "/admin/dashboard";
+        } else if (principalDetails.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_MANAGER"))) {
+            redirectUrl = "/manager/dashboard";
+        } else if (principalDetails.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_USER"))) {
+            redirectUrl = "/teacher/dashboard";
+        }
+
+        return "redirect:"+ redirectUrl;
     }
 
     @GetMapping("/my-leaves")
     public String getMyLeaves(@AuthenticationPrincipal PrincipalDetails principalDetails,
                               Model model) {
         List<LeaveDTO> leaves = leaveService.getLeavesByEmployee(principalDetails.getEmployee());
+        EmployeeDTO employeeDTO = employeeService.getEmployeeById(principalDetails.getEmployee().getId());
         model.addAttribute("leaves", leaves);
-        return "employee/my-leaves";
+        model.addAttribute("employeeDTO", employeeDTO);
+        return "/employee/leave_list";
     }
 
-    // 관리자용 - 휴가 승인/반려 처리
-//    @PreAuthorize("hasRole('ADMIN')")
-//    @PostMapping("/process/{leaveId}")
-//    @ResponseBody
-//    public ResponseEntity<?> processLeave(@PathVariable Long leaveId,
-//                                          @RequestParam(required = false) String rejectReason) {
-//        leaveService.processLeave(leaveId, status, rejectReason);
-//        return ResponseEntity.ok().build();
-//    }
-//
-//    // 관리자용 - 전체 휴가 신청 목록
-//    @PreAuthorize("hasRole('ADMIN')")
-//    @GetMapping("/admin/all")
-//    public String getAllLeaves(Model model) {
-//        List<LeaveDTO> allLeaves = leaveService.getAllLeaves();
-//        model.addAttribute("leaves", allLeaves);
-//        return "employee/leave/admin-leave-list";
-//    }
 }

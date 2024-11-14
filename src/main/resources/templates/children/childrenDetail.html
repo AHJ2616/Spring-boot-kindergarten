@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>원아 상세정보</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container {
+            margin-top: 2rem;
+        }
+        .info-row {
+            display: flex;
+            margin-bottom: 0.5rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .info-label {
+            width: 150px;
+            padding: 8px;
+            background-color: #f8f9fa;
+            font-weight: 500;
+        }
+        .info-content {
+            flex: 1;
+            padding: 8px 16px;
+            min-height: 40px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 class="mb-4">원아 상세정보</h2>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="info-row">
+                <div class="info-label">이름</div>
+                <div class="info-content" th:text="${children.childrenName}">제발좀</div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label">생년월일</div>
+                <div class="info-content" th:text="${#temporals.format(children.childrenBirthDate, 'yyyy-MM-dd')}">2024-11-13</div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label">성별</div>
+                <div class="info-content" th:text="${children.childrenGender}">FEMALE</div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label">혈액형</div>
+                <div class="info-content" th:text="${children.childrenBloodType}"></div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label">알레르기</div>
+                <div class="info-content" th:text="${children.childrenAllergies}"></div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label">병력사항</div>
+                <div class="info-content" th:text="${children.childrenMedicalHistory}"></div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label">특이사항</div>
+                <div class="info-content" th:text="${children.childrenNotes}"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a th:href="@{/erp/children/list}" class="btn btn-secondary">목록으로</a>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout}">
+<div layout:fragment="content">
+  <div class="approval-request-container">
+    <h2>결재 요청</h2>
+    <form th:action="@{/approval/submit}" method="post">
+      <div class="form-group">
+        <label>제목</label>
+        <input type="text" name="title" required>
+      </div>
+      <div class="form-group">
+        <label>내용</label>
+        <textarea name="content" required></textarea>
+      </div>
+      <div class="form-group">
+        <label>결재자</label>
+        <select name="approverId" required>
+          <option th:each="approver : ${approvers}"
+                  th:value="${approver.id}"
+                  th:text="${approver.name + ' (' + approver.position + ')'}">
+          </option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary">결재 요청</button>
+    </form>
+  </div>
+</div>
+</html>

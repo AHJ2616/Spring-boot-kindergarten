@@ -2,6 +2,7 @@ package com.kinder.kindergarten.controller.employee;
 
 import com.kinder.kindergarten.config.PrincipalDetails;
 import com.kinder.kindergarten.DTO.employee.EducationDTO;
+import com.kinder.kindergarten.entity.employee.Education;
 import com.kinder.kindergarten.service.employee.EducationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,7 @@ public class EducationController {
 
     @GetMapping("/record")
     public String leaveRequestForm() {
-        return "employee/record";
+        return "/employee/education_reg";
     }
 
     @PostMapping("/record")
@@ -39,10 +40,10 @@ public class EducationController {
                                   @AuthenticationPrincipal PrincipalDetails principalDetails, Model model) {
         try {
             educationService.saveEducation(educationDTO, file, principalDetails.getEmployee());
-            return "redirect:/education/history";
+            return "redirect:/education/education_list";
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
-            return "employee/record";
+            return "/employee/education_reg";
         }
     }
 
@@ -51,23 +52,7 @@ public class EducationController {
                                       Model model) {
         List<EducationDTO> history = educationService.getEducationHistory(principalDetails.getEmployee());
         model.addAttribute("history", history);
-        return "employee/history";
-    }
-
-    @GetMapping("/preview/{id}")
-    @ResponseBody
-    public ResponseEntity<Resource> previewPdf(@PathVariable Long id) {
-        try {
-            EducationDTO education = educationService.getEducationById(id);
-            Path path = Paths.get(education.getEd_path());
-            Resource resource = new UrlResource(path.toUri());
-
-            return ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_PDF)
-                    .body(resource);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+        return "/employee/education_list";
     }
 
     @GetMapping("/download/{id}")
@@ -85,6 +70,44 @@ public class EducationController {
         } catch (MalformedURLException e) {
             throw new RuntimeException("파일을 찾을 수 없습니다.", e);
         }
+    }
+
+    @GetMapping("/edit/{id}")
+    public String editEducationForm(@PathVariable Long id,
+                                    @AuthenticationPrincipal PrincipalDetails principalDetails,
+                                    Model model) {
+        if (!educationService.isEducationOwnedByEmployee(id, principalDetails.getEmployee())) {
+            return "redirect:/education/history";
+        }
+
+        EducationDTO education = educationService.getEducationById(id);
+        model.addAttribute("educationDTO", education);
+        return "/employee/education_edit";
+    }
+
+    @PostMapping("/edit/{id}")
+    public String updateEducation(@PathVariable Long id,
+                                  @Valid EducationDTO educationDTO,
+                                  @RequestParam(value = "file", required = false) MultipartFile file,
+                                  @AuthenticationPrincipal PrincipalDetails principalDetails,
+                                  Model model) {
+        try {
+            educationService.updateEducation(id, educationDTO, file, principalDetails.getEmployee());
+            return "redirect:/education/history";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("educationDTO", educationDTO);
+            return "/employee/education_edit";
+        }
+    }
+
+    @PostMapping("/delete/{id}")
+    public String deleteEducation(@PathVariable Long id,
+                                  @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        if (educationService.isEducationOwnedByEmployee(id, principalDetails.getEmployee())) {
+            educationService.deleteEducation(id, principalDetails.getEmployee());
+        }
+        return "redirect:/education/history";
     }
 
 }

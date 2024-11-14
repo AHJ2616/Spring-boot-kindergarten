@@ -8,64 +8,122 @@
     <ul>
       <!-- 공통 메뉴-->
       <li class="active">
-        <a th:href="@{//dashboard}">
+        <a th:href="@{/admin/dashboard}">
           <i class="fa-solid fa-house" style="color: white;"></i></a>
         <span class="tooltip">Home</span>
       </li>
-      <li>
-        <a th:href="@{/employee/new}">
-          <i class="fa-solid fa-pen-to-square" style="color: white;"></i></a>
-        <span class="tooltip">전자결제(개발중)</span>
-      </li>
-      <li>
-        <a th:href="@{/employee/mypage/{id}(id=${#authentication.principal.employee.id})}">
-          <i class="fa-solid fa-user" style="color: white;"></i></a>
-        <span class="tooltip">마이페이지</span>
+      <li class="ui-menu-item">
+        <i class="fa-solid fa-pen-to-square" style="color: white;"></i></a>
+        <ul class="side-menu">
+          <li><a th:href="@{/approval/request}">결재 요청</a></li>
+          <li><a th:href="@{/approval/pending}">결재 대기</a></li>
+          <li><a th:href="@{/approval/list}">결재 목록</a></li>
+        </ul>
       </li>
 
       <!--어드민만 볼수있는 메뉴-->
-      <li sec:authorize="hasRole('ROLE_ADMIN')">
-        <a th:href="@{/employee/new}">
-          <i class="fa-solid fa-pen" style="color: white;"></i></a>
-        <span class="tooltip">직원등록</span>
+      <li sec:authorize="hasRole('ROLE_ADMIN')" class="ui-menu-item">
+        <i class="fa-solid fa-user-group" style="color: white;"></i>
+        <ul class="side-menu">
+          <li><a th:href="@{/employee/new}">직원등록</a></li>
+          <li><a th:href="@{/employee/employeeList}">직원리스트</a></li>
+        </ul>
       </li>
-      <li sec:authorize="hasRole('ROLE_ADMIN')">
-        <a th:href="@{/employee/new}">
-          <i class="fa-solid fa-user-group" style="color: white;"></i></a>
-        <span class="tooltip">직원리스트</span>
-      </li>
-
       <!--교사만 볼수있는 메뉴-->
-      <li sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')">
-        <a th:href="@{/teacher/dashboard}">
-          <i class="fa-solid fa-marker" style="color: white;"></i></a>
-        <span class="tooltip">원아/학부모등록</span>
+      <li sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')" class="ui-menu-item">
+        <i class="fa-solid fa-baby" style="color: white;"></i>
+        <ul class="side-menu">
+          <li><a th:href="@{/erp/children/list}">원아관리</a></li>
+        </ul>
       </li>
-      <li sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')">
-        <a th:href="@{/manager/dashboard}">
-          <i class="fa-solid fa-user-gear" style="color: white;"></i></a>
-        <span class="tooltip">원아관리</span>
+      <li sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')" class="ui-menu-item">
+        <i class="fa-solid fa-person" style="color: white;"></i>
+        <ul class="side-menu">
+          <li><a th:href="@{/erp/parent/register}">학부모등록</a></li>
+          <li><a th:href="@{/erp/parent/list}">학부모관리</a></li>
+        </ul>
       </li>
-      <li sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')">
-        <a th:href="@{/employee/new}">
-          <i class="fa-solid fa-landmark" style="color: white;"></i></a>
-        <span class="tooltip">교실관리</span>
-      </li>
-
       <!--행정직원만 볼수있는 메뉴-->
-      <li sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')">
-        <a th:href="@{/employee/new}">
-          <i class="fa-solid fa-calculator" style="color: white;"></i></a>
-        <span class="tooltip">회계관리</span>
+      <li sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')" class="ui-menu-item">
+        <i class="fa-solid fa-calculator" style="color: white;"></i>
+        <ul class="side-menu">
+          <li><a th:href="@{/money/moneys}">회계관리</a></li>
+          <li><a th:href="@{/material/materials}">자재관리</a></li>
+        </ul>
       </li>
-      <li sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')">
-        <a th:href="@{/employee/new}">
-          <i class="fa-solid fa-industry" style="color: white;"></i></a>
-        <span class="tooltip">자재관리</span>
+      <li class="ui-menu-item">
+        <i class="fa-solid fa-clipboard-list" style="color: white;"></i>
+        <ul class="side-menu">
+          <li><a th:href="@{/board/list/common}">자유게시판</a></li>
+          <li><a th:href="@{/board/list/notification}">공지게시판</a></li>
+          <li><a th:href="@{/board/list/diary}">성장일기</a></li>
+        </ul>
+      </li>
+      <li class="ui-menu-item">
+          <i class="fa-regular fa-calendar" style="color: white;"></i></a>
+        <ul class="side-menu">
+          <li><a th:href="@{/teacher/dashboard}">게시판 일정</a></li>
+        </ul>
       </li>
     </ul>
   </nav>
   <!-- 사이드바 종료-->
+
+  <!-- 헤더 -->
+  <div class="top-header">
+    <div class="header-tools">
+      <!-- 세션 타이머 추가 -->
+      <div class="session-timer">
+        <i class="fas fa-clock"></i>
+        <span id="sessionTimer">30:00</span>
+        <button onclick="extendSession()" class="extend-session-btn">
+          <i class="fas fa-redo"></i> 연장
+        </button>
+      </div>
+      <!-- 알림 아이콘 -->
+      <div class="notification-wrapper">
+        <div class="icon-button" id="notificationButton">
+          <i class="fas fa-bell"></i>
+          <span class="notification-badge" th:text="${unreadCount}">0</span>
+        </div>
+        <div class="notification-dropdown" style="display: none;">
+          <div class="notification-header">
+            <h3>알림</h3>
+            <button class="mark-all-read">모두 읽음</button>
+          </div>
+          <div class="notification-list">
+            <!-- 알림 항목들이 여기에 동적으로 추가됨 -->
+          </div>
+        </div>
+      </div>
+
+      <!-- 메일 아이콘 -->
+      <div class="icon-button">
+        <i class="fas fa-envelope"></i>
+        <span class="notification-badge">5</span>
+      </div>
+
+      <!-- 프로필 섹션 -->
+      <div class="dropdown">
+        <div class="profile-section" id="profileSection" style="cursor: pointer;">
+          <img th:src="@{'/upload/' + ${#authentication.principal.employee.profileImageUrl}}"
+               alt="프로필" class="profile-image">
+          <div class="profile-info">
+            <span class="profile-name" th:text="${#authentication.principal.employee.name}">사용자명</span>
+            <span class="profile-role" th:text="${#authentication.principal.employee.position}">직위</span>
+          </div>
+        </div>
+        <!-- WebSocket 상태 표시 -->
+        <div id="websocket-status" class="websocket-status disconnected">
+          연결 끊김
+        </div>
+        <ul class="dropdown-menu" aria-labelledby="profileSection" style="display: none;">
+          <li><a class="dropdown-item" th:href="@{/employee/mypage/{id}(id=${#authentication.principal.employee.id})}">마이페이지</a></li>
+          <li><a class="dropdown-item" href="#">Another action</a></li>
+          <li><a class="dropdown-item" href="/main/logout">로그아웃</a></li>
+        </ul>
+      </div>
+    </div>
 </header>
 </body>
 </html>

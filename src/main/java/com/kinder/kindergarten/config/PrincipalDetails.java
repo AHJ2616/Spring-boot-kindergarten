@@ -1,6 +1,8 @@
 package com.kinder.kindergarten.config;
 
+
 import com.kinder.kindergarten.entity.Member;
+import com.kinder.kindergarten.entity.employee.Employee;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,37 +12,34 @@ import java.util.Collection;
 
 public class PrincipalDetails implements UserDetails {
 
-  private Member member;
+  private Employee employee;
 
-  public PrincipalDetails(Member member){
-    this.member = member;
+
+  public PrincipalDetails(Employee employee){
+    this.employee = employee;
   }
 
-  public Member getMember() {
-    return this.member;
+
+  public Employee getEmployee() {
+    return this.employee;
   }
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     Collection<GrantedAuthority> authorities = new ArrayList<>();
-    authorities.add(new SimpleGrantedAuthority(member.getRole().name()));
-    authorities.add(new SimpleGrantedAuthority("ROLE_" + member.getRole()));
+    authorities.add(new SimpleGrantedAuthority(employee.getRole().name()));
+    authorities.add(new SimpleGrantedAuthority("ROLE_" + employee.getPosition()));
     return authorities;
   }
 
-  public String getName(){
-    return member.getName();
-  }
-
-
   @Override
   public String getPassword() {
-    return member.getPassword();
+    return employee.getPassword();
   }
 
   @Override
   public String getUsername() {
-    return member.getEmail();
+    return employee.getEmail();
   }
 
   @Override

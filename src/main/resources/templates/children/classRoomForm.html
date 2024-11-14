@@ -2,19 +2,19 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>반 등록</title>
+    <title>반 개설하기</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
 <div class="container mt-5">
-    <h2 class="mb-4">반 등록</h2>
+    <h2 class="mb-4">반 개설하기</h2>
 
     <!-- 에러 메시지 표시 영역 -->
     <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
         <span th:text="${errorMessage}"></span>
     </div>
 
-    <!-- 반 등록 폼 -->
+    <!-- 반 개설 폼 -->
     <form th:action="@{/erp/classRoom/register}" th:object="${classRoomDTO}" method="post">
 
         <div class="form-group">

@@ -37,6 +37,8 @@ public class MoneyFormDTO {
     
     private MoneyStatus moneyStatus; // 수입 지출 상태
 
+    private String moneyApproval; // 돈 승인 여부
+
     //저장후, 수정시 파일 정보를 저장하는 리스트
     private List<MoneyFileDTO> MoneyFileList = new ArrayList<>();
 

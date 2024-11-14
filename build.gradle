@@ -25,6 +25,8 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven { url 'https://repo.spring.io/release' }
+    maven { url 'https://repo.spring.io/milestone' }
 }
 
 dependencies {
@@ -68,13 +70,12 @@ dependencies {
             "jakarta.annotation:jakarta.annotation-api",
             "com.querydsl:querydsl-apt:${queryDslVersion}:jakarta")
 
-    // 스프링 시큐리티 시작용
+// 스프링 시큐리티 시작용
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    // 부트 3이상 부터는 6 사용 함 https://mvnrepository.com/artifact/org.thymeleaf.extras/thymeleaf-extras-springsecurity6
+// 부트 3이상 부터는 6 사용 함 https://mvnrepository.com/artifact/org.thymeleaf.extras/thymeleaf-extras-springsecurity6
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6:3.1.1.RELEASE'
-
+    implementation 'org.springframework.security:spring-security-messaging:6.2.6' // 웹소켓 보안을 위한 의존성 추가
     testImplementation("org.springframework.security:spring-security-test") // 시큐리티 테스트
-
 
     // 외부 인증용 카카오, 구글,  네이버 등....
     //implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
@@ -100,16 +101,31 @@ dependencies {
     // okhttp : http통신을 도와주는 라이브러리
     implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
 
-
     // gson
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.10.1'
 
-
-
     // 설문조사용 추가
-    implementation 'org.webjars:bootstrap:5.2.3'  // Bootstrap 5로 업데이트
+    implementation 'org.webjars:bootstrap:5.2.3' // Bootstrap 5로 업데이트
     implementation 'org.webjars:select2:4.0.13'
     implementation 'org.webjars:momentjs:2.29.1'
+
+
+
+
+    // 기타 필요한 의존성들은 유지
+    implementation 'org.webjars:bootstrap:5.2.3'  // Bootstrap 5로 업데이트
+    implementation 'org.webjars:select2:4.0.13'
+
+    // websocket
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.webjars:stomp-websocket:2.3.3'
+    implementation 'org.webjars:sockjs-client:1.0.2'
+
+    // 엑셀 문서 출력
+    // https://mvnrepository.com/artifact/org.apache.poi/poi
+    implementation 'org.apache.poi:poi:5.2.3'
+    implementation 'org.apache.poi:poi-ooxml:5.2.3'
+
 
 }
 

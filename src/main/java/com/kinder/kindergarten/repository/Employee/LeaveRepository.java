@@ -1,5 +1,6 @@
 package com.kinder.kindergarten.repository.employee;
 
+
 import com.kinder.kindergarten.entity.employee.Employee;
 import com.kinder.kindergarten.entity.employee.Leave;
 import org.springframework.data.jpa.repository.JpaRepository;

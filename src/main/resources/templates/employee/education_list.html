@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout}">
+<head>
+  <link rel="stylesheet" href="/css/employee/education.css">
+  <meta charset="UTF-8">
+  <title>교육이력목록</title>
+</head>
+<body>
+<div layout:fragment="content">
+<div class="container">
+  <h2>교육이력</h2>
+  <a th:href="@{/education/record}" class="btn">교육이력 등록</a>
+  <table>
+    <thead>
+    <th>교육명</th>
+    <th>시작일</th>
+    <th>종료일</th>
+    <th>수료증</th>
+    <th>관리</th>
+    </thead>
+    <tbody>
+      <tr th:each="education : ${history}">
+        <td th:text="${education.ed_name}"></td>
+        <td th:text="${education.ed_start}"></td>
+        <td th:text="${education.ed_end}"></td>
+        <td>
+          <div th:if="${education.ed_path != null}" class="pdf-preview">
+          <a th:href="@{'/education/download/' + ${education.ed_id}}"
+             class="btn btn-primary" target="_blank">보기</a>
+          </div>
+        </td>
+        <td>
+          <a th:href="@{'/education/edit/' + ${education.ed_id}}" class="btn btn-warning">수정</a>
+          <form th:action="@{'/education/delete/' + ${education.ed_id}}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-danger" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
+          </form>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+</div>
+<script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
+<script src="/js/Employee/history.js"></script>
+</body>
+</html>

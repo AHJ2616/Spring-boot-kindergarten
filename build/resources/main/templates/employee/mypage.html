@@ -4,127 +4,265 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{common/layout}">
 <head>
+    <script src="/js/employee/mypage.js"></script>
+    <link rel="stylesheet" href="/css/employee/mypage.css">
     <meta charset="UTF-8">
     <title>Mypage</title>
 </head>
 <body>
 <div layout:fragment="content">
-<div class="container">
-    <h2>내 정보</h2>
-    <div class="button-section">
-        <p>테스트 화면</p>
-        <a th:href="@{/employee/new}">직원등록(완료)</a>
-        <a th:href="@{/employee/edit/{id}(id=${employeeDTO.id})}" class="btn">정보 수정(완료)</a>
-        <a th:href="@{/attendance/my-records}" class="btn">근태 기록(CR 완료)</a>
-        <a th:href="@{/leave/my-leaves}" class="btn">휴가 현황(CR 완료)</a>
-        <a th:href="@{/certificate/list}" class="btn">자격증 관리(CR 완료)</a>
-        <a th:href="@{/education/history}" class="btn">교육이력(CR 완료)</a>
-        <a th:href="@{/assets/index.html}" class="btn">프론트 테스트</a>
+    <div class="mypage-container">
+        <div class="mypage-section">
+            <h2>내 정보 <button onclick="toggleEditMode()" class="edit-button">수정</button></h2>
+            <div class="profile-image-section">
+                <div class="profile-image-container">
+                    <img th:if="${employeeDTO.profileImageUrl}"
+                         th:src="@{'/upload/' + ${employeeDTO.profileImageUrl}}"
+                         alt="프로필 이미지" class="myprofile-image">
+                    <div class="profile-image-overlay">
+                        <button onclick="document.getElementById('profileImageInput').click()" class="change-image-btn">
+                            사진 변경
+                        </button>
+                    </div>
+                </div>
+                <input type="file" id="profileImageInput" style="display: none" accept="image/*" onchange="uploadProfileImage(this)">
+            </div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">사번</div>
+                    <div class="info-value" th:text="${employeeDTO.cleanup}"></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">이름</div>
+                    <div class="info-value"
+                         th:classappend="${#authorization.expression('hasAnyRole(''ADMIN'', ''MANAGER'', ''USER'')') ? 'editable' : ''}"
+                         th:text="${employeeDTO.name}" onclick="editField('name', this)" data-field="name"></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">이메일</div>
+                    <div class="info-value"
+                         th:classappend="${#authorization.expression('hasRole(''ADMIN'')') ? 'editable' : ''}"
+                         th:text="${employeeDTO.email}" onclick="editField('email', this)" data-field="email"></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">전화번호</div>
+                    <div class="info-value"
+                         th:classappend="${#authorization.expression('hasAnyRole(''ADMIN'', ''MANAGER'', ''USER'')') ? 'editable' : ''}"
+                         th:text="${employeeDTO.phone}" onclick="editField('phone', this)" data-field="phone"></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">직위</div>
+                    <div class="info-value"
+                         th:classappend="${#authorization.expression('hasRole(''ADMIN'')') ? 'editable' : ''}"
+                         th:text="${employeeDTO.position}" onclick="editField('position', this)" data-field="position"></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">부서</div>
+                    <div class="info-value"
+                         th:classappend="${#authorization.expression('hasRole(''ADMIN'')') ? 'editable' : ''}"
+                         th:text="${employeeDTO.department}" onclick="editField('department', this)" data-field="department"></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">상태</div>
+                    <div class="info-value"
+                         th:classappend="${#authorization.expression('hasRole(''ADMIN'')') ? 'editable' : ''}"
+                         th:text="${employeeDTO.status}" onclick="editField('status', this)" data-field="status"></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">입사일</div>
+                    <div class="info-value" th:text="${employeeDTO.hireDate}"></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">주소</div>
+                    <div class="info-value"
+                         th:classappend="${#authorization.expression('hasAnyRole(''ADMIN'', ''MANAGER'', ''USER'')') ? 'editable' : ''}"
+                         th:text="${employeeDTO.address}" onclick="editField('address', this)" data-field="address"></div>
+                </div>
+            </div>
+        </div>
+        <div class="section-grid">
+            <div class="summary-card">
+                <div class="card-header">
+                    <h3>근태 현황</h3>
+                    <a th:href="@{/attendance/my-records}" class="view-more">더보기 ></a>
+                </div>
+                <div class="attendance-buttons">
+                    <button onclick="checkIn()" class="edit-button">출근하기</button>
+                    <button onclick="checkOut()" class="edit-button" style="background-color: #dc3545;">퇴근하기</button>
+                </div>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>날짜</th>
+                        <th>출근시간</th>
+                        <th>퇴근시간</th>
+                        <th>상태</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="record : ${records}">
+                        <td th:text="${record.at_date}"></td>
+                        <td th:text="${record.at_checkIn}"></td>
+                        <td th:text="${record.at_checkOut}"></td>
+                        <td th:text="${record.at_status}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="summary-card">
+                <div class="card-header">
+                    <h3>휴가 현황</h3>
+                    <a th:href="@{/leave/my-leaves}" class="view-more">더보기 ></a>
+                </div>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>시작일</th>
+                        <th>종료일</th>
+                        <th>유형</th>
+                        <th>상태</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="leave, iterStat : ${leaves}" th:if="${iterStat.index < 4}">
+                        <td th:text="${leave.le_start}"></td>
+                        <td th:text="${leave.le_end}"></td>
+                        <td th:text="${leave.le_type}"></td>
+                        <td th:text="${leave.le_status}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div style="text-align: right; margin-top: 15px;">
+                    <a th:href="@{/leave/request/{id}(id=${#authentication.principal.employee.id})}"
+                       class="edit-button">신청</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-grid">
+            <div class="summary-card">
+                <div class="card-header">
+                    <h3>자격증 현황</h3>
+                    <a th:href="@{/certificate/clist}" class="view-more">더보기 ></a>
+                </div>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>자격증명</th>
+                        <th>취득일</th>
+                        <th>만료일</th>
+                        <th>파일여부</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="cert, iterStat : ${certificates}" th:if="${iterStat.index < 4}">
+                        <td th:text="${cert.ce_name}"></td>
+                        <td th:text="${cert.ce_issued}"></td>
+                        <td th:text="${cert.ce_expri}"></td>
+                        <td>
+                            <a th:href="@{'/certificate/view/' + ${cert.ce_id}}" target="_blank"
+                               th:text="${cert.ce_path != null ? 'O' : 'X'}">
+                            </a>
+                        </td>
+                    </tr>
+                    <tr id="newCertificatesRow" style="display: none;">
+                        <form th:action="@{/certificates/upload}" method="post" enctype="multipart/form-data" id="certificatesForm">
+                            <td><input type="text" name="ce_name" required></td>
+                            <td><input type="date" name="ce_issued" required></td>
+                            <td><input type="date" name="ce_expri" required></td>
+                            <td><div class="button-wrapper">
+                                <button type="button" class="styled-button" onclick="selectFile('hiddenFileInputCert')">파일</button>
+                                <input type="file" name="file" id="hiddenFileInputCert" style="display: none;" onchange="updateFileName()" />
+                            </div></td>
+                            <td><button type="submit" class="styled-button">등록</button></td>
+                        </form>
+                    </tr>
+                    </tbody>
+                </table>
+                <div style="text-align: right; margin-top: 15px;">
+                    <a href="javascript:void(0);" class="edit-button" onclick="toggleCertificateForm()">추가</a>
+                </div>
+            </div>
+
+            <div class="summary-card">
+                <div class="card-header">
+                    <h3>교육 이력</h3>
+                    <a th:href="@{/education/history}" class="view-more">더보기 ></a>
+                </div>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>교육명</th>
+                        <th>시작일</th>
+                        <th>종료일</th>
+                        <th>수료증</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="edu, iterStat : ${history}" th:if="${iterStat.index < 4}">
+                        <td th:text="${edu.ed_name}"></td>
+                        <td th:text="${edu.ed_start}"></td>
+                        <td th:text="${edu.ed_end}"></td>
+                        <td>
+                            <a th:href="@{'/education/download/' + ${edu.ed_id}}" target="_blank"
+                               th:text="${edu.ed_path != null ? 'O' : 'X'}">
+                            </a>
+                        </td>
+                    </tr>
+                    <tr id="newEducationRow" style="display: none;">
+                        <form th:action="@{/education/record}" method="post" enctype="multipart/form-data" id="educationForm">
+                            <td><input type="text" name="ed_name" required></td>
+                            <td><input type="date" name="ed_start" required></td>
+                            <td><input type="date" name="ed_end" required></td>
+                            <td>
+                                <div class="button-wrapper">
+                                    <button type="button" class="styled-button" onclick="selectFile('hiddenFileInputEdu')">파일</button>
+                                    <input type="file" name="file" id="hiddenFileInputEdu" style="display: none;" onchange="updateFileName()" />
+                                </div>
+                            </td>
+                            <td><button type="submit" class="styled-button">등록</button></td>
+                        </form>
+                    </tr>
+                    </tbody>
+                </table>
+                <div style="text-align: right; margin-top: 15px;">
+                    <a href="javascript:void(0);" class="edit-button" onclick="toggleEducationForm()">추가</a>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="info-section">
-        <p>사번: <span th:text="${employeeDTO.cleanup}"></span></p>
-        <p>이름: <span th:text="${employeeDTO.name}"></span></p>
-        <p>이메일: <span th:text="${employeeDTO.email}"></span></p>
-        <p>전화번호: <span th:text="${employeeDTO.phone}"></span></p>
-        <p>직위: <span th:text="${employeeDTO.position}"></span></p>
-        <p>부서: <span th:text="${employeeDTO.department}"></span></p>
-        <p>상태: <span th:text="${employeeDTO.status}"></span></p>
-        <p>입사일: <span th:text="${employeeDTO.hireDate}"></span></p>
+
+    <!-- 수정 모달 -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h3>정보 수정</h3>
+            <form id="editForm" onsubmit="handleEditFormSubmit(event)">
+                <input type="text" id="editInput" class="form-control">
+                <input type="hidden" id="editField">
+                <input type="hidden" th:value="${employeeDTO.id}" name="id" id = "employeeId">
+                <div style="margin-top: 15px;">
+                    <button type="submit" class="edit-button">저장</button>
+                    <button type="button" onclick="closeModal()" class="edit-button" style="background-color: #6c757d;">취소</button>
+                </div>
+            </form>
+        </div>
     </div>
-    <h3>근태현황</h3>
-    <table>
-        <thead>
-        <tr>
-            <th>날짜</th>
-            <th>출근시간</th>
-            <th>퇴근시간</th>
-            <th>상태</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="record : ${records}">
-            <td th:text="${record.at_date}"></td>
-            <td th:text="${record.at_checkIn}"></td>
-            <td th:text="${record.at_checkOut}"></td>
-            <td th:text="${record.at_status}"></td>
-        </tr>
-        </tbody>
-    </table>
-    <div class="attendance-buttons"><!--나중에 메인페이지로 이동-->
-        <button onclick="checkIn()">출근</button>
-        <button onclick="checkOut()">퇴근</button>
-    </div>
-    <h2>내 휴가 현황</h2>
-    <table>
-        <thead>
-        <tr>
-            <th>시작일</th>
-            <th>종료일</th>
-            <th>유형</th>
-            <th>상태</th>
-            <th>사용휴가</th>
-            <th>잔여휴가</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="leave : ${leaves}">
-            <td th:text="${leave.le_start}"></td>
-            <td th:text="${leave.le_end}"></td>
-            <td th:text="${leave.le_type}"></td>
-            <td th:text="${leave.le_status}"></td>
-            <td th:text="${leave.le_total}"></td>
-            <td th:text="${employeeDTO.annualLeave}"></td>
-        </tr>
-        </tbody>
-    </table>
-    <a th:href="@{/leave/request/{id}(id=${#authentication.principal.employee.id})}" class="btn">휴가 신청</a>
-        <H2>교육이력현황</H2>
-    <a th:href="@{/education/record}" class="btn">교육이력 등록</a>
-    <table>
-        <thead>
-        <tr>
-            <th>교육이름</th>
-            <th>교육시작 날짜</th>
-            <th>교육종료 날짜</th>
-            <th>수료증 여부</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="history : ${history}">
-            <td th:text="${history.ed_name}"></td>
-            <td th:text="${history.ed_start}"></td>
-            <td th:text="${history.ed_end}"></td>
-            <td th:text="${history.ed_path != null ? 'O' : 'X'}"></td>
-        </tr>
-        </tbody>
-    </table>
-        <H2>자격증현황</H2>
-    <a th:href="@{/certificate/upload}" class="btn">자격증 등록</a>
-    <table>
-        <thead>
-        <tr>
-            <th>자격증명</th>
-            <th>취득일</th>
-            <th>만료일</th>
-            <th>관리</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="cert : ${certificates}">
-            <td th:text="${cert.ce_name}"></td>
-            <td th:text="${cert.ce_issued}"></td>
-            <td th:text="${cert.ce_expri}"></td>
-            <td>
-                <a th:href="@{/certificate/view/{id}(id=${cert.ce_id})}">보기</a>
-                <a th:href="@{/certificate/delete/{id}(id=${cert.ce_id})}"
-                   onclick="return confirm('삭제하시겠습니까?')">삭제</a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+
+    <!-- PDF 미리보기 모달 -->
+    <div class="modal fade" id="pdfPreviewModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">문서 미리보기</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <iframe id="pdfViewer" width="100%" height="600px" frameborder="0"></iframe>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-</div>
-<script src="/js/Employee/Attendance.js"></script>
 </body>
 </html>

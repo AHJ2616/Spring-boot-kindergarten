@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>반 배정</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h2 class="mb-4">반 배정</h2>
+
+    <!-- 성공/에러 메시지 표시 -->
+    <div th:if="${successMessage}" class="alert alert-success" role="alert">
+        <span th:text="${successMessage}"></span>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+        <span th:text="${errorMessage}"></span>
+    </div>
+
+    <form th:action="@{/erp/classRoom/assign}" method="post">
+        <input type="hidden" name="parentId" th:value="${parentId}"/>
+        <input type="hidden" name="childrenId" th:value="${childrenId}"/>
+
+        <div class="form-group">
+            <label for="classRoomId">반 선택:</label>
+            <select class="form-control" id="classRoomId" name="classRoomId" required>
+                <option value="">반을 선택해주세요</option>
+                <option th:each="classRoom : ${classRooms}"
+                        th:value="${classRoom.classRoomId}"
+                        th:text="${classRoom.classRoomName + ' (' + classRoom.currentStudents + '/' + classRoom.maxChildren + '명) - 담임: ' + classRoom.employeeName}">
+                </option>
+            </select>
+        </div>
+
+        <!-- 반 정보 표시 -->
+        <div class="card mb-4" th:each="classRoom : ${classRooms}" th:data-classroom-id="${classRoom.classRoomId}">
+            <div class="card-header">
+                <h5 class="card-title mb-0" th:text="${classRoom.classRoomName}">반 이름</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    <strong>담임교사:</strong> <span th:text="${classRoom.employeeName}"></span><br>
+                    <strong>정원:</strong> <span th:text="${classRoom.currentStudents + '/' + classRoom.maxChildren + '명'}"></span><br>
+                    <strong>설명:</strong> <span th:text="${classRoom.classRoomDescription}"></span>
+                </p>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary">반 배정하기</button>
+            <a th:href="@{/erp/parent/list}" class="btn btn-secondary ml-2">취소</a>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const classRoomSelect = document.getElementById('classRoomId');
+        classRoomSelect.addEventListener('change', function() {
+            const selectedValue = this.value;
+            const cards = document.querySelectorAll('.card');
+
+            cards.forEach(card => {
+                card.style.border = 'none';
+            });
+
+            if (selectedValue) {
+                const selectedCard = document.querySelector(`[data-classroom-id="${selectedValue}"]`);
+                if (selectedCard) {
+                    selectedCard.style.border = '2px solid #007bff';
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html> 

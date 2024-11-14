@@ -1,15 +1,13 @@
 package com.kinder.kindergarten.entity.survey;
 
+import com.github.f4b6a3.ulid.UlidCreator;
+import com.kinder.kindergarten.entity.TimeEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import com.github.f4b6a3.ulid.UlidCreator;
-import com.kinder.kindergarten.entity.TimeEntity;
-import com.kinder.kindergarten.entity.board.BoardEntity;
 
 @Entity
 @Table(name = "survey")

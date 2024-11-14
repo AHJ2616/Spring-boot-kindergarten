@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 @Table(name = "children")
 public class Children extends ChildrenBaseEntity {
 
@@ -34,8 +35,7 @@ public class Children extends ChildrenBaseEntity {
     @Column(nullable = false)
     private String childrenBloodType ;  // 원아의 혈액형
 
- /*   @Column(nullable = false)
-    private String	parentName; //학부모 성함 */
+    //private String	parentName; //학부모 성함
 
     private String	childrenAllergies;  //알레르기 정보
 

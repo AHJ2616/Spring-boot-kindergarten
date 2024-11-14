@@ -1,6 +1,7 @@
 package com.kinder.kindergarten.entity.material;
 
 import com.kinder.kindergarten.DTO.material.MaterialFormDTO;
+import com.kinder.kindergarten.constant.material.MaterialOrderStatus;
 import com.kinder.kindergarten.constant.material.MaterialStatus;
 import com.kinder.kindergarten.entity.TimeEntity;
 import jakarta.persistence.*;
@@ -11,54 +12,59 @@ import lombok.ToString;
 import java.time.LocalDate;
 
 @Entity
-@Table(name ="materialkl")
+@Table(name ="materialRe")
 @Getter
 @Setter
 @ToString
 public class MaterialEntity extends TimeEntity {
 
     @Id
-    @Column(name = "material_idK")
-    private String id;// 자재 코드
+    @Column(name = "materialId")
+    private String materialId;// 자재 코드
 
     @Column(nullable = false)
-    private String material_name; // 자재 이름
+    private String materialName; // 자재 이름
 
     @Lob
     @Column(nullable = false)
-    private String material_detail; // 자재 설명
+    private String materialDetail; // 자재 설명
 
     @Column(nullable = false)
-    private String material_category; // 자재 분류
+    private String materialCategory; // 자재 분류
 
     @Column(nullable = false)
-    private Integer material_price; // 자재 가격
+    private Integer materialPrice; // 자재 가격
 
     @Column(nullable = false)
-    private Integer material_ea; // 자재 재고
+    private Integer materialEa; // 자재 재고
 
     @Column(nullable = false)
-    private String material_remark; // 비고란
+    private String materialRemark; // 비고란
 
     @Column(nullable = false)
-    private LocalDate material_regdate; // 자재 입고일
+    private LocalDate materialRegdate; // 자재 입고일
+
+    @Column(nullable = false)
+    private String materialWriter; // 글작성자
 
     @Enumerated(EnumType.STRING)   //enum 타입 매핑
     private MaterialStatus materialStatus; //자재 상태
 
-    /*@OneToMany(mappedBy = "materialEntity", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    private List<MaterialImgEntity> materialImgEntities;*/
+    // 장바구니 후처리 구현중 2024 11 13
+    @Enumerated(EnumType.STRING)
+    private MaterialOrderStatus orderStatus; // 주문 상태 (ORDERED, CANCELED, COMPLETED)
+
 
     public void updateMaterial(MaterialFormDTO materialFormDTO){
 
-        this.material_name = materialFormDTO.getMaterial_name();
-        this.material_detail = materialFormDTO.getMaterial_detail();
-        this.material_category = materialFormDTO.getMaterial_category();
-        this.material_price = materialFormDTO.getMaterial_price();
-        this.material_ea = materialFormDTO.getMaterial_ea();
-        this.material_remark = materialFormDTO.getMaterial_remark();
-        this.material_regdate = materialFormDTO.getMaterial_regdate();
-        this.material_name = materialFormDTO.getMaterial_name();
+        this.materialWriter = materialFormDTO.getMaterialWriter();
+        this.materialName = materialFormDTO.getMaterialName();
+        this.materialDetail = materialFormDTO.getMaterialDetail();
+        this.materialCategory = materialFormDTO.getMaterialCategory();
+        this.materialPrice = materialFormDTO.getMaterialPrice();
+        this.materialEa = materialFormDTO.getMaterialEa();
+        this.materialRemark = materialFormDTO.getMaterialRemark();
+        this.materialRegdate = materialFormDTO.getMaterialRegdate();
         this.materialStatus = materialFormDTO.getMaterialStatus();
     }
 
