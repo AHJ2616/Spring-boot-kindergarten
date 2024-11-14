@@ -5,7 +5,6 @@ import com.kinder.kindergarten.DTO.employee.EducationDTO;
 import com.kinder.kindergarten.entity.employee.Education;
 import com.kinder.kindergarten.entity.employee.Employee;
 import com.kinder.kindergarten.repository.employee.EducationRepository;
-import com.kinder.kindergarten.repository.employee.FileRepository;
 import com.kinder.kindergarten.service.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

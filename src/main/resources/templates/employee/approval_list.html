@@ -2,92 +2,38 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{common/layout}">
-<script th:src="@{/js/employee/approval.js}" defer></script>
+<head>
+  <link rel="stylesheet" href="/css/employee/certificate.css">
+  <meta charset="UTF-8">
+  <title>결재 목록</title>
+</head>
 <div layout:fragment="content">
-  <div class="approval-list-container">
+  <div class="container">
     <h2>결재 목록</h2>
-    <ul class="nav nav-tabs">
-      <li class="nav-item">
-        <a class="nav-link active" data-bs-toggle="tab" href="#requested">요청한 결재</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="tab" href="#received">받은 결재</a>
-      </li>
-    </ul>
-
-    <div class="tab-content">
-      <div id="requested" class="tab-pane fade show active">
-        <table class="table">
-          <thead>
-          <tr>
-            <th>요청일</th>
-            <th>제목</th>
-            <th>결재자</th>
-            <th>상태</th>
-            <th>처리일</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr th:each="approval : ${myRequests}">
-            <td th:text="${#temporals.format(approval.requestDate, 'yyyy-MM-dd HH:mm')}"></td>
-            <td th:text="${approval.title}"></td>
-            <td th:text="${approval.}"></td>
-            <td th:text="${approval.status.getStatus()}"></td>
-            <td th:text="${approval.processDate != null ? #temporals.format(approval.processDate, 'yyyy-MM-dd HH:mm') : '-'}"></td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div id="received" class="tab-pane fade">
-        <table class="table">
-          <thead>
-          <tr>
-            <th>요청일</th>
-            <th>요청자</th>
-            <th>제목</th>
-            <th>상태</th>
-            <th>처리</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr th:each="approval : ${receivedApprovals}">
-            <td th:text="${#temporals.format(approval.requestDate, 'yyyy-MM-dd HH:mm')}"></td>
-            <td th:text="${approval.requesterName}"></td>
-            <td th:text="${approval.title}"></td>
-            <td th:text="${approval.status.getStatus()}"></td>
-            <td>
-              <div th:if="${approval.status.name() == 'PENDING'}">
-                <button class="btn btn-success btn-sm"
-                        th:onclick="'approveRequest(' + ${approval.id} + ')'">승인</button>
-                <button class="btn btn-danger btn-sm"
-                        th:onclick="'showRejectModal(' + ${approval.id} + ')'">반려</button>
-              </div>
-            </td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- 반려 사유 입력 모달 -->
-  <div class="modal fade" id="rejectModal" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">반려 사유</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <textarea id="rejectReason" class="form-control" rows="3"></textarea>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-          <button type="button" class="btn btn-primary" onclick="rejectRequest()">확인</button>
-        </div>
-      </div>
-    </div>
+    <table>
+      <thead>
+      <tr>
+        <th>요청일</th>
+        <th>요청자</th>
+        <th>제목</th>
+        <th>구분</th>
+        <th>결재자</th>
+        <th>상태</th>
+        <th>처리일</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="approval : ${myRequests}">
+        <td th:text="${#temporals.format(approval.requestDate, 'yyyy-MM-dd HH:mm')}"></td>
+        <td th:text="${approval.requesterName}"></td>
+        <td th:text="${approval.title}"></td>
+        <td th:text="${approval.type.getType()}"></td>
+        <td th:text="${approval.position}"></td>
+        <td th:text="${approval.status.getStatus()}"></td>
+        <td th:text="${approval.processDate != null ? #temporals.format(approval.processDate, 'yyyy-MM-dd HH:mm') : '-'}"></td>
+      </tr>
+      </tbody>
+    </table>
   </div>
 </div>
 </html>

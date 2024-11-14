@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 public class LeaveService {
 
     private final LeaveRepository leaveRepository;
-
     private final ApprovalService approvalService;
     private final EmployeeService employeeService;
 
@@ -47,13 +46,8 @@ public class LeaveService {
                 .status("대기")
                 .build();
 
-//        employee.setAnnualLeave(employee.getAnnualLeave() - requestedLeaveDays);
-//
-//        employeeRepository.save(employee);
-        // 휴가 정보 저장
-//        leaveRepository.save(leave);
         Leave savedLeave = leaveRepository.save(leave);
-        // 결재자 찾기 (예: 부서장)
+        // 결재자 찾기 (예: 원장)
         Employee position = employeeService.findDepartmentHead(employee.getDepartment());
 
         // 결재 요청 생성
@@ -88,13 +82,9 @@ public class LeaveService {
                 .le_type(leave.getType().toString())
                 .le_total(leave.getTotal())
                 .le_reason(leave.getLe_reason())
+                .rejectReason(leave.getRejectReason())
                 .le_status(leave.getStatus())
                 .build();
-    }
-
-    public Leave getLeaveById(Long id) {
-        return leaveRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("휴가 신청을 찾을 수 없습니다."));
     }
 }
 

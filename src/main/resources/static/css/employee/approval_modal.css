@@ -1,0 +1,61 @@
+/* 모달 배경 */
+.modal {
+    display: none; /* 기본적으로 숨김 */
+    position: fixed; /* 화면에 고정 */
+    top: 0;
+    left: 0;
+    width: 100%; /* 전체 화면 크기 */
+    height: 100%; /* 전체 화면 크기 */
+    background-color: rgba(0, 0, 0, 0.5); /* 배경을 어둡게 */
+    z-index: 1000; /* 다른 콘텐츠 위에 표시 */
+}
+
+/* 모달 내용 영역 */
+.modal-content {
+    position: absolute; /* 모달을 화면 중앙에 위치시킴 */
+    top: 50%; /* 화면 중앙 기준 */
+    left: 50%; /* 화면 중앙 기준 */
+    transform: translate(-50%, -50%); /* 정확히 중앙에 배치 */
+    background-color: white; /* 모달 배경색 */
+    padding: 20px; /* 내용과 경계 간의 여백 */
+    border-radius: 8px; /* 모서리 둥글게 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 그림자 추가 */
+    width: 400px; /* 고정 너비 */
+}
+
+/* 반려 사유 입력창 스타일 */
+textarea {
+    width: 100%; /* 너비를 100%로 설정 */
+    height: 100px; /* 높이를 100px로 설정 */
+    padding: 8px;
+    border: 1px solid #ccc; /* 테두리 */
+    border-radius: 4px; /* 둥근 모서리 */
+    resize: vertical; /* 세로로만 크기 조정 가능 */
+}
+
+/* 버튼 스타일 */
+button {
+    padding: 10px 20px; /* 버튼 내부 여백 */
+    border: none; /* 테두리 없애기 */
+    border-radius: 4px; /* 둥근 모서리 */
+    cursor: pointer; /* 마우스 커서 변경 */
+    font-size: 14px; /* 글자 크기 */
+}
+
+/* 취소 버튼 스타일 */
+.btn-secondary {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+/* 확인 버튼 스타일 */
+.btn-reject {
+    background-color: #ff4d4d;
+    color: white;
+    margin-left: 10px; /* 버튼 사이 여백 */
+}
+
+/* 버튼 호버 효과 */
+button:hover {
+    opacity: 0.8;
+}

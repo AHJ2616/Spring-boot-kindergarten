@@ -2,11 +2,8 @@ package com.kinder.kindergarten.service.employee;
 
 import com.kinder.kindergarten.DTO.employee.CertificateDTO;
 
-import com.kinder.kindergarten.DTO.employee.EducationDTO;
 import com.kinder.kindergarten.entity.employee.Certificate;
-import com.kinder.kindergarten.entity.employee.Education;
 import com.kinder.kindergarten.entity.employee.Employee;
-import com.kinder.kindergarten.entity.employee.Employee_File;
 import com.kinder.kindergarten.repository.employee.CertificateRepository;
 import com.kinder.kindergarten.service.FileService;
 import lombok.RequiredArgsConstructor;
