@@ -8,9 +8,9 @@ import com.kinder.kindergarten.entity.employee.Approval;
 import com.kinder.kindergarten.entity.employee.Employee;
 import com.kinder.kindergarten.entity.employee.Leave;
 import com.kinder.kindergarten.repository.employee.ApprovalRepository;
+import com.kinder.kindergarten.repository.employee.EmployeeRepository;
 import com.kinder.kindergarten.repository.employee.LeaveRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +26,8 @@ public class ApprovalService {
     private final ApprovalRepository approvalRepository;
     private final LeaveRepository leaveRepository;
 
+    private final EmployeeRepository employeeRepository;
+
     // 휴가 결재 요청 생성
     public void createLeaveApproval(Employee requester, Employee approver, Leave leave) {
         Approval approval = Approval.builder()
@@ -33,6 +35,7 @@ public class ApprovalService {
                 .position(approver)
                 .type(ApprovalType.LEAVE)
                 .title(leave.getTitle())
+                .content(leave.getLe_reason())
                 .status(ApprovalStatus.PENDING)
                 .requestDate(LocalDateTime.now())
                 .referenceId(leave.getId())
@@ -53,21 +56,30 @@ public class ApprovalService {
 
         // 휴가 결재인 경우
         if (approval.getType() == ApprovalType.LEAVE) {
+
             Leave leave = leaveRepository.findById(approval.getReferenceId())
                     .orElseThrow(() -> new RuntimeException("휴가 신청을 찾을 수 없습니다."));
 
+            Employee employee = employeeRepository.findByEmail(leave.getEmployee().getEmail());
+
             if (status == ApprovalStatus.APPROVED) {
                 leave.setStatus("승인");
+                employee.setAnnualLeave(employee.getAnnualLeave()-leave.getTotal());
             } else if (status == ApprovalStatus.REJECTED) {
                 leave.setStatus("반려");
                 leave.setRejectReason(rejectReason);
-                // 연차 반환
-                leave.getEmployee().returnAnnualLeave(leave.getTotal());
             }
+            employeeRepository.save(employee);
             leaveRepository.save(leave);
         }
 
         approvalRepository.save(approval);
+    }
+
+    //결재 정보 조회
+    public Approval findApprovalById(Long id) {
+        return approvalRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("결재 정보를 찾을 수 없습니다."));
     }
 
     // 결재 대기 목록 조회

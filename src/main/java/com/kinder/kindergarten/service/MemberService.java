@@ -1,7 +1,5 @@
 package com.kinder.kindergarten.service;
 
-import com.github.f4b6a3.ulid.Ulid;
-import com.github.f4b6a3.ulid.UlidCreator;
 import com.kinder.kindergarten.DTO.MemberDTO;
 import com.kinder.kindergarten.entity.FcmTokenEntity;
 import com.kinder.kindergarten.entity.Member;

@@ -9,7 +9,7 @@ function approveRequest(approvalId) {
 function showRejectModal(approvalId) {
     currentApprovalId = approvalId;
     document.getElementById('rejectModal').style.display = 'block';
-    document.getElementById('rejectReason').value = '';
+    document.getElementById('rejectReason').value = '';  // 반려 사유 초기화
 }
 
 function closeRejectModal() {
@@ -22,12 +22,27 @@ function submitReject() {
         alert('반려 사유를 입력해주세요.');
         return;
     }
-    processApproval(currentApprovalId, 'REJECTED', reason);
+    processApproval(currentApprovalId, 'REJECTED', reason);  // 반려 사유와 함께 처리
     closeRejectModal();
 }
 
+// 특정 아이템 DOM 요소를 업데이트하는 함수 예시
+function updateApprovalStatus(approvalId, status) {
+    const itemElement = document.querySelector(`#approval-item-${approvalId}`);
+    if (itemElement) {
+        itemElement.querySelector('.status').innerText = status === 'APPROVED' ? '승인됨' : '반려됨';
+        itemElement.classList.add(status.toLowerCase());
+    }
+}
+
+// 승인 및 반려 요청을 처리하는 함수
 function processApproval(approvalId, status, rejectReason = '') {
     const data = new URLSearchParams();
+
+    // CSRF 토큰을 메타 태그에서 읽어오기
+    const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
     data.append('status', status);
     if (rejectReason) {
         data.append('rejectReason', rejectReason);
@@ -35,12 +50,17 @@ function processApproval(approvalId, status, rejectReason = '') {
 
     fetch(`/approval/process/${approvalId}`, {
         method: 'POST',
-        body: data
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded', // 데이터가 URL 인코딩 형식임을 명시
+            [csrfHeader]: csrfToken, // CSRF 토큰을 헤더에 추가
+        },
+        body: data // request body에 데이터를 추가
     })
         .then(response => {
             if (response.ok) {
                 alert(status === 'APPROVED' ? '승인되었습니다.' : '반려되었습니다.');
-                location.reload();
+                updateApprovalStatus(approvalId, status); // 상태 업데이트
+                closeRejectModal(); // 모달 창 닫기
             } else {
                 alert('처리 중 오류가 발생했습니다.');
             }

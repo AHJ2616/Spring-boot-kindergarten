@@ -3,16 +3,19 @@ package com.kinder.kindergarten.controller.employee;
 import com.kinder.kindergarten.config.PrincipalDetails;
 import com.kinder.kindergarten.constant.employee.ApprovalStatus;
 import com.kinder.kindergarten.constant.employee.ApprovalType;
+import com.kinder.kindergarten.entity.employee.Approval;
 import com.kinder.kindergarten.entity.employee.Employee;
 import com.kinder.kindergarten.service.employee.ApprovalService;
 import com.kinder.kindergarten.service.employee.EmployeeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
