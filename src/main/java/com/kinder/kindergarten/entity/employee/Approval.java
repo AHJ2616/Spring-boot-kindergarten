@@ -2,6 +2,7 @@ package com.kinder.kindergarten.entity.employee;
 
 import com.kinder.kindergarten.constant.employee.ApprovalStatus;
 import com.kinder.kindergarten.constant.employee.ApprovalType;
+import com.kinder.kindergarten.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,7 +23,7 @@ public class Approval {
 
     @ManyToOne
     @JoinColumn(name = "requester_id")
-    private Employee requester; // 결재 요청자
+    private Member requester; // 결재 요청자
 
     @ManyToOne
     @JoinColumn(name = "employee_position")

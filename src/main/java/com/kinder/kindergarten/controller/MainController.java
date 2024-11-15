@@ -1,11 +1,18 @@
 package com.kinder.kindergarten.controller;
 
+import com.kinder.kindergarten.DTO.MemberDTO;
+import com.kinder.kindergarten.entity.Member;
+import com.kinder.kindergarten.service.MemberService;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -19,8 +26,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @Log4j2
 @Controller
+@RequiredArgsConstructor
 public class MainController {
 
+  private final MemberService memberService;
+  private final PasswordEncoder passwordEncoder;
 
   @GetMapping(value={"/main","/"})
   String main(Model model){
@@ -34,7 +44,6 @@ public class MainController {
     return "calendar";
   }
 
-
   @GetMapping(value = "/main/login")
   public String loginMember(String email) {return "/login";}
 
@@ -43,20 +52,6 @@ public class MainController {
     model.addAttribute("loginErrorMsg", "아이디 또는 비밀번호를 확인해주세요");
     return "/login";
   }
-
-//  @PostMapping(value = "/member/new")
-//  public String newMember(@Valid BindingResult bindingResult, Model model) {
-//
-//    try {
-//      Member member = Member.builder().build();
-//      employeeService.saveEmployee(employee);
-//    }  catch (Exception e) {
-//      model.addAttribute("errorMessage", "서버 오류가 발생했습니다.");
-//      return "employee/new";
-//    }
-//
-//    return "redirect:/admin/dashboard";
-//  }
 
   @GetMapping("/admin/dashboard")
   @PreAuthorize("hasRole('ADMIN')")

@@ -1,6 +1,7 @@
 package com.kinder.kindergarten.repository.employee;
 
 
+import com.kinder.kindergarten.entity.Member;
 import com.kinder.kindergarten.entity.employee.Certificate;
 import com.kinder.kindergarten.entity.employee.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,6 +12,6 @@ import java.util.Optional;
 
 @Repository
 public interface CertificateRepository extends JpaRepository<Certificate, Long> {
-    List<Certificate> findByEmployee(Employee employee);
-    Optional<Certificate> findByIdAndEmployee(Long id, Employee employee);
+    List<Certificate> findByMember(Member member);
+    Optional<Certificate> findByIdAndMember(Long id, Member member);
 }
