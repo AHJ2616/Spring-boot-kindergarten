@@ -49,15 +49,16 @@ public class CommentsService {
   }
 
 
-  public CommentsDTO createComment(CommentsDTO commentsDTO, String writer) {
+  public CommentsDTO createComment(CommentsDTO commentsDTO, String memberId) {
     BoardEntity board = boardRepository.findById(commentsDTO.getBoardId())
             .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
 
-    Member memberWriter = memberRepository.findByEmail(writer);
+    Member member = memberRepository.findById(memberId)
+            .orElseThrow(() -> new RuntimeException("회원을 찾을 수 없습니다."));
 
     CommentsEntity comment = new CommentsEntity();
     comment.setBoardId(board);
-    comment.setWriter(memberWriter);
+    comment.setMember(member);
     comment.setContents(commentsDTO.getContents());
     Ulid ulid = UlidCreator.getUlid();
     comment.setCommentsId(ulid.toString());
@@ -74,22 +75,28 @@ public class CommentsService {
             .collect(Collectors.toList());
   }
 
-  public void deleteComment(String commentId, String writer) {
+  public void deleteComment(String commentId, String memberId) {
     CommentsEntity comment = commentsRepository.findById(commentId)
             .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
 
-    if (!comment.getWriter().getEmail().equals(writer)) {
+    Member member = memberRepository.findById(memberId)
+            .orElseThrow(() -> new RuntimeException("회원을 찾을 수 없습니다."));
+
+    if (!comment.getMember().getId().equals(memberId)) {
       throw new RuntimeException("댓글 삭제 권한이 없습니다.");
     }
 
     commentsRepository.delete(comment);
   }
 
-  public CommentsDTO updateComment(String commentId, CommentsDTO commentsDTO, String writer) {
+  public CommentsDTO updateComment(String commentId, CommentsDTO commentsDTO, String memberId) {
     CommentsEntity comment = commentsRepository.findById(commentId)
             .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
+            
+    Member member = memberRepository.findById(memberId)
+            .orElseThrow(() -> new RuntimeException("회원을 찾을 수 없습니다."));
 
-    if (!comment.getWriter().getEmail().equals(writer)) {
+    if (!comment.getMember().getId().equals(memberId)) {
       throw new RuntimeException("댓글 수정 권한이 없습니다.");
     }
 

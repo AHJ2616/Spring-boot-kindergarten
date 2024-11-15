@@ -32,7 +32,7 @@
   </div>
 
   <div id="boardList">
-    <table class="board-table">
+    <table class="board-table" th:if="${not #lists.isEmpty(boards.content)}">
       <thead>
       <tr>
         <th style="width:35%">제목</th>
@@ -63,7 +63,7 @@
       </tbody>
     </table>
     <div class="no-result" th:if="${#lists.isEmpty(boards.content)}">
-      검색과 일치하는 결과가 없습니다.
+      게시글이 없습니다.
     </div>
   </div>
 

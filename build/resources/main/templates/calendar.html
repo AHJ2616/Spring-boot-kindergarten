@@ -4,8 +4,8 @@
       layout:decorate="~{common/layout2}">
 <head>
   <meta charset="UTF-8">
-  <meta name="_csrf" content="${_csrf.token}">
-  <meta name="_csrf_header" content="${_csrf.headerName}">
+  <meta name="_csrf" th:content="${_csrf.token}">
+  <meta name="_csrf_header" th:content="${_csrf.headerName}">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>캘린더</title>
 

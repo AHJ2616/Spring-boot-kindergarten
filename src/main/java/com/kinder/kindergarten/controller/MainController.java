@@ -10,8 +10,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.kinder.kindergarten.DTO.MemberDTO;
+
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 @Log4j2
 @Controller
@@ -19,7 +23,7 @@ public class MainController {
 
 
   @GetMapping(value={"/main","/"})
-  String main(){
+  String main(Model model){
     return "main";
   }
 
@@ -98,5 +102,14 @@ public class MainController {
     response.put("timeLeft", session.getMaxInactiveInterval());
     return ResponseEntity.ok(response);
   }
+
+@PostMapping("/test/register")
+public void resisterMember(@RequestBody MemberDTO memberDTO) {
+    //회원가입
+    
+
+}
+
+
 
 }

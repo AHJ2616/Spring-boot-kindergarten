@@ -24,7 +24,7 @@ public class BoardFormDTO {
   private BoardType boardType;
 
   //작성자
-  private String boardWriter;
+  private String memeberId;
 
   //첨부파일 키
   private String fileId;

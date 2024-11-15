@@ -8,6 +8,7 @@ import com.kinder.kindergarten.DTO.board.BoardDTO;
 import com.kinder.kindergarten.DTO.board.BoardFileDTO;
 import com.kinder.kindergarten.DTO.board.BoardFormDTO;
 import com.kinder.kindergarten.constant.board.BoardType;
+import com.kinder.kindergarten.entity.Member;
 import com.kinder.kindergarten.entity.board.BoardEntity;
 import com.kinder.kindergarten.entity.board.BoardFileEntity;
 import com.kinder.kindergarten.repository.QueryDSL;
@@ -46,7 +47,6 @@ import java.util.zip.ZipOutputStream;
 
           private final BoardFileRepository boardFileRepository;
 
-          private final QueryDSL queryDSL;
 
           private final ModelMapper modelMapper;
 
@@ -66,6 +66,12 @@ import java.util.zip.ZipOutputStream;
 
             // fetch join을 사용하는 메서드 호출
             Page<BoardEntity> boardPage = boardRepository.findByBoardTypeWithFiles(boardType, pageable);
+            
+            // 게시글이 없는 경우 빈 페이지 반환
+            if (boardPage == null || boardPage.isEmpty()) {
+                List<BoardDTO> emptyList = new ArrayList<>();
+                return new PageImpl<>(emptyList, pageable, 0);
+            }
 
             return boardPage.map(board -> {
                 BoardDTO dto = modelMapper.map(board, BoardDTO.class);
@@ -75,20 +81,34 @@ import java.util.zip.ZipOutputStream;
                     .collect(Collectors.toList());
                 dto.setBoardFileList(fileList);
                 dto.setFileCount(fileList.size());
+                
+                // Member null 체크 추가
+                if (board.getMember() != null) {
+                    dto.setWriter(board.getMember().getName());
+                } else {
+                    dto.setWriter("탈퇴한 사용자");
+                }
                 return dto;
             });
           }
 
           @Transactional
-          public void saveBoard(BoardFormDTO boardFormDTO) throws Exception{
-            // HTML 컨텐츠 sanitize
-            boardFormDTO.setBoardContents(HtmlSanitizer.sanitize(boardFormDTO.getBoardContents()));
-            Ulid ulid = UlidCreator.getUlid();
-            String id = ulid.toString();
-            boardFormDTO.setBoardId(id); // UUID대신 사용할 ULID
-            BoardEntity board = boardFormDTO.wirteBoard();
-            boardRepository.save(board);
-            log.info("게시글+파일 저장 - BoardService.saveBoard() 실행" + boardFormDTO);
+          public void saveBoard(BoardFormDTO boardFormDTO) {
+            BoardEntity boardEntity = new BoardEntity();
+             // HTML 컨텐츠 sanitize
+             boardFormDTO.setBoardContents(HtmlSanitizer.sanitize(boardFormDTO.getBoardContents()));
+            // 기존의 데이터 설정
+            boardEntity.setBoardId(UlidCreator.getUlid().toString());
+            boardEntity.setBoardTitle(boardFormDTO.getBoardTitle());
+            boardEntity.setBoardContents(boardFormDTO.getBoardContents());
+            boardEntity.setBoardType(boardFormDTO.getBoardType());
+            
+            // Member 엔티티 생성 및 설정
+            Member member = new Member();
+            member.setId(boardFormDTO.getMemeberId());
+            boardEntity.setMember(member);
+            
+            boardRepository.save(boardEntity);
           }
 
           public void saveBoardWithFile(BoardFormDTO boardFormDTO, List<MultipartFile> boardFileList) throws Exception{
@@ -154,6 +174,7 @@ import java.util.zip.ZipOutputStream;
             boardDTO.setBoardTitle(boardEntity.getBoardTitle());
             boardDTO.setBoardContents(boardEntity.getBoardContents());
             boardDTO.setBoardType(boardEntity.getBoardType());
+            boardDTO.setWriter(boardEntity.getMember().getName());
             
             // Member null 체크 추가
             if (boardEntity.getMember() != null) {
@@ -260,7 +281,7 @@ import java.util.zip.ZipOutputStream;
                 BoardFileEntity boardFile = new BoardFileEntity();
                 String originalFilename = file.getOriginalFilename();
 
-                // FileService를 사용하여 파일 저장
+                // FileService를 사용하여 파일 ��장
                 String savedFileName = fileService.uploadFile(uploadPath, originalFilename, file.getBytes());
                 String filePath = fileService.getFullPath(savedFileName);
 

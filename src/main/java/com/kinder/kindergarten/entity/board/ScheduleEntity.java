@@ -28,5 +28,4 @@ public class ScheduleEntity {
   private String textColor;
 
   private boolean allDay;
-  private String username;
 }

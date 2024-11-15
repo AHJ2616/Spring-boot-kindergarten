@@ -52,7 +52,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         end: event.end,
                         description: event.description,
                         type: event.type,
-                        username: event.username,
                         backgroundColor: event.backgroundColor,
                         textColor: event.textColor || '#ffffff',
                         allDay: event.allDay
@@ -93,32 +92,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 이벤트 드래그 & 리사이즈
         eventDrop: function(info) {
-            const event = info.event;
-            const newStart = moment(event.start).format('YYYY-MM-DDTHH:mm:ss');
-            const newEnd = event.end ? moment(event.end).format('YYYY-MM-DDTHH:mm:ss') : newStart;
+            var token = $("meta[name='_csrf']").attr("content");
+            var header = $("meta[name='_csrf_header']").attr("content");
 
-            // 종일 이벤트와 시간 이벤트 간의 변환 방지
-            if (info.view.type === 'timeGridWeek' || info.view.type === 'timeGridDay') {
-                if (draggedEventIsAllDay !== event.allDay) {
-                    alert('종일 일정은 시간 일정으로 변경할 수 없습니다.');
-                    info.revert();
-                    return;
-                }
-            }
-
-            const eventData = {
-                start: newStart,
-                end: newEnd,
-                allDay: event.allDay
+            var eventData = {
+                start: moment(info.event.start).format('YYYY-MM-DDTHH:mm:ss'),
+                end: moment(info.event.end || info.event.start).format('YYYY-MM-DDTHH:mm:ss'),
+                title: info.event.title,
+                description: info.event.extendedProps.description,
+                type: info.event.extendedProps.type,
+                backgroundColor: info.event.backgroundColor,
+                textColor: info.event.textColor,
+                allDay: info.event.allDay
             };
 
             $.ajax({
-                url: `/events/drag/${event.id}`,
+                url: '/events/drag/' + info.event.id,
                 type: 'PUT',
                 data: JSON.stringify(eventData),
                 contentType: 'application/json',
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader(header, token);  // CSRF 토큰 추가
+                },
                 success: function(response) {
-                    alert('일정이 수정되었습니다.');
+                    calendar.refetchEvents();
                 },
                 error: function() {
                     alert('일정 수정 중 오류가 발생했습니다.');

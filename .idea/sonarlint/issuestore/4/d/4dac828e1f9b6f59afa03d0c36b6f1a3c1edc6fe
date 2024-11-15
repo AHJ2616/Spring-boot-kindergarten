@@ -1,8 +1,0 @@
-
-y
-java:S1192:"cDefine a constant instead of duplicating this literal "ì§ì›ì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤." 3 times.(¨ŠÈ¢
-o	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(í´Ô×
-h
-java:S6204W"RReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()'(ª™¨¹
-`
-java:S1128"KRemove this unused import 'com.kinder.kindergarten.constant.Employee.Role'.(—™Ÿ

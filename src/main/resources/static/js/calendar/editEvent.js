@@ -42,11 +42,17 @@ function editEvent(event) {
             allDay: document.getElementById('edit-allDay').checked
         };
 
+        var token = $("meta[name='_csrf']").attr("content");
+        var header = $("meta[name='_csrf_header']").attr("content");
+
         $.ajax({
             url: `/events/${event.id}`,
             type: 'PUT',
             data: JSON.stringify(eventData),
             contentType: 'application/json',
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader(header, token);  // CSRF 토큰 추가
+            },
             success: function(response) {
                 calendar.refetchEvents();
                 eventModal.hide();
@@ -59,9 +65,15 @@ function editEvent(event) {
 
     $('#deleteEvent').off('click').on('click', function() {
         if (confirm('이 일정을 삭제하시겠습니까?')) {
+            var token = $("meta[name='_csrf']").attr("content");
+            var header = $("meta[name='_csrf_header']").attr("content");
+
             $.ajax({
                 url: `/events/delete/${event.id}`,
                 type: 'DELETE',
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader(header, token);  // CSRF 토큰 추가
+                },
                 success: function(response) {
                     calendar.refetchEvents();
                     eventModal.hide();

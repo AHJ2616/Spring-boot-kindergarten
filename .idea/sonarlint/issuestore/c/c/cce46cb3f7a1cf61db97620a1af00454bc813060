@@ -1,9 +1,0 @@
-
-h
-java:S1192/"MDefine a constant instead of duplicating this literal "employee/new" 3 times.(φΐΐψÿÿÿÿ
-b
-java:S1192."LDefine a constant instead of duplicating this literal "employeeDTO" 3 times.(΄ίΐΙ
-t	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(ΕΫεφϊÿÿÿÿ
-h	java:S100-"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(έΏ¨ιόÿÿÿÿ
-h
-java:S1128"RRemove this unused import 'com.kinder.kindergarten.exception.OutOfStockException'.(Ώ®‚η

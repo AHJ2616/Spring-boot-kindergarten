@@ -19,24 +19,31 @@ import java.util.List;
 public class Member {
 
     @Id
-    @Column(name = "member_email")
+    @Column(name = "member_id")
+    private String id;
+
+    @Column(name = "member_email" , unique = true)
     private String email;
 
-    @Column(name = "member_password")
+    @Column(name = "member_password", nullable = false)
     private String password;
 
-    @Column(name = "member_name")
+    @Column(name = "member_name", nullable = false)
     private String name;
 
-    @Column(name = "member_address")
+    @Column(name = "member_address", nullable = false)
     private String address;
 
-    @Column(name = "member_phone")
+    @Column(name = "member_phone", nullable = false)
     private String phone;
 
     @Column(name = "member_role")
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @Column(name = "member_profile_image")
+    private String profileImage;
+
 
     // 2차 합본 합치면서 추가 - 2024 11 13
     @Builder.Default
