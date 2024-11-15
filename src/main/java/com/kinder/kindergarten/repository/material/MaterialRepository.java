@@ -9,7 +9,7 @@ import java.util.List;
 public interface MaterialRepository extends JpaRepository<MaterialEntity, String>,
         QuerydslPredicateExecutor<MaterialEntity>, MaterialRepositoryCustom {
 
-    List<MaterialEntity> findByIdOrderByIdAsc(String id);
+    List<MaterialEntity> findByMaterialIdOrderByMaterialIdAsc(String materialId);
 }
 
 

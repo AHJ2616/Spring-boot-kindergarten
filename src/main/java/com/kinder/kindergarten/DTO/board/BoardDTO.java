@@ -1,6 +1,6 @@
 package com.kinder.kindergarten.DTO.board;
 
-import com.kinder.kindergarten.constant.BoardType;
+import com.kinder.kindergarten.constant.board.BoardType;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -23,7 +23,10 @@ public class BoardDTO {
   private BoardType boardType;
 
   //작성자
-  private String boardWriter;
+  private String email; //MemberDTO.email
+
+  //작성자 이름
+  private String writer;
 
   private int views;
 
@@ -36,6 +39,8 @@ public class BoardDTO {
   private List<Long> FileIds = new ArrayList<>();
 
   private boolean hasZipFile;
+
+  private int fileCount;
 
   public boolean getHasZipFile() {
     if (BoardFileList == null) return false;

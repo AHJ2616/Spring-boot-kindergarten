@@ -1,14 +1,11 @@
 package com.kinder.kindergarten.entity.parent;
 
-import com.kinder.kindergarten.constant.parent.Children_Role;
 import com.kinder.kindergarten.constant.parent.ParentType;
 import com.kinder.kindergarten.entity.children.Children;
 import com.kinder.kindergarten.entity.children.ChildrenBaseEntity;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Entity

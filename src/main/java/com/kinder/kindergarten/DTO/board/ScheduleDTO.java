@@ -4,12 +4,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
-
 @Getter @Setter
 @ToString
 public class ScheduleDTO {
-
 
   //기본키
   private String id;
@@ -20,16 +17,20 @@ public class ScheduleDTO {
   //일정 내용
   private String description;
 
-  private String type;
+  private String type; //카테고리
 
   private String username;
 
-  private String backgroundColor;
+  private String backgroundColor = "#3788d8";
 
-  private String textColor;
+  private String textColor = "#ffffff";
 
-  private boolean allDay;
-  private LocalDateTime start;       // schedule_time (시작)
-  private LocalDateTime end;         // schedule_time (종료)
+  private boolean allDay = false;
+  private String start;       // schedule_time (시작)
+  private String end;         // schedule_time (종료)
+
+  public boolean isValid() {
+    return id != null && title != null && start != null && end != null;
+  }
 
 }

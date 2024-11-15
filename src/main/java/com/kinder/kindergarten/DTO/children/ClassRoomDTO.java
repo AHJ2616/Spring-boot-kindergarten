@@ -36,6 +36,7 @@ public class ClassRoomDTO {
     @Builder.Default
     private Integer currentStudents = 0;  // 현재 등록된 원아 수 (기본값 0)
 
+    @Builder.Default
     @OneToMany(mappedBy = "assignedClass")
     private List<Children> children = new ArrayList<>();
 

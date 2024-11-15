@@ -1,115 +1,75 @@
 /* ****************
  *  일정 편집
  * ************** */
-var editEvent = function (event, element, view) {
+function editEvent(event) {
+    const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+    const modalTitle = document.querySelector('.modal-title');
+    
+    modalTitle.textContent = '일정 수정';
+    
+    // 폼 필드 설정
+    document.getElementById('edit-title').value = event.title;
+    document.getElementById('edit-start').value = moment(event.start).format('YYYY-MM-DDTHH:mm');
+    document.getElementById('edit-end').value = moment(event.end || event.start).format('YYYY-MM-DDTHH:mm');
+    document.getElementById('edit-type').value = event.extendedProps.type;
+    document.getElementById('edit-desc').value = event.extendedProps.description;
+    document.getElementById('edit-color').value = event.backgroundColor;
+    document.getElementById('edit-allDay').checked = event.allDay;
 
-    $('#deleteEvent').data('id', event._id); //클릭한 이벤트 ID
+    document.querySelector('.modalBtnContainer-addEvent').style.display = 'none';
+    document.querySelector('.modalBtnContainer-modifyEvent').style.display = 'block';
+    
+    eventModal.show();
 
-    $('.popover.fade.top').remove();
-    $(element).popover("hide");
+    $('#updateEvent').off('click').on('click', function() {
+        if (document.getElementById('edit-title').value === '') {
+            alert('일정명은 필수입니다.');
+            return;
+        }
 
-    if (event.allDay === true) {
-        editAllDay.prop('checked', true);
-    } else {
-        editAllDay.prop('checked', false);
-    }
-
-    if (event.end === null) {
-        event.end = event.start;
-    }
-
-    if (event.allDay === true && event.end !== event.start) {
-        editEnd.val(moment(event.end).subtract(1, 'days').format('YYYY-MM-DD HH:mm'))
-    } else {
-        editEnd.val(event.end.format('YYYY-MM-DD HH:mm'));
-    }
-
-    modalTitle.html('일정 수정');
-    editTitle.val(event.title);
-    editStart.val(event.start.format('YYYY-MM-DD HH:mm'));
-    editType.val(event.type);
-    editDesc.val(event.description);
-    editColor.val(event.backgroundColor).css('color', event.backgroundColor);
-
-    addBtnContainer.hide();
-    modifyBtnContainer.show();
-    eventModal.modal('show');
-
-    //업데이트 버튼 클릭시
-    $('#updateEvent').unbind();
-    $('#updateEvent').on('click', function () {
-
-        if (editStart.val() > editEnd.val()) {
+        if (document.getElementById('edit-start').value > document.getElementById('edit-end').value) {
             alert('끝나는 날짜가 앞설 수 없습니다.');
-            return false;
+            return;
         }
 
-        if (editTitle.val() === '') {
-            alert('일정명은 필수입니다.')
-            return false;
-        }
+        const eventData = {
+            title: document.getElementById('edit-title').value,
+            start: document.getElementById('edit-start').value,
+            end: document.getElementById('edit-end').value,
+            description: document.getElementById('edit-desc').value,
+            type: document.getElementById('edit-type').value,
+            backgroundColor: document.getElementById('edit-color').value,
+            allDay: document.getElementById('edit-allDay').checked
+        };
 
-        var statusAllDay;
-        var startDate;
-        var endDate;
-        var displayDate;
-
-        if (editAllDay.is(':checked')) {
-            statusAllDay = true;
-            startDate = moment(editStart.val()).format('YYYY-MM-DD');
-            endDate = moment(editEnd.val()).format('YYYY-MM-DD');
-            displayDate = moment(editEnd.val()).add(1, 'days').format('YYYY-MM-DD');
-        } else {
-            statusAllDay = false;
-            startDate = editStart.val();
-            endDate = editEnd.val();
-            displayDate = endDate;
-        }
-
-        eventModal.modal('hide');
-let eventData ={
-        id: $(this).data('id'),
-        title: $('#edit-title').val(),
-        start: $('#edit-start').val(),
-        end: $('#edit-end').val(),
-        description: $('#edit-desc').val(),
-        type: $('#edit-type').val(),
-        backgroundColor: $('#edit-color').val(),
-        allDay: $('#edit-allDay').is(':checked')
-}
-
-
-        $("#calendar").fullCalendar('updateEvent', event);
-
-        //일정 업데이트
         $.ajax({
-            type: "PUT",
-            url: '/events/' + event.id,
+            url: `/events/${event.id}`,
+            type: 'PUT',
             data: JSON.stringify(eventData),
             contentType: 'application/json',
-            success: function (response) {
-                alert('수정되었습니다.')
+            success: function(response) {
+                calendar.refetchEvents();
+                eventModal.hide();
+            },
+            error: function() {
+                alert('일정 수정 중 오류가 발생했습니다.');
             }
         });
-
     });
-};
 
-// 삭제버튼
-$('#deleteEvent').on('click', function () {
-    
-    $('#deleteEvent').unbind();
-    $("#calendar").fullCalendar('removeEvents', $(this).data('id'));
-    eventModal.modal('hide');
-
-    //삭제시
-    $.ajax({
-        url: "/events/delete/" + eventId,
-        method: "DELETE",
-        success: function (response) {
-            $('#calendar').fullCalendar('removeEvents', eventId);
-            eventModal.modal('hide');
+    $('#deleteEvent').off('click').on('click', function() {
+        if (confirm('이 일정을 삭제하시겠습니까?')) {
+            $.ajax({
+                url: `/events/delete/${event.id}`,
+                type: 'DELETE',
+                success: function(response) {
+                    calendar.refetchEvents();
+                    eventModal.hide();
+                },
+                error: function() {
+                    alert('일정 삭제 중 오류가 발생했습니다.');
+                }
+            });
         }
     });
-
-});
+}

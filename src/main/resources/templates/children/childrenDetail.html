@@ -35,17 +35,17 @@
         <div class="card-body">
             <div class="info-row">
                 <div class="info-label">이름</div>
-                <div class="info-content" th:text="${children.childrenName}">제발좀</div>
+                <div class="info-content" th:text="${children.childrenName}"></div>
             </div>
 
             <div class="info-row">
                 <div class="info-label">생년월일</div>
-                <div class="info-content" th:text="${#temporals.format(children.childrenBirthDate, 'yyyy-MM-dd')}">2024-11-13</div>
+                <div class="info-content" th:text="${#temporals.format(children.childrenBirthDate, 'yyyy-MM-dd')}"></div>
             </div>
 
             <div class="info-row">
                 <div class="info-label">성별</div>
-                <div class="info-content" th:text="${children.childrenGender}">FEMALE</div>
+                <div class="info-content" th:text="${children.childrenGender}"></div>
             </div>
 
             <div class="info-row">

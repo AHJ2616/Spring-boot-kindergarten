@@ -26,7 +26,17 @@ public class ScheduleService {
   public List<ScheduleDTO> getAllSchedules() {
     List<ScheduleEntity> schedules = scheduleRepository.findAll();
     return schedules.stream()
-            .map(schedule -> modelMapper.map(schedule, ScheduleDTO.class))
+            .map(schedule -> {
+                ScheduleDTO dto = modelMapper.map(schedule, ScheduleDTO.class);
+                if (dto.getTextColor() == null) {
+                    dto.setTextColor("#ffffff");
+                }
+                if (dto.getBackgroundColor() == null) {
+                    dto.setBackgroundColor("#3788d8");
+                }
+                return dto;
+            })
+            .filter(ScheduleDTO::isValid)
             .collect(Collectors.toList());
   }
 
@@ -67,8 +77,27 @@ public class ScheduleService {
     return modelMapper.map(updatedSchedule, ScheduleDTO.class);
   }
 
+  public ScheduleDTO dragUpdateSchedule(String id,ScheduleDTO scheduleDTO){
+    ScheduleEntity schedule = scheduleRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("일정을 찾을 수 없습니다."));
+// 기존 일정 정보 업데이트
+    schedule.setId(scheduleDTO.getId());
+    schedule.setStart(scheduleDTO.getStart());
+    schedule.setEnd(scheduleDTO.getEnd());
+    schedule.setAllDay(scheduleDTO.isAllDay());
+    ScheduleEntity updatedSchedule = scheduleRepository.save(schedule);
+    return modelMapper.map(updatedSchedule, ScheduleDTO.class);
+  }
+
   // 일정 삭제
   public void deleteSchedule(String id) {
     scheduleRepository.deleteById(id);
+  }
+
+  public List<ScheduleDTO> findSchedulesByType(String type) {
+    List<ScheduleEntity> schedules = scheduleRepository.findByType(type);
+    return schedules.stream()
+            .map(schedule -> modelMapper.map(schedule, ScheduleDTO.class)) 
+            .collect(Collectors.toList());
   }
 }

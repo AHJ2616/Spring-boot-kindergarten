@@ -1,6 +1,7 @@
 package com.kinder.kindergarten.entity.board;
 
-import com.kinder.kindergarten.constant.BoardType;
+import com.kinder.kindergarten.constant.board.BoardType;
+import com.kinder.kindergarten.entity.Member;
 import com.kinder.kindergarten.entity.TimeEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -8,6 +9,9 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "board")
@@ -32,11 +36,15 @@ public class BoardEntity extends TimeEntity {
   @Column(name = "board_type")
   private BoardType boardType;
 
-  @Column(nullable = false) //나중에 변경
-  private String boardWriter;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(referencedColumnName = "member_email" , name="board_writer")
+  private Member member;
 
   @ColumnDefault("0")
   private Integer views;
+
+  @OneToMany(mappedBy = "boardEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<BoardFileEntity> boardFiles = new ArrayList<>();
 
 
 

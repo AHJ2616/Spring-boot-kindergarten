@@ -1,7 +1,5 @@
 package com.kinder.kindergarten.DTO.children;
 
-import com.kinder.kindergarten.entity.children.ClassRoom;
-import jakarta.persistence.Column;
 import jakarta.persistence.Lob;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

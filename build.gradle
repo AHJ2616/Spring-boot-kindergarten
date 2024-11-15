@@ -25,13 +25,15 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven { url 'https://repo.spring.io/release' }
+    maven { url 'https://repo.spring.io/milestone' }
 }
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
-
+    implementation 'org.springframework.boot:spring-boot-starter'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 
@@ -54,9 +56,6 @@ dependencies {
     // 타입리프 용 코드
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
-    // jsoup : XXS 취약점에 대한 html 보안(HTML sanitize)
-    implementation group: 'org.jsoup', name: 'jsoup', version: '1.18.1' // 11.04(추가(희준이))
-
     //Thymeleaf time-format Java8time
     implementation group: 'org.thymeleaf.extras', name: 'thymeleaf-extras-java8time', version: '3.0.4.RELEASE'
 
@@ -71,13 +70,12 @@ dependencies {
             "jakarta.annotation:jakarta.annotation-api",
             "com.querydsl:querydsl-apt:${queryDslVersion}:jakarta")
 
-    // 스프링 시큐리티 시작용
+// 스프링 시큐리티 시작용
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    // 부트 3이상 부터는 6 사용 함 https://mvnrepository.com/artifact/org.thymeleaf.extras/thymeleaf-extras-springsecurity6
+// 부트 3이상 부터는 6 사용 함 https://mvnrepository.com/artifact/org.thymeleaf.extras/thymeleaf-extras-springsecurity6
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6:3.1.1.RELEASE'
-
+    implementation 'org.springframework.security:spring-security-messaging:6.2.6' // 웹소켓 보안을 위한 의존성 추가
     testImplementation("org.springframework.security:spring-security-test") // 시큐리티 테스트
-
 
     // 외부 인증용 카카오, 구글,  네이버 등....
     //implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
@@ -90,10 +88,43 @@ dependencies {
     //google 의 Guava 사용(캐시 관리)
     implementation group: 'com.google.guava', name: 'guava', version: '33.3.1-jre'
 
+    // PDF 변환을 위한 의존성 추가
+    implementation 'org.apache.pdfbox:pdfbox:2.0.29'
+    implementation 'commons-io:commons-io:2.16.1'
+
     // jsoup : XXS 취약점에 대한 html 보안(HTML sanitize)
     implementation group: 'org.jsoup', name: 'jsoup', version: '1.18.1'
 
+    //web push 에 필요한 firebase 설치
+    implementation 'com.google.firebase:firebase-admin:9.1.1'
 
+    // okhttp : http통신을 도와주는 라이브러리
+    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
+
+    // gson
+    implementation group: 'com.google.code.gson', name: 'gson', version: '2.10.1'
+
+    // 설문조사용 추가
+    implementation 'org.webjars:bootstrap:5.2.3' // Bootstrap 5로 업데이트
+    implementation 'org.webjars:select2:4.0.13'
+    implementation 'org.webjars:momentjs:2.29.1'
+
+
+
+
+    // 기타 필요한 의존성들은 유지
+    implementation 'org.webjars:bootstrap:5.2.3'  // Bootstrap 5로 업데이트
+    implementation 'org.webjars:select2:4.0.13'
+
+    // websocket
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.webjars:stomp-websocket:2.3.3'
+    implementation 'org.webjars:sockjs-client:1.0.2'
+
+    // 엑셀 문서 출력
+    // https://mvnrepository.com/artifact/org.apache.poi/poi
+    implementation 'org.apache.poi:poi:5.2.3'
+    implementation 'org.apache.poi:poi-ooxml:5.2.3'
 
 
 }

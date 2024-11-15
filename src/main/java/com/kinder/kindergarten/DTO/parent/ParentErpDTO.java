@@ -3,14 +3,11 @@ package com.kinder.kindergarten.DTO.parent;
 
 import com.kinder.kindergarten.DTO.children.ChildrenErpDTO;
 import com.kinder.kindergarten.constant.parent.ParentType;
-import com.kinder.kindergarten.entity.children.ChildrenBaseEntity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
-import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;

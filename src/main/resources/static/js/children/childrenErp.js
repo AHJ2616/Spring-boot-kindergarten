@@ -58,8 +58,8 @@ function addChildForm() {
                             name="childrenArray[${newIndex}].childrenGender"
                             required>
                         <option value="">선택하세요</option>
-                        <option value="MALE">남자</option>
-                        <option value="FEMALE">여자</option>
+                        <option value="남자">남자</option>
+                        <option value="여자">여자</option>
                     </select>
                 </div>
 

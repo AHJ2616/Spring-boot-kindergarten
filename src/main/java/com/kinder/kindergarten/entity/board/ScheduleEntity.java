@@ -1,11 +1,12 @@
 package com.kinder.kindergarten.entity.board;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
 
 
 @Entity
@@ -19,8 +20,8 @@ public class ScheduleEntity {
 
   private String title;
   private String description;
-  private LocalDateTime start;
-  private LocalDateTime end;
+  private String start;
+  private String end;
   private String type;
   private String backgroundColor;
 

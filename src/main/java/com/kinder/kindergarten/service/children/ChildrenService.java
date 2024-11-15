@@ -1,14 +1,10 @@
 package com.kinder.kindergarten.service.children;
 
-import com.kinder.kindergarten.DTO.children.ChildrenClassRoomDTO;
 import com.kinder.kindergarten.DTO.children.ChildrenErpDTO;
 import com.kinder.kindergarten.DTO.children.ChildrenUpdateDTO;
-import com.kinder.kindergarten.DTO.parent.ParentErpDTO;
 import com.kinder.kindergarten.entity.children.Children;
-import com.kinder.kindergarten.entity.children.ClassRoom;
 import com.kinder.kindergarten.entity.parent.Parent;
 import com.kinder.kindergarten.repository.children.ChildrenRepository;
-import com.kinder.kindergarten.repository.children.ClassRoomRepository;
 import com.kinder.kindergarten.repository.parent.ParentRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -19,10 +15,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service

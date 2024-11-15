@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout}">
+<head>
+<link rel="stylesheet" href="/css/employee/certificate.css">
+<meta charset="UTF-8">
+<title>결재 대기 목록</title>
+</head>
+<body>
+<div layout:fragment="content">
+  <div class="container">
+    <h2>결재 대기 목록</h2>
+    <table>
+      <thead>
+      <tr>
+        <th>요청일시</th>
+        <th>요청자</th>
+        <th>제목</th>
+        <th>구분</th>
+        <th>상태</th>
+        <th>처리</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="approval : ${pendingApprovals}">
+        <td th:text="${#temporals.format(approval.requestDate, 'yyyy-MM-dd HH:mm')}"></td>
+        <td th:text="${approval.requesterName}"></td>
+        <td th:text="${approval.title}"></td>
+        <td th:text="${approval.type.getType()}"></td>
+        <td th:text="${approval.status.getStatus()}"></td>
+        <td>
+            <a th:href="'approveRequest(' + ${approval.id} + ')'">승인</a>
+          <form th:action="@{'/certificate/delete/' + ${approval.id}}"method="post" style="display:inline;">
+            <button type="submit" class="btn btn-danger">반려</button>
+          </form>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+<!--    &lt;!&ndash; 반려 사유 입력 모달 &ndash;&gt;-->
+<!--    <div id="rejectModal" class="modal">-->
+<!--      <div class="modal-content">-->
+<!--        <h3>반려 사유</h3>-->
+<!--        <textarea id="rejectReason" rows="4" style="width: 100%; margin: 10px 0;"></textarea>-->
+<!--        <div style="text-align: right;">-->
+<!--          <button onclick="closeRejectModal()" class="btn-secondary">취소</button>-->
+<!--          <button onclick="submitReject()" class="btn-reject">확인</button>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+  </div>
+</div>
+</body>
+</html>

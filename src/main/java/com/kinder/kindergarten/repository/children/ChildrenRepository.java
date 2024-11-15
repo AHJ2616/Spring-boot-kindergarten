@@ -2,15 +2,12 @@ package com.kinder.kindergarten.repository.children;
 
 import com.kinder.kindergarten.entity.children.Children;
 import com.kinder.kindergarten.entity.children.ClassRoom;
-import com.kinder.kindergarten.entity.parent.Parent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 
