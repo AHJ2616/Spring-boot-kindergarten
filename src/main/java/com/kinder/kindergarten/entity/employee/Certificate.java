@@ -1,5 +1,6 @@
 package com.kinder.kindergarten.entity.employee;
 
+import com.kinder.kindergarten.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,8 +20,8 @@ public class Certificate {
     private Long id; // 자격증 기본키
 
     @ManyToOne
-    @JoinColumn(name = "employee_id")
-    private Employee employee; // 교사 기본키
+    @JoinColumn(name = "member_id")
+    private Member member; // 교사 기본키
 
     @Column(name = "certificate_name")
     private String name; // 자격증 이름

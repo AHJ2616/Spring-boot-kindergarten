@@ -1,8 +1,10 @@
 package com.kinder.kindergarten.controller.employee;
 
+import com.kinder.kindergarten.DTO.MultiDTO;
 import com.kinder.kindergarten.DTO.employee.EmployeeDTO;
 import com.kinder.kindergarten.config.PrincipalDetails;
 import com.kinder.kindergarten.DTO.employee.LeaveDTO;
+import com.kinder.kindergarten.service.MemberService;
 import com.kinder.kindergarten.service.employee.EmployeeService;
 import com.kinder.kindergarten.service.employee.LeaveService;
 import jakarta.validation.Valid;
@@ -22,14 +24,16 @@ public class LeaveController {
 
     private final LeaveService leaveService;
     private final EmployeeService employeeService;
+
+    private final MemberService memberService;
     @GetMapping("/request")
     public String leaveRequestForm(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                    Model model) {
         // 직원 인적사항
-        EmployeeDTO employeeDTO = employeeService.readEmployee(principalDetails.getEmployee().getId());
+        MultiDTO multiDTO = memberService.readMember(principalDetails.getMember().getId());
 
         model.addAttribute("leaveDTO", new LeaveDTO());
-        model.addAttribute("employeeDTO", employeeDTO);
+        model.addAttribute("multiDTO", multiDTO);
         return "/employee/leave_reg";
     }
 
@@ -43,7 +47,7 @@ public class LeaveController {
         }
 
         try {
-            leaveService.requestLeave(leaveDTO, principalDetails.getEmployee());
+            leaveService.requestLeave(leaveDTO, principalDetails.getMember());
         } catch (IllegalStateException e) {
             bindingResult.rejectValue("le_type", "error.leaveDTO", e.getMessage());
             return "/employee/leave_reg"; // 에러가 있을 경우 요청 페이지로 돌아감
@@ -68,10 +72,10 @@ public class LeaveController {
     @GetMapping("/my-leaves")
     public String getMyLeaves(@AuthenticationPrincipal PrincipalDetails principalDetails,
                               Model model) {
-        List<LeaveDTO> leaves = leaveService.getLeavesByEmployee(principalDetails.getEmployee());
-        EmployeeDTO employeeDTO = employeeService.getEmployeeById(principalDetails.getEmployee().getId());
+        List<LeaveDTO> leaves = leaveService.getLeavesByEmployee(principalDetails.getMember());
+        MultiDTO multiDTO = memberService.readMember(principalDetails.getMember().getId());
         model.addAttribute("leaves", leaves);
-        model.addAttribute("employeeDTO", employeeDTO);
+        model.addAttribute("multiDTO", multiDTO);
         return "/employee/leave_list";
     }
 

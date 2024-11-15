@@ -1,6 +1,7 @@
 package com.kinder.kindergarten.repository.employee;
 
 
+import com.kinder.kindergarten.entity.Member;
 import com.kinder.kindergarten.entity.employee.Attendance;
 import com.kinder.kindergarten.entity.employee.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,7 +13,7 @@ import java.util.Optional;
 
 @Repository
 public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
-    boolean existsByEmployeeAndDate(Employee employee, LocalDate date);
-    Optional<Attendance> findByEmployeeAndDate(Employee employee, LocalDate date);
-    List<Attendance> findByEmployeeAndDateBetween(Employee employee, LocalDate start, LocalDate end);
+    boolean existsByMemberAndDate(Member member, LocalDate date);
+    Optional<Attendance> findByMemberAndDate(Member member, LocalDate date);
+    List<Attendance> findByMemberAndDateBetween(Member member, LocalDate start, LocalDate end);
 }

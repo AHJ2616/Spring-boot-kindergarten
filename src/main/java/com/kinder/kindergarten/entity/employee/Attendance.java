@@ -1,6 +1,7 @@
 package com.kinder.kindergarten.entity.employee;
 
 import com.kinder.kindergarten.constant.employee.Status;
+import com.kinder.kindergarten.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,8 +22,8 @@ public class Attendance {
     private Long id; // 근태관리 기본키
 
     @ManyToOne
-    @JoinColumn(name = "employee_id")
-    private Employee employee; // 직원 기본키
+    @JoinColumn(name = "member_id")
+    private Member member; // 직원 기본키
 
     @Column(name = "attendance_date")
     private LocalDate date; // 출근날짜

@@ -29,7 +29,7 @@ public class AttendanceController {
     public ResponseEntity<Map<String, Object>> checkIn(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         Map<String, Object> response = new HashMap<>();
         try {
-            AttendanceDTO attendance = attendanceService.checkIn(principalDetails.getEmployee());
+            AttendanceDTO attendance = attendanceService.checkIn(principalDetails.getMember());
             response.put("success", true);
             response.put("message", "출근이 완료되었습니다.");
             response.put("attendance", attendance);
@@ -46,7 +46,7 @@ public class AttendanceController {
     public ResponseEntity<Map<String, Object>> checkOut(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         Map<String, Object> response = new HashMap<>();
         try {
-            AttendanceDTO attendance = attendanceService.checkOut(principalDetails.getEmployee());
+            AttendanceDTO attendance = attendanceService.checkOut(principalDetails.getMember());
             response.put("success", true);
             response.put("message", "퇴근이 완료되었습니다.");
             response.put("attendance", attendance);
@@ -63,7 +63,7 @@ public class AttendanceController {
     public ResponseEntity<Map<String, Object>> getAttendanceStatus(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         Map<String, Object> response = new HashMap<>();
         try {
-            AttendanceDTO status = attendanceService.getTodayAttendance(principalDetails.getEmployee());
+            AttendanceDTO status = attendanceService.getTodayAttendance(principalDetails.getMember());
             response.put("success", true);
             response.put("attendance", status);
             return ResponseEntity.ok(response);
@@ -77,7 +77,7 @@ public class AttendanceController {
     @GetMapping("/my-records")
     public String getMyAttendance(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                   Model model) {
-        List<AttendanceDTO> records = attendanceService.getMonthlyAttendance(principalDetails.getEmployee());
+        List<AttendanceDTO> records = attendanceService.getMonthlyAttendance(principalDetails.getMember());
         model.addAttribute("records", records);
         return "attendance_list";
     }

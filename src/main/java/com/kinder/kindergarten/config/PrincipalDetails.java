@@ -12,13 +12,18 @@ import java.util.Collection;
 
 public class PrincipalDetails implements UserDetails {
 
+  private Member member;
   private Employee employee;
 
-
-  public PrincipalDetails(Employee employee){
+  public PrincipalDetails(Member member, Employee employee){
+    this.member = member;
     this.employee = employee;
   }
 
+
+  public Member getMember() {
+    return this.member;
+  }
 
   public Employee getEmployee() {
     return this.employee;
@@ -27,19 +32,19 @@ public class PrincipalDetails implements UserDetails {
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     Collection<GrantedAuthority> authorities = new ArrayList<>();
-    authorities.add(new SimpleGrantedAuthority(employee.getRole().name()));
-    authorities.add(new SimpleGrantedAuthority("ROLE_" + employee.getPosition()));
+    authorities.add(new SimpleGrantedAuthority(member.getRole().name()));
+    authorities.add(new SimpleGrantedAuthority("ROLE_" + member.getRole()));
     return authorities;
   }
 
   @Override
   public String getPassword() {
-    return employee.getPassword();
+    return member.getPassword();
   }
 
   @Override
   public String getUsername() {
-    return employee.getEmail();
+    return member.getEmail();
   }
 
   @Override

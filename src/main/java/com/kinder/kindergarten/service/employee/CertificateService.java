@@ -2,6 +2,7 @@ package com.kinder.kindergarten.service.employee;
 
 import com.kinder.kindergarten.DTO.employee.CertificateDTO;
 
+import com.kinder.kindergarten.entity.Member;
 import com.kinder.kindergarten.entity.employee.Certificate;
 import com.kinder.kindergarten.entity.employee.Employee;
 import com.kinder.kindergarten.repository.employee.CertificateRepository;
@@ -24,14 +25,14 @@ public class CertificateService {
     private final FileService fileService;
 
     // 자격증 등록
-    public void saveCertificate(CertificateDTO certificateDTO, MultipartFile file, Employee employee) {
+    public void saveCertificate(CertificateDTO certificateDTO, MultipartFile file, Member member) {
         String pdfPath = null;
         if (file != null && !file.isEmpty()) {
-            pdfPath = fileService.uploadAndConvertToPdf(file, employee);
+            pdfPath = fileService.uploadAndConvertToPdf(file, member);
         }
 
         Certificate certificate = Certificate.builder()
-                .employee(employee)
+                .member(member)
                 .name(certificateDTO.getCe_name())
                 .issued(certificateDTO.getCe_issued())
                 .expri(certificateDTO.getCe_expri())
@@ -42,8 +43,8 @@ public class CertificateService {
     }
 
     // 직원별 자격증 조회
-    public List<CertificateDTO> getCertificatesByEmployee(Employee employee) {
-        return certificateRepository.findByEmployee(employee).stream()
+    public List<CertificateDTO> getCertificatesByEmployee(Member member) {
+        return certificateRepository.findByMember(member).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -67,8 +68,8 @@ public class CertificateService {
 
     // 자격증 수정
     @Transactional
-    public void updateCertificate(Long id, CertificateDTO certificateDTO, MultipartFile file, Employee employee) {
-        Certificate certificate = certificateRepository.findByIdAndEmployee(id, employee)
+    public void updateCertificate(Long id, CertificateDTO certificateDTO, MultipartFile file, Member member) {
+        Certificate certificate = certificateRepository.findByIdAndMember(id, member)
                 .orElseThrow(() -> new RuntimeException("자격증 정보를 찾을 수 없습니다."));
 
         // 기본 정보 업데이트
@@ -83,7 +84,7 @@ public class CertificateService {
                 fileService.deleteFile(certificate.getPath());
             }
             // 새 파일 업로드
-            String newPdfPath = fileService.uploadAndConvertToPdf(file, employee);
+            String newPdfPath = fileService.uploadAndConvertToPdf(file, member);
             certificate.setPath(newPdfPath);
         }
 
@@ -92,8 +93,8 @@ public class CertificateService {
 
     // 자격증 삭제
     @Transactional
-    public void deleteCertificate(Long id, Employee employee) {
-        Certificate certificate = certificateRepository.findByIdAndEmployee(id, employee)
+    public void deleteCertificate(Long id, Member member) {
+        Certificate certificate = certificateRepository.findByIdAndMember(id, member)
                 .orElseThrow(() -> new RuntimeException("자격증 정보를 찾을 수 없습니다."));
 
         // 관련 파일이 있다면 삭제
@@ -105,8 +106,9 @@ public class CertificateService {
     }
 
     // 특정 자격증이 해당 직원의 것인지 확인
-    public boolean isCertificateOwnedByEmployee(Long id, Employee employee) {
-        return certificateRepository.findByIdAndEmployee(id, employee).isPresent();
+    public boolean isCertificateOwnedByEmployee(Long id, Member member) {
+
+        return certificateRepository.findByIdAndMember(id, member).isPresent();
     }
 }
 

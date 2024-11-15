@@ -12,33 +12,32 @@
 <body>
 <div layout:fragment="content">
   <div class="container">
-<!--<form id="memberForm" th:action="@{/member/new}" th:object="${memberDTO}" method="post" onsubmit="return validateForm()">-->
-    <form th:action="@{/employee/new}" th:object="${employeeDTO}" method="post" onsubmit="return validateForm()">
+    <form th:action="@{/employee/new}" th:object="${multiDTO}" method="post" onsubmit="return validateForm()">
       <div class="form-group">
         <label>이름</label>
-        <input type="text" th:field="*{name}" required>
-        <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
+        <input type="text" th:field="*{memberDTO.name}" required>
+        <p th:if="${#fields.hasErrors('memberDTO.name')}" th:errors="*{memberDTO.name}"></p>
       </div>
 
       <div class="form-group">
         <label>이메일</label>
-        <input type="email" id="email" th:field="*{email}" required oninput="validateEmail()">
+        <input type="email" id="email" th:field="*{memberDTO.email}" required oninput="validateEmail()">
         <p id="emailError" style="color: red; display: none;">이메일 형식으로 입력해주세요.</p>
         <p id="emailValid" style="color: red; display: none;"></p> <!-- 이메일 중복 메시지 -->
-        <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
+        <p th:if="${#fields.hasErrors('memberDTO.email')}" th:errors="*{memberDTO.email}"></p>
       </div>
 
       <div class="form-group">
         <label>비밀번호</label>
-        <input type="password" id="password" th:field="*{password}" required oninput="validatePassword()">
+        <input type="password" id="password" th:field="*{memberDTO.password}" required oninput="validatePassword()">
         <p id="passwordError" style="color: red; display: none;">비밀번호는 8자 이상, 16자 이하로 입력해주세요</p>
-        <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
+        <p th:if="${#fields.hasErrors('memberDTO.password')}" th:errors="*{memberDTO.password}"></p>
       </div>
 
       <div class="form-group">
         <label>주소</label>
-        <input type="text" th:field="*{address}" required>
-        <p th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></p>
+        <input type="text" th:field="*{memberDTO.address}" required>
+        <p th:if="${#fields.hasErrors('memberDTO.address')}" th:errors="*{memberDTO.address}"></p>
       </div>
 
       <div class="form-group">
@@ -53,19 +52,15 @@
         <p id="phoneError" style="color: red; display: none;">전화번호 형식은 000-0000-0000입니다.</p>
         <p id="phoneValid" style="color: red; display: none;"></p> <!-- 전화번호 중복 메시지 -->
       </div>
-      <!--두개 테이블 같이 저장할때 사용-->
-<!--      <button type="submit" style="display: none;"></button> -->
-<!--    </form>-->
-<!--      <form id="employeeForm" th:action="@{/employee/new}" th:object="${employeeDTO}" method="post" onsubmit="return validateForm()">-->
       <div class="form-group">
         <label>급여</label>
-        <input type="number" th:field="*{salary}" required>
-        <p th:if="${#fields.hasErrors('salary')}" th:errors="*{salary}"></p>
+        <input type="number" th:field="*{employeeDTO.salary}" required>
+        <p th:if="${#fields.hasErrors('employeeDTO.salary')}" th:errors="*{employeeDTO.salary}"></p>
       </div>
 
       <div class="form-group">
         <label>직위</label>
-        <select th:field="*{position}" required>
+        <select th:field="*{employeeDTO.position}" required>
           <option value="">선택하세요</option>
           <option value="사원">사원</option>
           <option value="대리">대리</option>
@@ -78,7 +73,7 @@
 
       <div class="form-group">
         <label>부서</label>
-        <select th:field="*{department}" required>
+        <select th:field="*{employeeDTO.department}" required>
           <option value="">선택하세요</option>
           <option value="교육부">교육부</option>
           <option value="행정부">행정부</option>
@@ -89,17 +84,12 @@
 
       <div class="form-group">
         <label>입사일</label>
-        <input type="date" th:field="*{hireDate}" required>
-        <p th:if="${#fields.hasErrors('hireDate')}" th:errors="*{hireDate}"></p>
+        <input type="date" th:field="*{employeeDTO.hireDate}" required>
+        <p th:if="${#fields.hasErrors('employeeDTO.hireDate')}" th:errors="*{employeeDTO.hireDate}"></p>
       </div>
-      <input type="hidden" th:field="*{phone}" id="phone">
+      <input type="hidden" th:field="*{memberDTO.phone}" id="phone">
       <button type="submit">등록</button>
-      <!-- <button type="submit" style="display: none;"></button> 두개 테이블 같이 저장할때 사용-->
     </form>
-    <!-- 추가 버튼을 클릭하면 두 폼을 동시에 제출 -->
-<!--    <div style="text-align: right; margin-top: 15px;">-->
-<!--      <a href="javascript:void(0);" class="edit-button" onclick="submitForms()">추가</a>-->
-<!--    </div>-->
   </div>
 </div>
 </body>

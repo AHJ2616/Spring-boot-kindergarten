@@ -2,14 +2,12 @@ package com.kinder.kindergarten.controller.employee;
 
 import com.kinder.kindergarten.config.PrincipalDetails;
 import com.kinder.kindergarten.DTO.employee.EducationDTO;
-import com.kinder.kindergarten.entity.employee.Education;
 import com.kinder.kindergarten.service.employee.EducationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -39,7 +37,7 @@ public class EducationController {
                                   @RequestParam(value = "file", required = false) MultipartFile file,
                                   @AuthenticationPrincipal PrincipalDetails principalDetails, Model model) {
         try {
-            educationService.saveEducation(educationDTO, file, principalDetails.getEmployee());
+            educationService.saveEducation(educationDTO, file, principalDetails.getMember());
             return "redirect:/education/education_list";
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
@@ -50,7 +48,7 @@ public class EducationController {
     @GetMapping("/history")
     public String getEducationHistory(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                       Model model) {
-        List<EducationDTO> history = educationService.getEducationHistory(principalDetails.getEmployee());
+        List<EducationDTO> history = educationService.getEducationHistory(principalDetails.getMember());
         model.addAttribute("history", history);
         return "/employee/education_list";
     }
@@ -76,7 +74,7 @@ public class EducationController {
     public String editEducationForm(@PathVariable Long id,
                                     @AuthenticationPrincipal PrincipalDetails principalDetails,
                                     Model model) {
-        if (!educationService.isEducationOwnedByEmployee(id, principalDetails.getEmployee())) {
+        if (!educationService.isEducationOwnedByEmployee(id, principalDetails.getMember())) {
             return "redirect:/education/history";
         }
 
@@ -92,7 +90,7 @@ public class EducationController {
                                   @AuthenticationPrincipal PrincipalDetails principalDetails,
                                   Model model) {
         try {
-            educationService.updateEducation(id, educationDTO, file, principalDetails.getEmployee());
+            educationService.updateEducation(id, educationDTO, file, principalDetails.getMember());
             return "redirect:/education/history";
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
@@ -104,8 +102,8 @@ public class EducationController {
     @PostMapping("/delete/{id}")
     public String deleteEducation(@PathVariable Long id,
                                   @AuthenticationPrincipal PrincipalDetails principalDetails) {
-        if (educationService.isEducationOwnedByEmployee(id, principalDetails.getEmployee())) {
-            educationService.deleteEducation(id, principalDetails.getEmployee());
+        if (educationService.isEducationOwnedByEmployee(id, principalDetails.getMember())) {
+            educationService.deleteEducation(id, principalDetails.getMember());
         }
         return "redirect:/education/history";
     }

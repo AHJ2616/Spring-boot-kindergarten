@@ -134,8 +134,7 @@
                     </tbody>
                 </table>
                 <div style="text-align: right; margin-top: 15px;">
-                    <a th:href="@{/leave/request/{id}(id=${#authentication.principal.employee.id})}"
-                       class="edit-button">신청</a>
+                    <a th:href="@{/leave/request}" class="edit-button">신청</a>
                 </div>
             </div>
         </div>
@@ -167,7 +166,7 @@
                         </td>
                     </tr>
                     <tr id="newCertificatesRow" style="display: none;">
-                        <form th:action="@{/certificates/upload}" method="post" enctype="multipart/form-data" id="certificatesForm">
+                        <form th:action="@{/certificate/upload}" method="post" enctype="multipart/form-data" id="certificatesForm">
                             <td><input type="text" name="ce_name" required></td>
                             <td><input type="date" name="ce_issued" required></td>
                             <td><input type="date" name="ce_expri" required></td>
