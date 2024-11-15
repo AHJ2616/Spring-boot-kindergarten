@@ -106,10 +106,10 @@
       <!-- 프로필 섹션 -->
       <div class="dropdown">
         <div class="profile-section" id="profileSection" style="cursor: pointer;">
-          <img th:src="@{'/upload/' + ${#authentication.principal.employee.profileImageUrl}}"
+          <img th:src="@{'/upload/' + ${#authentication.principal.member.profileImage}}"
                alt="프로필" class="profile-image">
           <div class="profile-info">
-            <span class="profile-name" th:text="${#authentication.principal.employee.name}">사용자명</span>
+            <span class="profile-name" th:text="${#authentication.principal.member.name}">사용자명</span>
             <span class="profile-role" th:text="${#authentication.principal.employee.position}">직위</span>
           </div>
         </div>
@@ -118,7 +118,7 @@
           연결 끊김
         </div>
         <ul class="dropdown-menu" aria-labelledby="profileSection" style="display: none;">
-          <li><a class="dropdown-item" th:href="@{/employee/mypage/{id}(id=${#authentication.principal.employee.id})}">마이페이지</a></li>
+          <li><a class="dropdown-item" th:href="@{/employee/mypage/{id}(id=${#authentication.principal.member.id})}">마이페이지</a></li>
           <li><a class="dropdown-item" href="#">Another action</a></li>
           <li><a class="dropdown-item" href="/main/logout">로그아웃</a></li>
         </ul>

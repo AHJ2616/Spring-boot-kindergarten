@@ -1,11 +1,11 @@
-// function submitForms() {
-//     var employeeForm = document.getElementById('employeeForm');
-//     var memberForm = document.getElementById('memberForm');
-//
-//     // 두 폼 모두 제출 나중에 멤버테이블로 각자 저장할때 사용)
-//     employeeForm.submit();
-//     memberForm.submit();
-// }
+ function submitForms() {
+     var employeeForm = document.getElementById('employeeForm');
+     var memberForm = document.getElementById('memberForm');
+
+     // 두 폼 모두 제출 나중에 멤버테이블로 각자 저장할때 사용)
+     employeeForm.submit();
+     memberForm.submit();
+ }
 
 // 실시간 이메일 유효성 검사 및 중복 검사
 function validateEmail() {

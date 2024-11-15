@@ -2,6 +2,7 @@ package com.kinder.kindergarten.service.employee;
 
 import com.kinder.kindergarten.DTO.employee.EducationDTO;
 
+import com.kinder.kindergarten.entity.Member;
 import com.kinder.kindergarten.entity.employee.Education;
 import com.kinder.kindergarten.entity.employee.Employee;
 import com.kinder.kindergarten.repository.employee.EducationRepository;
@@ -24,14 +25,14 @@ public class EducationService {
 
 
     // 교육이력 등록
-    public void saveEducation(EducationDTO educationDTO, MultipartFile file, Employee employee) {
+    public void saveEducation(EducationDTO educationDTO, MultipartFile file, Member member) {
         String pdfPath = null;
         if (file != null && !file.isEmpty()) {
-            pdfPath = fileService.uploadAndConvertToPdf(file, employee);
+            pdfPath = fileService.uploadAndConvertToPdf(file, member);
         }
 
         Education education = Education.builder()
-                .employee(employee)
+                .member(member)
                 .name(educationDTO.getEd_name())
                 .startDate(educationDTO.getEd_start())
                 .endDate(educationDTO.getEd_end())
@@ -42,8 +43,8 @@ public class EducationService {
     }
 
     // 교육이력 조회
-    public List<EducationDTO> getEducationHistory(Employee employee) {
-        return educationRepository.findByEmployee(employee).stream()
+    public List<EducationDTO> getEducationHistory(Member member) {
+        return educationRepository.findByMember(member).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -57,8 +58,8 @@ public class EducationService {
 
     // 교육이력 수정
     @Transactional
-    public void updateEducation(Long id, EducationDTO educationDTO, MultipartFile file, Employee employee) {
-        Education education = educationRepository.findByIdAndEmployee(id, employee)
+    public void updateEducation(Long id, EducationDTO educationDTO, MultipartFile file, Member member) {
+        Education education = educationRepository.findByIdAndMember(id, member)
                 .orElseThrow(() -> new RuntimeException("교육 정보를 찾을 수 없습니다."));
 
         // 기본 정보 업데이트
@@ -73,7 +74,7 @@ public class EducationService {
                 fileService.deleteFile(education.getCertificate());
             }
             // 새 파일 업로드
-            String newPdfPath = fileService.uploadAndConvertToPdf(file, employee);
+            String newPdfPath = fileService.uploadAndConvertToPdf(file, member);
             education.setCertificate(newPdfPath);
         }
 
@@ -82,8 +83,8 @@ public class EducationService {
 
     // 교육이력 삭제
     @Transactional
-    public void deleteEducation(Long id, Employee employee) {
-        Education education = educationRepository.findByIdAndEmployee(id, employee)
+    public void deleteEducation(Long id, Member member) {
+        Education education = educationRepository.findByIdAndMember(id, member)
                 .orElseThrow(() -> new RuntimeException("교육 정보를 찾을 수 없습니다."));
 
         // 관련 파일이 있다면 삭제
@@ -95,8 +96,8 @@ public class EducationService {
     }
 
     // 특정 교육이력이 해당 직원의 것인지 확인
-    public boolean isEducationOwnedByEmployee(Long id, Employee employee) {
-        return educationRepository.findByIdAndEmployee(id, employee).isPresent();
+    public boolean isEducationOwnedByEmployee(Long id, Member member) {
+        return educationRepository.findByIdAndMember(id, member).isPresent();
     }
 
     private EducationDTO convertToDTO(Education education) {

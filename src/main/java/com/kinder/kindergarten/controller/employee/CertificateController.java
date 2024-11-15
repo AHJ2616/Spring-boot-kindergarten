@@ -38,7 +38,7 @@ public class CertificateController {
                                     @AuthenticationPrincipal PrincipalDetails principalDetails, Model model) {
 
         try {
-            certificateService.saveCertificate(certificateDTO, file, principalDetails.getEmployee());
+            certificateService.saveCertificate(certificateDTO, file, principalDetails.getMember());
             return "redirect:/certificate/clist";
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
@@ -66,7 +66,7 @@ public class CertificateController {
     @GetMapping("/clist")
     public String getMyCertificates(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                     Model model) {
-        List<CertificateDTO> certificates = certificateService.getCertificatesByEmployee(principalDetails.getEmployee());
+        List<CertificateDTO> certificates = certificateService.getCertificatesByEmployee(principalDetails.getMember());
         model.addAttribute("certificates", certificates);
         return "/employee/certificate_list";
     }
@@ -75,7 +75,7 @@ public class CertificateController {
     public String editCertificateForm(@PathVariable Long id,
                                       @AuthenticationPrincipal PrincipalDetails principalDetails,
                                       Model model) {
-        if (!certificateService.isCertificateOwnedByEmployee(id, principalDetails.getEmployee())) {
+        if (!certificateService.isCertificateOwnedByEmployee(id, principalDetails.getMember())) {
             return "redirect:/employee/clist";
         }
 
@@ -91,7 +91,7 @@ public class CertificateController {
                                     @AuthenticationPrincipal PrincipalDetails principalDetails,
                                     Model model) {
         try {
-            certificateService.updateCertificate(id, certificateDTO, file, principalDetails.getEmployee());
+            certificateService.updateCertificate(id, certificateDTO, file, principalDetails.getMember());
             return "redirect:/certificate/clist";
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
@@ -103,8 +103,8 @@ public class CertificateController {
     @PostMapping("/delete/{id}")
     public String deleteCertificate(@PathVariable Long id,
                                     @AuthenticationPrincipal PrincipalDetails principalDetails) {
-        if (certificateService.isCertificateOwnedByEmployee(id, principalDetails.getEmployee())) {
-            certificateService.deleteCertificate(id, principalDetails.getEmployee());
+        if (certificateService.isCertificateOwnedByEmployee(id, principalDetails.getMember())) {
+            certificateService.deleteCertificate(id, principalDetails.getMember());
         }
         return "redirect:/certificate/clist";
     }

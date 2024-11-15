@@ -2,6 +2,7 @@ package com.kinder.kindergarten.service;
 
 import com.github.f4b6a3.ulid.Ulid;
 import com.github.f4b6a3.ulid.UlidCreator;
+import com.kinder.kindergarten.entity.Member;
 import com.kinder.kindergarten.entity.employee.Employee;
 import com.kinder.kindergarten.entity.employee.Employee_File;
 import com.kinder.kindergarten.repository.employee.FileRepository;
@@ -108,7 +109,7 @@ public class FileService {
         return originalFilename.substring(pos + 1);
     }
 
-    public String uploadAndConvertToPdf(MultipartFile file, Employee employee) {
+    public String uploadAndConvertToPdf(MultipartFile file, Member member) {
         try {
             String originalFilename = file.getOriginalFilename();
             String extension = getFileExtension(originalFilename);
@@ -119,7 +120,7 @@ public class FileService {
                 String pdfPath = uploadPath + newFileName + ".pdf";
 
                 Employee_File employee_file = Employee_File.builder()
-                        .employee(employee)
+                        .member(member)
                         .name(newFileName + ".pdf")
                         .original(originalFilename)
                         .path(pdfPath)
@@ -131,7 +132,7 @@ public class FileService {
             }
             // 이미지 파일이면 PDF로 변환
             if (isImageFile(extension)) {
-                return convertImageToPdf(file, newFileName, employee);
+                return convertImageToPdf(file, newFileName, member);
             }
             // 지원하지 않는 파일 형식
             throw new IllegalArgumentException("지원하지 않는 파일 형식입니다. (지원 형식: PDF, JPG, PNG, JPEG)");
@@ -140,7 +141,7 @@ public class FileService {
         }
     }
 
-    private String convertImageToPdf(MultipartFile file, String newFileName, Employee employee) throws IOException {
+    private String convertImageToPdf(MultipartFile file, String newFileName, Member member) throws IOException {
         PDDocument document = new PDDocument();
         try {
             PDPage page = new PDPage();
@@ -163,7 +164,7 @@ public class FileService {
             document.save(pdfPath);
 
             Employee_File employee_file = Employee_File.builder()
-                    .employee(employee)
+                    .member(member)
                     .name(newFileName + ".pdf")
                     .original(file.getOriginalFilename())
                     .path(pdfPath)
@@ -178,7 +179,7 @@ public class FileService {
 
 
     // 이미지 파일 업로드 처리
-    public String uploadProfileImage(MultipartFile file, Employee employee) {
+    public String uploadProfileImage(MultipartFile file, Member member) {
         try {
             String originalFilename = file.getOriginalFilename();
             String extension =
@@ -197,7 +198,7 @@ public class FileService {
 
             // 파일 정보 저장
             Employee_File employee_file = Employee_File.builder()
-                    .employee(employee)
+                    .member(member)
                     .name(newFileName)
                     .original(originalFilename)
                     .path(imagePath)

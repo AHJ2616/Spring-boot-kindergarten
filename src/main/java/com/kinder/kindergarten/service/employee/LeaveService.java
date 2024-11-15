@@ -3,6 +3,7 @@ package com.kinder.kindergarten.service.employee;
 import com.kinder.kindergarten.constant.employee.DayOff;
 import com.kinder.kindergarten.DTO.employee.LeaveDTO;
 
+import com.kinder.kindergarten.entity.Member;
 import com.kinder.kindergarten.entity.employee.Employee;
 import com.kinder.kindergarten.entity.employee.Leave;
 import com.kinder.kindergarten.repository.employee.EmployeeRepository;
@@ -28,15 +29,22 @@ public class LeaveService {
 
     // 휴가 신청
     @Transactional
-    public void requestLeave(LeaveDTO leaveDTO, Employee employee) {
+    public void requestLeave(LeaveDTO leaveDTO, Member member) {
+        // Member에 포함된 Employee 객체를 가져옵니다.
+        Employee employee = member.getEmployees()
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("회원에 대한 직원 정보가 없습니다."));
+
         // 연차 잔여일수 확인
         double requestedLeaveDays = calculateLeaveDays(leaveDTO);
         if (employee.getAnnualLeave() < requestedLeaveDays) {
             throw new IllegalStateException("연차 잔여일수가 부족합니다.");
         }
 
+        // 휴가 신청 데이터 저장
         Leave leave = Leave.builder()
-                .employee(employee)
+                .member(member)
                 .start(leaveDTO.getLe_start())
                 .end(leaveDTO.getLe_end())
                 .type(DayOff.valueOf(leaveDTO.getLe_type()))
@@ -47,11 +55,12 @@ public class LeaveService {
                 .build();
 
         Leave savedLeave = leaveRepository.save(leave);
-        // 결재자 찾기 (예: 원장)
+
+        // 부서장 찾기 (employee에서 부서 정보 사용)
         Employee position = employeeService.findDepartmentHead(employee.getDepartment());
 
-        // 결재 요청 생성
-        approvalService.createLeaveApproval(employee, position, savedLeave);
+        // 결재 요청 생성 (requester는 Member 객체, approver는 Employee 객체)
+        approvalService.createLeaveApproval(member, position, savedLeave);
     }
 
     // 휴가 일수 계산
@@ -68,8 +77,8 @@ public class LeaveService {
     }
 
     // 직원별 휴가 조회
-    public List<LeaveDTO> getLeavesByEmployee(Employee employee) {
-        return leaveRepository.findByEmployee(employee).stream()
+    public List<LeaveDTO> getLeavesByEmployee(Member member) {
+        return leaveRepository.findByMember(member).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }

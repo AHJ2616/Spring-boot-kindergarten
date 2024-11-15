@@ -1,5 +1,6 @@
 package com.kinder.kindergarten.entity.employee;
 
+import com.kinder.kindergarten.entity.Member;
 import com.kinder.kindergarten.entity.employee.Employee;
 import jakarta.persistence.*;
 import lombok.*;
@@ -20,8 +21,8 @@ public class Education {
     private Long id; // 교육이력 기본키
 
     @ManyToOne
-    @JoinColumn(name = "employee_id")
-    private Employee employee; // 직원 기본키
+    @JoinColumn(name = "member_id")
+    private Member member; // 직원 기본키
 
     @Column(name = "education_name", nullable = false)
     private String name; // 교육이름

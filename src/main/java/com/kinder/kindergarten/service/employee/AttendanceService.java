@@ -3,6 +3,7 @@ package com.kinder.kindergarten.service.employee;
 import com.kinder.kindergarten.constant.employee.Status;
 import com.kinder.kindergarten.DTO.employee.AttendanceDTO;
 
+import com.kinder.kindergarten.entity.Member;
 import com.kinder.kindergarten.entity.employee.Attendance;
 import com.kinder.kindergarten.entity.employee.Employee;
 import com.kinder.kindergarten.repository.employee.AttendanceRepository;
@@ -23,20 +24,20 @@ public class AttendanceService {
     private final AttendanceRepository attendanceRepository;
 
     // 출근 처리
-    public AttendanceDTO checkIn(Employee employee) {
+    public AttendanceDTO checkIn(Member member) {
         LocalDate today = LocalDate.now();
         LocalTime now = LocalTime.now();
 
         AttendanceDTO attendanceDTO;
 
         // 이미 출근했는지 확인
-        if (attendanceRepository.existsByEmployeeAndDate(employee, today)) {
+        if (attendanceRepository.existsByMemberAndDate(member, today)) {
             attendanceDTO = new AttendanceDTO(null, today, null, null, null, false, "이미 출근 처리되었습니다.");
             return attendanceDTO; // 실패 메시지 반환
         }
 
         Attendance attendance = Attendance.builder()
-                .employee(employee)
+                .member(member)
                 .date(today)
                 .checkIn(now)
                 .status(determineStatus(now))
@@ -51,9 +52,9 @@ public class AttendanceService {
     }
 
     // 퇴근 처리
-    public AttendanceDTO checkOut(Employee employee) {
+    public AttendanceDTO checkOut(Member member) {
         LocalDate today = LocalDate.now();
-        Attendance attendance = attendanceRepository.findByEmployeeAndDate(employee, today)
+        Attendance attendance = attendanceRepository.findByMemberAndDate(member, today)
                 .orElseThrow(() -> new IllegalStateException("출근 기록이 없습니다."));
 
         attendance.setCheckOut(LocalTime.now());
@@ -66,19 +67,19 @@ public class AttendanceService {
     }
 
     // 월별 근태 기록 조회
-    public List<AttendanceDTO> getMonthlyAttendance(Employee employee) {
+    public List<AttendanceDTO> getMonthlyAttendance(Member member) {
         LocalDate start = LocalDate.now().withDayOfMonth(1);
         LocalDate end = start.plusMonths(1).minusDays(1);
 
-        return attendanceRepository.findByEmployeeAndDateBetween(employee, start, end)
+        return attendanceRepository.findByMemberAndDateBetween(member, start, end)
                 .stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
-    public AttendanceDTO getTodayAttendance(Employee employee) {
+    public AttendanceDTO getTodayAttendance(Member member) {
         LocalDate today = LocalDate.now();
-        return attendanceRepository.findByEmployeeAndDate(employee, today)
+        return attendanceRepository.findByMemberAndDate(member, today)
                 .map(this::convertToDTO)
                 .orElse(null);
     }

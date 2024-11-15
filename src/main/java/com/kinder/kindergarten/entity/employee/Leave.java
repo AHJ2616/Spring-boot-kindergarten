@@ -1,6 +1,7 @@
 package com.kinder.kindergarten.entity.employee;
 
 import com.kinder.kindergarten.constant.employee.DayOff;
+import com.kinder.kindergarten.entity.Member;
 import com.kinder.kindergarten.entity.employee.Employee;
 import jakarta.persistence.*;
 import lombok.*;
@@ -22,8 +23,8 @@ public class Leave {
     private Long id; // 휴가 기본키
 
     @ManyToOne
-    @JoinColumn(name = "employee_id")
-    private Employee employee; // 직원 기본키
+    @JoinColumn(name = "member_id")
+    private Member member; // 직원 기본키
 
     @Column(name = "leave_start")
     private LocalDate start; // 휴가 시작 날짜
