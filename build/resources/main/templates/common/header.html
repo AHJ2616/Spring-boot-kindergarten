@@ -7,8 +7,8 @@
   <nav class="sidebar-navigation">
     <ul>
       <!-- 공통 메뉴-->
-      <li class="active" sec:authorize="isAnonymous()">
-        <a th:href="@{/}">
+      <li class="active">
+        <a th:href="@{/admin/dashboard}">
           <i class="fa-solid fa-house" style="color: white;"></i></a>
         <span class="tooltip">Home</span>
       </li>
@@ -62,7 +62,7 @@
       <li class="ui-menu-item">
           <i class="fa-regular fa-calendar" style="color: white;"></i></a>
         <ul class="side-menu">
-          <li><a th:href="@{/calendar}">게시판 일정</a></li>
+          <li><a th:href="@{/teacher/dashboard}">게시판 일정</a></li>
         </ul>
       </li>
     </ul>
@@ -103,7 +103,16 @@
         <span class="notification-badge">5</span>
       </div>
 
-    
+      <!-- 프로필 섹션 -->
+      <div class="dropdown">
+        <div class="profile-section" id="profileSection" style="cursor: pointer;">
+          <img th:src="@{'/upload/' + ${#authentication.principal.member.profileImage}}"
+               alt="프로필" class="profile-image">
+          <div class="profile-info">
+            <span class="profile-name" th:text="${#authentication.principal.member.name}">사용자명</span>
+            <span class="profile-role" th:text="${#authentication.principal.employee.position}">직위</span>
+          </div>
+        </div>
         <!-- WebSocket 상태 표시 -->
         <div id="websocket-status" class="websocket-status disconnected">
           연결 끊김

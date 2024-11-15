@@ -12,14 +12,17 @@ import com.kinder.kindergarten.entity.employee.Employee;
 import com.kinder.kindergarten.exception.OutOfStockException;
 import com.kinder.kindergarten.repository.FcmTokenRepository;
 import com.kinder.kindergarten.repository.MemberRepository;
+import com.kinder.kindergarten.repository.employee.EmployeeRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,32 +34,23 @@ import java.util.stream.Collectors;
 public class MemberService implements UserDetailsService {
 
     private final MemberRepository memberRepository;
-
+    private final FileService fileService;
     private final FcmTokenRepository fcmTokenRepository;
-
-    private final ModelMapper modelMapper;
-
-    private final PasswordEncoder passwordEncoder;
+    private final EmployeeRepository employeeRepository;
 
     @Override
     // 0. 로그인
     public UserDetails loadUserByUsername(String email){
         // 이메일 정보를 받아 처리
         Member member = memberRepository.findByEmail(email);
-        return new PrincipalDetails(member);
+        Employee employee = employeeRepository.findByMemberId(member.getId());
+        System.out.println(employee);
+        return new PrincipalDetails(member, employee);
     }
 
     // 1. 회원 등록
-    public Member saveMember(MemberDTO memberDTO) {
-        // DTO를 엔티티로 변환
-        memberDTO.setId(UlidCreator.getUlid().toString());
-        Member member = modelMapper.map(memberDTO, Member.class);
-        
-        // 비밀번호 암호화
-        String encodedPassword = passwordEncoder.encode(member.getPassword());
-        member.setPassword(encodedPassword);
-        
-        // 회원 저장
+    public Member saveMember(Member member){
+        validateDuplicateMember(member);
         return memberRepository.save(member);
     }
 
@@ -69,13 +63,13 @@ public class MemberService implements UserDetailsService {
     }
 
     // 2. 회원 찾기
-    public MultiDTO readMember(String id) {
-        Optional<Member> memberOpt = memberRepository.findById(id);
-        Member member = memberOpt.orElseThrow(() -> 
-            new EntityNotFoundException("회원을 찾을 수 없습니다."));
+    public MultiDTO readMember(Long id){
+        Member member = memberRepository.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("직원을 찾을 수 없습니다."));;
 
         MultiDTO multiDTO = new MultiDTO();
-        multiDTO.setMemberDTO(modelMapper.map(member, MemberDTO.class));
+        multiDTO.setMemberDTO(covertToMemberDTO(member));
+        multiDTO.setEmployeeDTO(covertToEmployeeDTO((Employee) member.getEmployees()));
 
         return multiDTO;
     }
@@ -88,6 +82,7 @@ public class MemberService implements UserDetailsService {
                 .map(member -> {
                     MultiDTO multiDTO = new MultiDTO();
                     multiDTO.setMemberDTO(covertToMemberDTO(member));  // MemberDTO 변환
+                    multiDTO.setEmployeeDTO(covertToEmployeeDTO((Employee) member.getEmployees()));  // EmployeeDTO 변환
                     return multiDTO;
                 })
                 .collect(Collectors.toList());
@@ -111,7 +106,7 @@ public class MemberService implements UserDetailsService {
     }
 
     // 3-1. 프로필 이미지 업데이트
-    /*@Transactional
+    @Transactional
     public void updateProfileImage(Long id, MultipartFile file) {
         Member member = memberRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("직원을 찾을 수 없습니다."));
@@ -125,10 +120,10 @@ public class MemberService implements UserDetailsService {
         String newImageName = fileService.uploadProfileImage(file, member);
         member.setProfileImage(newImageName);
         memberRepository.save(member);
-    }*/
+    }
 
     // 3-2. 프로필 이미지 삭제
-    /*@Transactional
+    @Transactional
     public void deleteProfileImage(Long id) {
         Member member = memberRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("직원을 찾을 수 없습니다."));
@@ -138,7 +133,7 @@ public class MemberService implements UserDetailsService {
             member.setProfileImage(null);
             memberRepository.save(member);
         }
-    }*/
+    }
 
 
     // 4. 엔티티값 DTO로 변환

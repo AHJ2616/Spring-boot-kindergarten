@@ -2,6 +2,7 @@ package com.kinder.kindergarten.config;
 
 
 import com.kinder.kindergarten.entity.Member;
+import com.kinder.kindergarten.entity.employee.Employee;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,14 +13,20 @@ import java.util.Collection;
 public class PrincipalDetails implements UserDetails {
 
   private Member member;
+  private Employee employee;
 
-  public PrincipalDetails(Member member){
+  public PrincipalDetails(Member member, Employee employee){
     this.member = member;
+    this.employee = employee;
   }
 
 
   public Member getMember() {
     return this.member;
+  }
+
+  public Employee getEmployee() {
+    return this.employee;
   }
 
   @Override

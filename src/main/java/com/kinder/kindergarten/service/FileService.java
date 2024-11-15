@@ -109,11 +109,77 @@ public class FileService {
         return originalFilename.substring(pos + 1);
     }
 
+    public String uploadAndConvertToPdf(MultipartFile file, Member member) {
+        try {
+            String originalFilename = file.getOriginalFilename();
+            String extension = getFileExtension(originalFilename);
+            String newFileName = generateFileName();
 
+            // PDF 파일이면 바로 저장
+            if ("pdf".equalsIgnoreCase(extension)) {
+                String pdfPath = uploadPath + newFileName + ".pdf";
+
+                Employee_File employee_file = Employee_File.builder()
+                        .member(member)
+                        .name(newFileName + ".pdf")
+                        .original(originalFilename)
+                        .path(pdfPath)
+                        .build();
+                fileRepository.save(employee_file);
+
+                file.transferTo(new File(pdfPath));
+                return newFileName + ".pdf";
+            }
+            // 이미지 파일이면 PDF로 변환
+            if (isImageFile(extension)) {
+                return convertImageToPdf(file, newFileName, member);
+            }
+            // 지원하지 않는 파일 형식
+            throw new IllegalArgumentException("지원하지 않는 파일 형식입니다. (지원 형식: PDF, JPG, PNG, JPEG)");
+        } catch (Exception e) {
+            throw new RuntimeException("파일 처리 중 오류가 발생했습니다.", e);
+        }
+    }
+
+    private String convertImageToPdf(MultipartFile file, String newFileName, Member member) throws IOException {
+        PDDocument document = new PDDocument();
+        try {
+            PDPage page = new PDPage();
+            document.addPage(page);
+            PDImageXObject image = PDImageXObject.createFromByteArray(document,
+                    file.getBytes(), file.getOriginalFilename());
+
+            PDPageContentStream contentStream = new PDPageContentStream(document, page);
+            // 이미지 크기 조정
+            float scale = Math.min(
+                    page.getMediaBox().getWidth() / image.getWidth(),
+                    page.getMediaBox().getHeight() / image.getHeight()
+            );
+
+            contentStream.drawImage(image, 0, 0,
+                    image.getWidth() * scale,
+                    image.getHeight() * scale);
+            contentStream.close();
+            String pdfPath = uploadPath + newFileName + ".pdf";
+            document.save(pdfPath);
+
+            Employee_File employee_file = Employee_File.builder()
+                    .member(member)
+                    .name(newFileName + ".pdf")
+                    .original(file.getOriginalFilename())
+                    .path(pdfPath)
+                    .build();
+            fileRepository.save(employee_file);
+
+            return newFileName + ".pdf";
+        } finally {
+            document.close();
+        }
+    }
 
 
     // 이미지 파일 업로드 처리
-    public String uploadProfileImage(MultipartFile file, Employee employee) {
+    public String uploadProfileImage(MultipartFile file, Member member) {
         try {
             String originalFilename = file.getOriginalFilename();
             String extension =
@@ -132,7 +198,7 @@ public class FileService {
 
             // 파일 정보 저장
             Employee_File employee_file = Employee_File.builder()
-                    .employee(employee)
+                    .member(member)
                     .name(newFileName)
                     .original(originalFilename)
                     .path(imagePath)
