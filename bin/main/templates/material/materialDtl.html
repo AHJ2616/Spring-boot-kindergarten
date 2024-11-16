@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/header}">
+<head>
+    <meta charset="UTF-8">
+    <title>상세보기 페이지</title>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+<body>
+<!--jQuery에서 제공하는 3.5.1 버전의 jQuery CDN 호스트-->
+<script src="http://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+<!-- 아이템 디테일 페이지 -->
+<!-- 사용자 스크립트 추가 -->
+<th:block layout:fragment="script">
+
+</th:block>
+
+<!-- 사용자 CSS 추가 -->
+<th:block layout:fragment="css">
+    <style>
+        .mgb-15{
+            margin-bottom:15px;
+        }
+        .mgt-30{
+            margin-top:30px;
+        }
+        .mgt-50{
+            margin-top:50px;
+        }
+        .repImgDiv{
+            margin-right:15px;
+            height:auto;
+            width:50%;
+        }
+        .repImg{
+            width:100%;
+            height:400px;
+        }
+        .wd50{
+            height:auto;
+            width:50%;
+        }
+    </style>
+</th:block>
+
+<div layout:fragment="content" style="margin-left:25%;margin-right:25%">
+
+    <input type="hidden" id="materialId" th:value="${material.id}">
+
+    <div class="d-flex">
+<!--        <div class="repImgDiv">
+            <img th:src="${material.materialImgDTOList[0].materialImgUrl}" class = "rounded repImg" th:alt="${material.material_name}">
+        </div>-->
+
+        <div class="repImgDiv">
+            <img th:if="${material.materialImgDTOList != null and material.materialImgDTOList.size() > 0}"
+                 th:src="${material.materialImgDTOList[0].materialImgUrl}" class="rounded repImg"
+                 th:alt="${material.material_name}">
+        </div>
+
+        <div class="wd50">
+
+            <span th:switch="${material.materialStatus}">
+              <span th:case="${T(com.kinder.kindergarten.constant.Material.MaterialStatus).NORMAL}" class="badge badge-primary mgb-15">정상</span>
+              <span th:case="${T(com.kinder.kindergarten.constant.Material.MaterialStatus).REPAIR}" class="badge btn-danger mgb-15">수리중</span>
+              <span th:case="${T(com.kinder.kindergarten.constant.Material.MaterialStatus).BREAKAGE}" class="badge btn-danger mgb-15">파손</span>
+              <span th:case="*">상태 미정</span> <!-- 예외 처리 -->
+          </span>
+            <div class="h4" th:text="${material.material_name}"></div>
+            <hr class="my-4">
+
+            <div class="text-right">
+                <div class="h4 text-danger text-left">
+                    <span th:text="${material.material_regdate}"></span>
+                </div>
+            </div>
+            <hr class="my-4">
+        </div>
+    </div>
+
+    <div class="jumbotron jumbotron-fluid mgt-30">
+        <div class="container">
+            <h4 class="display-5">자재 상세 설명</h4>
+            <hr class="my-4">
+            <p class="lead" th:text="${material.material_detail}"></p>
+        </div>
+    </div>
+
+    <!-- 등록된 상품 이미지를 반복 구문을 통해 보여줌   -->
+    <div th:each="materialImg : ${material.materialImgDTOList}" class="text-center">
+        <img th:if="${not #strings.isEmpty(materialImg.materialImgUrl)}" th:src="${materialImg.materialImgUrl}" class="rounded mgb-15" width="800">
+    </div>
+
+</div>
+
+
+</body>
+</html>

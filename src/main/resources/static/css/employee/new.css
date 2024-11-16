@@ -1,0 +1,91 @@
+/* 기본적인 스타일링 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+}
+
+/* 전체 컨테이너 */
+.container {
+    width: 50%;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+/* 제목 스타일 */
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+}
+
+/* 폼 그룹 */
+.form-group {
+    margin-bottom: 10px;
+}
+
+label {
+    display: block;
+    font-size: 16px;
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+/* 입력 필드 스타일 */
+input, select, button {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+input:focus, select:focus, button:focus {
+    border-color: #4CAF50;
+    outline: none;
+}
+
+/* 입력 필드 기본 스타일 */
+input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="date"], select {
+    background-color: #f9f9f9;
+}
+
+/* 버튼 스타일 */
+button {
+    background-color: #4CAF50;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    padding: 15px;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+/* 오류 메시지 스타일 */
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+/* 추가적인 스타일 */
+input[type="text"]:disabled, input[type="email"]:disabled, input[type="password"]:disabled, input[type="number"]:disabled, input[type="date"]:disabled, select:disabled {
+    background-color: #e9e9e9;
+    cursor: not-allowed;
+}

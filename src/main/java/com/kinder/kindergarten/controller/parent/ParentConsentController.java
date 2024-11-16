@@ -26,6 +26,8 @@ public class ParentConsentController {
                                     @RequestParam(required = false) Boolean communityAgreed,
                                     @RequestParam(required = false) Boolean privacyAgreed,
                                     Model model) {
+        // 서비스 이용약관, 커뮤니티 동의서, 개인정보 동의서 페이지를 보여주는 메서드
+
         try {
             ParentConsentDTO consentDTO = new ParentConsentDTO();
 
@@ -41,29 +43,34 @@ public class ParentConsentController {
             }
 
             model.addAttribute("consent", consentDTO);
+            // consentDTO를 모델에 담아서 뷰로 전달
+
             return "parent/consent/consentForm";
+
         } catch (Exception e) {
+
             log.error("동의서 폼 로딩 중 에러 발생: ", e);
             return "error/500";
-        }
+        }// 동의서 로딩 중 에러가 발생하면 500에러로 리턴
     }
 
-    // 약관 동의 처리
     @PostMapping("/submit")
     public String submitConsent(@Valid @ModelAttribute ParentConsentDTO consentDTO,
                                 BindingResult bindingResult,
                                 RedirectAttributes redirectAttributes) {
+        // 약관, 동의서에서 제출 처리 컨트롤러 메서드
+
         if (bindingResult.hasErrors()) {
             return "parent/consent/consentForm";
-        }
+        }// 유효성 검사 실패 시 폼으로 리턴
 
         try {
-            // 필수 약관 동의 확인
+
             if (!isRequiredConsentsChecked(consentDTO)) {
                 redirectAttributes.addFlashAttribute("errorMessage",
                         "필수 약관에 모두 동의해주셔야 합니다.");
                 return "redirect:/consent";
-            }
+            } // 필수 약관 동의 확인
 
             // 동의서 저장
             parentConsentService.createConsent(consentDTO);
@@ -78,32 +85,79 @@ public class ParentConsentController {
         }
     }
 
-    // 약관 내용 보기
     @GetMapping("/terms")
     public String showTerms() {
+        // ERP 시스템 및 커뮤니티 서비스 이용 약관 페이지 내용 보기 메서드
+
         return "parent/consent/terms";
     }
 
     @GetMapping("/community")
     public String showCommunity() {
+        // 학부모 커뮤니티 활동 동의서 페이지 내용 보기 메서드
+
         return "parent/consent/community";
     }
 
     @GetMapping("/privacy")
     public String showPrivacy() {
+        // 학부모 개인정보 및 제3자 제공 동의서 내용 보기 메서드
+
         return "parent/consent/privacy";
+    }
+
+    @GetMapping("/photo")
+    public String showPhoto() {
+        // 사진 및 영상 촬영/활용 동의서 내용 보기 메서드
+
+        return "parent/consent/photo";
+    }
+
+    @GetMapping("/medical")
+    public String showMedical() {
+        // 의료 정보 활용 동의서 내용보기 메서드
+
+        return "parent/consent/medicalInfo";
+    }
+
+    @GetMapping("/emergency")
+    public String showEmergency() {
+        // 비상 연락망 및 응급 상황 동의서 내용보기 메서드
+
+        return "parent/consent/emergencyInfo";
     }
 
     // 동의 완료 페이지
     @GetMapping("/success")
     public String showSuccessPage() {
+        // 동의 완료한 페이지 보여주는 메서드
+
         return "parent/consent/success";
     }
 
-    // 필수 약관 동의 확인
     private boolean isRequiredConsentsChecked(ParentConsentDTO consentDTO) {
+        // 필수 약관 동의 여부를 확인하는 메서드
+
         return consentDTO.getTermsConsent() != null && consentDTO.getTermsConsent() &&
                 consentDTO.getCommunityConsent() != null && consentDTO.getCommunityConsent() &&
                 consentDTO.getPrivateConsent() != null && consentDTO.getPrivateConsent();
+    }
+
+    @GetMapping("/second")
+    public String showSecondConsentForm(Model model) {
+        // 학부모 동의서 2단계 페이지 열어주는 컨트롤러 메세지
+
+        try {
+            ParentConsentDTO consentDTO = new ParentConsentDTO();
+
+            model.addAttribute("consent", consentDTO);
+
+            return "parent/consent/consentFormSecond";
+
+        } catch (Exception e) {
+
+            log.error("학부모 동의서 2단계 로딩 중 에러 발생" + e);
+            return "error/500";
+        }
     }
 }
