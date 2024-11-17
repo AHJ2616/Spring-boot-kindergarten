@@ -45,7 +45,6 @@ public class SecurityConfig{
                     // 로그인페이지 허용
                     .requestMatchers("/main/login", "/employee/new").permitAll()
                     .requestMatchers("/erp/**").permitAll()
-                    .requestMatchers("/consent", "/consent/**").permitAll()
 
                     // 본인 작업 경로 적어주시면 됩니다.
                     .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자만 /admin/** 경로 접근 가능
@@ -53,6 +52,7 @@ public class SecurityConfig{
                     .requestMatchers("/teacher/**").hasRole("USER") // 사용자만 /teacher/** 경로 접근 가능
                     .requestMatchers("/employee/**").hasAnyRole("ADMIN", "MANAGER", "USER") // 직원은 모든 역할 접근 가능
                     .requestMatchers("/parent/**").hasRole("Parent")
+                    .requestMatchers("/consent", "/consent/**").permitAll()
                     .requestMatchers("/erp/**").hasAnyRole("ADMIN", "MANAGER")  // ERP 접근 권한 추가
                     .requestMatchers("/money/**").hasAnyRole("ADMIN", "MANAGER", "USER") // 2024 11 11 회계 관리 추가
                     .requestMatchers("/material/**").hasAnyRole("ADMIN", "MANAGER", "USER") // 2024 11 11 자재 관리 추가

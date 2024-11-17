@@ -54,10 +54,24 @@
     <h3 class="mb-4">학부모 동의서 2단계</h3>
 
     <form th:action="@{/consent/submit}" method="post" th:object="${consent}">
+        <!-- 이전 동의 상태를 hidden input으로 유지 -->
+        <input type="hidden" name="previousConsents" th:value="${previousConsents}">
+
+        <div class="consent-item mb-4">
+            <label class="d-flex align-items-center">
+                <input type="checkbox" id="allConsent" class="me-2" onchange="handleAllConsent()">
+                <strong>모두 동의합니다.</strong>
+            </label>
+            <small class="text-muted d-block mt-1">
+                사진 및 영상 촬영/활용 동의, 의료 정보 활용 동의, 비상 연락망 및 응급 상황 동의에 대해 모두 동의합니다.
+                각 사항에 대한 동의 여부를 개별적으로 선택하실 수 있으며 동의 하지 않을 시 불이익은 없으나 서비스 이용에 제한이 될 수 있습니다.
+            </small>
+        </div>
+
         <!-- 사진 및 영상 촬영/활용 동의 -->
         <div class="consent-item">
-            <span class="consent-status" th:classappend="${consent.photoConsent} ? 'status-agreed' : 'status-pending'"
-                  th:text="${consent.photoConsent} ? '동의완료' : '미동의'">미동의</span>
+    <span class="consent-status" th:classappend="${consent.photoConsent} ? 'status-agreed' : 'status-pending'"
+          th:text="${consent.photoConsent} ? '동의완료' : '미동의'">미동의</span>
             <label>
                 <input type="checkbox" th:field="*{photoConsent}" required>
                 사진 및 영상 촬영/활용 동의 <span class="required">*</span>
@@ -73,8 +87,8 @@
 
         <!-- 의료 정보 활용 동의 -->
         <div class="consent-item">
-            <span class="consent-status" th:classappend="${consent.medicalInfoConsent} ? 'status-agreed' : 'status-pending'"
-                  th:text="${consent.medicalInfoConsent} ? '동의완료' : '미동의'">미동의</span>
+    <span class="consent-status" th:classappend="${consent.medicalInfoConsent} ? 'status-agreed' : 'status-pending'"
+          th:text="${consent.medicalInfoConsent} ? '동의완료' : '미동의'">미동의</span>
             <label>
                 <input type="checkbox" th:field="*{medicalInfoConsent}" required>
                 의료 정보 활용 동의 <span class="required">*</span>
@@ -90,8 +104,8 @@
 
         <!-- 비상 연락망 및 응급 상황 동의 -->
         <div class="consent-item">
-            <span class="consent-status" th:classappend="${consent.emergencyInfoConsent} ? 'status-agreed' : 'status-pending'"
-                  th:text="${consent.emergencyInfoConsent} ? '동의완료' : '미동의'">미동의</span>
+    <span class="consent-status" th:classappend="${consent.emergencyInfoConsent} ? 'status-agreed' : 'status-pending'"
+          th:text="${consent.emergencyInfoConsent} ? '동의완료' : '미동의'">미동의</span>
             <label>
                 <input type="checkbox" th:field="*{emergencyInfoConsent}" required>
                 비상 연락망 및 응급 상황 동의 <span class="required">*</span>

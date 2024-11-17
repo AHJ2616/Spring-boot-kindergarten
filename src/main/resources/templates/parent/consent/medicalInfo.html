@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>의료 정보 활용 동의서</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .terms-container {
@@ -28,66 +27,15 @@
             font-size: 1.2rem;
             font-weight: bold;
         }
-        .terms-content {
-            line-height: 1.8;
-            color: #2c3e50;
-        }
-        .terms-content p {
-            margin-bottom: 15px;
-            padding-left: 10px;
-        }
-        .terms-content ul {
-            padding-left: 30px;
-            margin-bottom: 20px;
-        }
-        .terms-content li {
-            margin-bottom: 10px;
-        }
     </style>
 </head>
 <body>
 <div class="terms-container">
-    <h2 class="terms-title">의료 정보 활용 동의서 v.1.0.0</h2>
-
-    <!-- 요약본 -->
+    <h2 class="terms-title">의료 정보 활용 동의서</h2>
     <div class="terms-summary">
-        <h4 class="section-title">주요 내용 요약</h4>
-        <ul>
-            <li class="section-title">1. 수집 항목</li>
-            <p>• 원아 이름, 연락처, 알레르기 정보, 병력, 복용 약물.</p>
-        </ul>
-
-        <ul>
-            <li class="section-title">2. 활용 목적</li>
-            <p>• 원아 건강 관리, 응급 상황 시 의료 지원, 안전 확보.</p>
-        </ul>
-
-        <ul>
-            <li class="section-title">3. 제공받는 기관</li>
-            <p>• 응급 병원, 학교 지정 의료 기관, 보건소.</p>
-        </ul>
-
-        <ul>
-            <li class="section-title">4. 활용 시나리오</li>
-            <p>• 응급 상황 발생 시 정보 전달 및 신속 대처.</p>
-        </ul>
-
-        <ul>
-            <li class="section-title">5. 보관 기간</li>
-            <p>• 원아 재학 기간 중 보관, 퇴학 후 6개월 이내 파기.</p>
-        </ul>
-
-        <ul>
-            <li class="section-title">추가 안내</li>
-            <p>• 동의하지 않을 경우 응급 상황 대처에 제한이 있을 수 있습니다.</p>
-        </ul>
-
-        <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#medicalInfoModal">
-            전체 약관 보기
-        </button>
+        <!-- 내용 요약 -->
     </div>
 
-    <!-- 동의 버튼 그룹 추가 -->
     <div class="d-flex justify-content-center gap-3 mt-4">
         <button type="button" class="btn btn-primary" style="width: 150px;" onclick="agreeAndReturn()">
             동의함
@@ -96,74 +44,8 @@
             동의하지 않음
         </button>
     </div>
+</div>
 
-    <!-- 동의 관련 안내문 추가 -->
-    <div class="text-center mt-3">
-        <small class="text-muted">
-            서비스 이용을 위해서는 약관에 동의해주셔야 합니다.
-        </small>
-    </div>
-
-    <div class="modal fade" id="medicalInfoModal" tabindex="-1" aria-labelledby="medicalInfoModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="medicalInfoModalLabel">의료 정보 활용 동의서 v.1.0.0</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="terms-content">
-                        <h3 class="section-title">수집 및 관리 항목</h3>
-                        <p>원아의 의료 정보는 다음과 같은 항목을 포함합니다:</p>
-                        <p>필수 항목: 원아 이름, 생년월일, 연락처, 학부모 정보.</p>
-                        <p>의료 정보</p>
-                        <ul>
-                            <li>📌알레르기 정보(예: 특정 음식, 약물 등).</li>
-                            <li>📌병력 및 치료 이력(예: 천식, 당뇨 등).</li>
-                            <li>📌현재 복용 중인 약물.</li>
-                        </ul>
-
-                        <h3 class="section-title">활용 목적:</h3>
-                        <p>수집된 의료 정보는 아래의 목적으로 활용됩니다:</p>
-                        <ul>
-                            <li>📌원아 건강 상태 파악 및 관리.</li>
-                            <li>📌응급 상황 시 신속한 의료 지원 제공.</li>
-                            <li>📌보육 및 교육 환경에서 원아의 안전 확보.</li>
-                        </ul>
-
-                        <h3 class="section-title">의료 정보 제공받는 기관</h3>
-                        <p>원아의 의료 정보는 아래 기관 및 단체에 제공될 수 있습니다:</p>
-                        <ul>
-                            <li>📌응급 병원 및 의료진: 응급 상황에서 적절한 치료 제공.</li>
-                            <li>📌지정한 의료 기관: 정기 건강검진 및 상담.</li>
-                            <li>📌교육청 및 보건소: 감염병 등 관련된 보건 관리 필요 시.</li>
-                        </ul>
-
-                        <h3 class="section-title">활용 시나리오</h3>
-                        <ul>
-                            <li>📌원아가 알레르기로 인해 응급 치료가 필요한 경우, 의료 정보를 의료진에게 제공하여 신속한 조치.</li>
-                            <li>📌원아의 기존 병력을 바탕으로 적절한 응급 처치 방법 결정.</li>
-                            <li>📌감염병이나 단체 질환 발생 시 보건소와 협력하여 대처.</li>
-                        </ul>
-
-                        <h3 class="section-title">보관 및 관리</h3>
-                        <ul>
-                            <li>📌의료 정보는 ERP 시스템(학교 관리 시스템)을 통해 암호화되어 안전하게 보관됩니다.</li>
-                            <li>📌보관 기간은 원아 재학 기간 중으로 한정되며, 퇴학 후 6개월 이내에 파기합니다.</li>
-                        </ul>
-
-                        <h3 class="section-title">동의 여부</h3>
-                        <p>학부모님은 의료 정보 제공 및 활용 동의를 거부할 수 있으나, 동의하지 않을 경우 응급 상황 대처가 어려울 수 있습니다.</p>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/consent/consent.js"></script>
 </body>
