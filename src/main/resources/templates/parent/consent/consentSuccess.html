@@ -76,8 +76,8 @@
 
     <div class="link-cards">
         <!-- 메인 페이지 링크 -->
-        <a href="/" class="link-card shadow-sm">
-            <img src="/images/main-page.jpg" alt="메인 페이지" class="card-image">
+        <a href="/" class="link-card">
+            <img th:src="@{/images/happy.png}" alt="메인 페이지" class="card-image">
             <h3 class="card-title">메인 페이지로 이동</h3>
             <p class="card-description">
                 유치원의 다양한 소식과 정보를<br>
@@ -86,13 +86,14 @@
         </a>
 
         <!-- 입학 시스템 링크 -->
-        <a href="/admission" class="link-card shadow-sm">
-            <img src="/images/admission.jpg" alt="입학 시스템" class="card-image">
+        <a href="/" class="link-card">
+            <img th:src="@{/images/cow.jpg}" alt="입학 시스템" class="card-image">
             <h3 class="card-title">입학 신청하기</h3>
             <p class="card-description">
                 입학 및 대기 신청을<br>
                 진행하실 수 있습니다.
             </p>
+            <p> * 서비스 구현 예정 중 * </p>
         </a>
     </div>
 </div>

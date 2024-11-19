@@ -29,8 +29,8 @@ public class ParentConsent {
 
     private Boolean emergencyInfoConsent;   // 비상 연락망 및 응급 상황 동의서
 
-    @OneToOne
-    @JoinColumn(name = "parentId")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
     private Parent parent;  // 학부모 엔티티와의 1:1 관계 매핑
 
     /*

@@ -2,6 +2,7 @@ package com.kinder.kindergarten.controller.parent;
 
 import com.kinder.kindergarten.DTO.parent.ParentConsentDTO;
 import com.kinder.kindergarten.DTO.parent.ParentInfoDTO;
+import com.kinder.kindergarten.entity.parent.Parent;
 import com.kinder.kindergarten.service.parent.ParentConsentService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -181,7 +183,10 @@ public class ParentConsentController {
                                  BindingResult bindingResult,
                                  HttpSession session,
                                  RedirectAttributes redirectAttributes) {
+        log.info("registerParent 호출됨. parentInfoDTO: {}", parentInfoDTO);
+
         if (bindingResult.hasErrors()) {
+            log.error("Validation errors: {}", bindingResult.getAllErrors());
             return "parent/consent/parentInfo";
         }
 
@@ -192,12 +197,16 @@ public class ParentConsentController {
                 throw new IllegalStateException("동의 정보가 없습니다.");
             }
 
+            log.info("동의 정보 확인: {}", consentDTO);  // 동의 정보 로그
+
+
             // 학부모 정보와 동의 정보 함께 저장
             parentConsentService.saveParentInfoAndConsent(parentInfoDTO, consentDTO);
 
             // 세션의 동의 정보 제거
             session.removeAttribute("finalConsent");
 
+            log.info("학부모 등록 완료");
             return "redirect:/consent/consent-success";
         } catch (Exception e) {
             log.error("학부모 등록 중 에러 발생: ", e);
@@ -222,6 +231,56 @@ public class ParentConsentController {
         } catch (Exception e) {
             response.put("error", "이메일 중복 확인 중 오류가 발생했습니다.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    // 학부모 승인 관리 페이지
+    @GetMapping("/admin/requests")
+    public String listRegistrationRequests(Model model) {
+        List<Parent> pendingRequests = parentConsentService.getPendingRegistrations();
+        log.info("Pending requests: {}", pendingRequests);
+        model.addAttribute("requests", pendingRequests);
+        return "parent/consent/registrationRequests";
+    }
+
+    // 승인 처리
+    @PostMapping("/admin/approve/{parentId}")
+    @ResponseBody
+    public ResponseEntity<?> approveRegistration(@PathVariable Long parentId) {
+        try {
+            parentConsentService.approveRegistration(parentId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            log.error("승인 처리 중 오류 발생: ", e);
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // 반려 처리
+    @PostMapping("/admin/reject/{parentId}")
+    @ResponseBody
+    public ResponseEntity<?> rejectRegistration(
+            @PathVariable Long parentId,
+            @RequestParam String reason) {
+        try {
+            parentConsentService.rejectRegistration(parentId, reason);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            log.error("반려 처리 중 오류 발생: ", e);
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // 상세 정보 조회
+    @GetMapping("/admin/request-details/{parentId}")
+    @ResponseBody
+    public ResponseEntity<?> getRequestDetails(@PathVariable Long parentId) {
+        try {
+            Parent parent = parentConsentService.getParentDetails(parentId);
+            return ResponseEntity.ok(parent);
+        } catch (Exception e) {
+            log.error("상세 정보 조회 중 오류 발생: ", e);
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 }

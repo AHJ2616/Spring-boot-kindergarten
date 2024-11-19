@@ -3,6 +3,7 @@ package com.kinder.kindergarten.service.parent;
 
 import com.kinder.kindergarten.DTO.parent.ParentConsentDTO;
 import com.kinder.kindergarten.DTO.parent.ParentInfoDTO;
+import com.kinder.kindergarten.constant.parent.RegistrationStatus;
 import com.kinder.kindergarten.entity.parent.Parent;
 import com.kinder.kindergarten.entity.parent.ParentConsent;
 import com.kinder.kindergarten.repository.parent.ParentConsentRepository;
@@ -13,6 +14,8 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -160,8 +163,11 @@ public class ParentConsentService {
 
     @Transactional
     public void saveParentInfoAndConsent(ParentInfoDTO parentInfoDTO, ParentConsentDTO consentDTO) {
+
         try {
-            // Parent 엔티티 생성 및 저장
+            log.info("Starting to save parent info and consent...");
+            // Parent 엔티티 생성 및 저장 ( DB 진입 전 대기 상태)
+
             Parent parent = Parent.builder()
                     .parentEmail(parentInfoDTO.getParentEmail())
                     .parentName(parentInfoDTO.getParentName())
@@ -169,9 +175,13 @@ public class ParentConsentService {
                     .childrenEmergencyPhone(parentInfoDTO.getChildrenEmergencyPhone())
                     .parentAddress(parentInfoDTO.getParentAddress())
                     .detailAddress(parentInfoDTO.getDetailAddress())
+                    .registrationStatus(RegistrationStatus.PENDING)
+                    .isErpRegistered(false)
                     .build();
 
+            log.info("Creating new parent with status: {}", parent.getRegistrationStatus());
             parent = parentRepository.save(parent);
+            log.info("Saved parent with ID: {} and status: {}", parent.getParentId(), parent.getRegistrationStatus());
 
             // ParentConsent 엔티티 생성 및 저장
             ParentConsent consent = ParentConsent.builder()
@@ -185,6 +195,12 @@ public class ParentConsentService {
                     .build();
 
             parentConsentRepository.save(consent);
+            log.info("Saved consent for parent ID: {}", parent.getParentId());
+
+            Parent savedParent = parentRepository.findById(parent.getParentId()).orElse(null);
+            if (savedParent != null) {
+                log.info("Verified saved parent status: {}", savedParent.getRegistrationStatus());
+            }
         } catch (Exception e) {
             log.error("학부모 정보 및 동의 정보 저장 중 오류 발생: ", e);
             throw new RuntimeException("학부모 정보 저장에 실패했습니다.", e);
@@ -208,5 +224,55 @@ public class ParentConsentService {
                 .communityConsent(consent.getCommunityConsent())
                 .parentId(consent.getParentConsentId())
                 .build();
+    }
+
+    public List<Parent> getPendingRegistrations() {
+        // 동의서 페이지에서 학부모 정보를 등록한 학부모 대기 중인 목록 조회
+        log.info("Fetching pending registrations...");
+
+        List<Parent> pendingList = parentRepository.findByRegistrationStatus(RegistrationStatus.PENDING);
+        log.info("Found {} pending registrations", pendingList.size());
+        pendingList.forEach(parent ->
+                log.info("Pending parent - ID: {}, Email: {}, Status: {}",
+                        parent.getParentId(),
+                        parent.getParentEmail(),
+                        parent.getRegistrationStatus())
+        );
+        return pendingList;
+
+    }
+
+    @Transactional
+    public void approveRegistration(Long parentId) {
+        // 대기 중인 학부모를 승인 처리 하는 메서드
+
+        Parent parent = parentRepository.findById(parentId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 학부모를 찾을 수 없습니다."));
+
+        parent.setRegistrationStatus(RegistrationStatus.APPROVED);
+        parent.setApprovedAt(LocalDateTime.now());
+        parent.setApprovedBy("관리자");
+
+        parentRepository.save(parent);
+        log.info("학부모 승인 완료" + parentId);
+    }
+
+    @Transactional
+    public void rejectRegistration(Long parentId, String reason) {
+        Parent parent = parentRepository.findById(parentId).orElseThrow(()
+        -> new EntityNotFoundException("해당 학부모를 찾을 수 없습니다."));
+
+        parent.setRegistrationStatus(RegistrationStatus.REJECTED);
+        parent.setRejectReason(reason);
+
+        parentRepository.save(parent);
+        log.info("학부모 반려 완료, 사유 : " + parent, reason);
+
+    }
+
+    public Parent getParentDetails(Long parentId) {
+
+        return parentRepository.findById(parentId)
+                .orElseThrow(() -> new EntityNotFoundException("학부모를 찾을 수 없습니다."));
     }
 }

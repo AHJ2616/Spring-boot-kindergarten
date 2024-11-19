@@ -57,6 +57,7 @@ public class SecurityConfig{
                     .requestMatchers("/money/**").hasAnyRole("ADMIN", "MANAGER", "USER") // 2024 11 11 회계 관리 추가
                     .requestMatchers("/material/**").hasAnyRole("ADMIN", "MANAGER", "USER") // 2024 11 11 자재 관리 추가
                     .requestMatchers("/**", "/board/**", "/item/**", "/images/**").permitAll()
+                    .requestMatchers("/consent/admin/**").hasRole("ADMIN")  // 관리자 권한 필요(테스트를 위해 잠시 설정 -학부모)
                     .anyRequest().authenticated()
             )
             .formLogin(form -> form

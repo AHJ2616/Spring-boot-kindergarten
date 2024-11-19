@@ -32,6 +32,7 @@
       color: #6c757d;
       font-size: 0.875rem;
       margin-left: 5px;
+    }
 
     .registration-guide {
       background-color: #f8f9fa;
@@ -154,9 +155,9 @@
     <div class="form-section">
       <h4 class="mb-4">로그인 정보</h4>
       <div class="form-group">
-        <label for="email">이메일<span class="required-mark">*</span></label>
+        <label for="parentEmail">이메일<span class="required-mark">*</span></label>
         <div class="input-group">
-          <input type="email" class="form-control" id="email" name="email" required>
+          <input type="email" class="form-control" id="parentEmail" name="parentEmail" required>
           <button type="button" class="btn btn-outline-primary" onclick="checkEmailDuplicate()">중복확인</button>
         </div>
         <div class="form-text" id="emailHelp">로그인 시 사용할 이메일 주소를 입력해주세요.</div>
@@ -167,8 +168,8 @@
     <div class="form-section">
       <h4 class="mb-4">학부모 개인정보</h4>
       <div class="form-group">
-        <label for="name">성함<span class="required-mark">*</span></label>
-        <input type="text" class="form-control" id="name" name="name" required>
+        <label for="parentName">성함<span class="required-mark">*</span></label>
+        <input type="text" class="form-control" id="parentName" name="parentName" required>
       </div>
 
       <div class="form-group">
@@ -183,11 +184,9 @@
             <option value="019">019</option>
           </select>
           <span class="input-group-text">-</span>
-          <input type="text" class="form-control" id="phone2" maxlength="4"
-                 oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+          <input type="text" class="form-control" id="phone2" maxlength="4">
           <span class="input-group-text">-</span>
-          <input type="text" class="form-control" id="phone3" maxlength="4"
-                 oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+          <input type="text" class="form-control" id="phone3" maxlength="4">
           <input type="hidden" name="parentPhone" id="parentPhone">
         </div>
       </div>
@@ -204,23 +203,21 @@
             <option value="019">019</option>
           </select>
           <span class="input-group-text">-</span>
-          <input type="text" class="form-control" id="emergency2" maxlength="4"
-                 oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+          <input type="text" class="form-control" id="emergency2" maxlength="4">
           <span class="input-group-text">-</span>
-          <input type="text" class="form-control" id="emergency3" maxlength="4"
-                 oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+          <input type="text" class="form-control" id="emergency3" maxlength="4">
           <input type="hidden" name="childrenEmergencyPhone" id="childrenEmergencyPhone">
         </div>
         <div class="form-text">비상시 연락 가능한 다른 연락처를 입력해주세요.</div>
       </div>
 
       <div class="form-group">
-        <label for="postcode">주소<span class="required-mark">*</span></label>
+        <label for="parentAddress">주소<span class="required-mark">*</span></label>
         <div class="input-group mb-2">
-          <input type="text" class="form-control" id="postcode" name="postcode" placeholder="우편번호" readonly required>
+          <input type="text" class="form-control" id="postcode" placeholder="우편번호" readonly>
           <button type="button" class="btn btn-outline-primary" onclick="searchAddress()">주소 검색</button>
         </div>
-        <input type="text" class="form-control mb-2" id="address" name="address" placeholder="기본주소" readonly required>
+        <input type="text" class="form-control mb-2" id="parentAddress" name="parentAddress" placeholder="기본주소" readonly required>
         <input type="text" class="form-control" id="detailAddress" name="detailAddress" placeholder="상세주소">
       </div>
     </div>
@@ -228,8 +225,9 @@
     <!-- 버튼 그룹 -->
     <div class="d-flex justify-content-between mt-4">
       <button type="button" class="btn btn-secondary" onclick="history.back()">이전</button>
-      <button type="submit" class="btn btn-primary">가입 완료</button>
+      <button type="submit" class="btn btn-primary" onclick="return validateAndSubmit()">가입 완료</button>
     </div>
+
   </form>
 </div>
 
@@ -240,9 +238,9 @@
 <script>
   // 이메일 중복 확인
   function checkEmailDuplicate() {
-    const email = document.getElementById('email').value;
+    const email = document.getElementById('parentEmail').value;
     const emailHelp = document.getElementById('emailHelp');
-    const emailInput = document.getElementById('email');
+    const emailInput = document.getElementById('parentEmail');
 
     // 이메일 형식 검증
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -278,34 +276,40 @@
     new daum.Postcode({
       oncomplete: function(data) {
         document.getElementById('postcode').value = data.zonecode;
-        document.getElementById('address').value = data.address;
+        document.getElementById('parentAddress').value = data.address;
         document.getElementById('detailAddress').focus();
       }
     }).open();
   }
 
-  // 폼 제출 전 유효성 검사
-  document.getElementById('parentInfoForm').addEventListener('submit', function(e) {
-    const emailHelp = document.getElementById('emailHelp');
-    if (emailHelp.className.includes('text-danger')) {
-      e.preventDefault();
-      alert('이메일 중복 확인이 필요하거나 중복된 이메일입니다.');
-      return false;
-    }
-  });
-
+  // 폼 제출 처리
   document.getElementById('parentInfoForm').addEventListener('submit', function(e) {
     e.preventDefault();
 
-    // 휴대폰 번호 조합
-    const phone1 = document.getElementById('phone1').value;
+    // 필수 필드 검증
+    const email = document.getElementById('parentEmail').value;
+    const name = document.getElementById('parentName').value;
     const phone2 = document.getElementById('phone2').value;
     const phone3 = document.getElementById('phone3').value;
-    if (phone2 && phone3) {
-      document.getElementById('parentPhone').value = `${phone1}-${phone2}-${phone3}`;
+    const address = document.getElementById('parentAddress').value;
+
+    if (!email || !name || !phone2 || !phone3 || !address) {
+      alert('모든 필수 항목을 입력해주세요.');
+      return false;
     }
 
-    // 비상연락처 조합 (선택사항이므로 모든 필드가 채워진 경우에만 저장)
+    // 이메일 중복 확인 상태 검증
+    const emailHelp = document.getElementById('emailHelp');
+    if (emailHelp.className.includes('text-danger')) {
+      alert('이메일 중복 확인이 필요하거나 중복된 이메일입니다.');
+      return false;
+    }
+
+    // 휴대폰 번호 조합
+    const phone1 = document.getElementById('phone1').value;
+    document.getElementById('parentPhone').value = `${phone1}-${phone2}-${phone3}`;
+
+    // 비상연락처 조합 (선택사항)
     const emergency1 = document.getElementById('emergency1').value;
     const emergency2 = document.getElementById('emergency2').value;
     const emergency3 = document.getElementById('emergency3').value;
@@ -313,6 +317,11 @@
       document.getElementById('childrenEmergencyPhone').value =
               `${emergency1}-${emergency2}-${emergency3}`;
     }
+
+    // 로딩 표시
+    const submitBtn = document.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> 처리중...';
 
     // 폼 제출
     this.submit();
@@ -334,8 +343,24 @@
   // 비상연락처 자동 포커스
   setupAutoFocus(document.getElementById('emergency2'), 'emergency3');
 
+  // 숫자만 입력되도록 처리
+  function setupNumberOnly(inputId) {
+    const input = document.getElementById(inputId);
+    if (input) {
+      input.addEventListener('input', function() {
+        this.value = this.value.replace(/[^0-9]/g, '');
+      });
+    }
+  }
+
+  // 숫자만 입력되도록 설정
+  setupNumberOnly('phone2');
+  setupNumberOnly('phone3');
+  setupNumberOnly('emergency2');
+  setupNumberOnly('emergency3');
+
   // 이메일 입력 필드 변경 시 상태 초기화
-  document.getElementById('email').addEventListener('input', function() {
+  document.getElementById('parentEmail').addEventListener('input', function() {
     const emailHelp = document.getElementById('emailHelp');
     emailHelp.textContent = '로그인 시 사용할 이메일 주소를 입력해주세요.';
     emailHelp.className = 'form-text';

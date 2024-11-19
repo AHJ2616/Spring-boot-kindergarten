@@ -1,11 +1,13 @@
 package com.kinder.kindergarten.entity.parent;
 
 import com.kinder.kindergarten.constant.parent.ParentType;
+import com.kinder.kindergarten.constant.parent.RegistrationStatus;
 import com.kinder.kindergarten.entity.children.Children;
 import com.kinder.kindergarten.entity.children.ChildrenBaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -31,7 +33,7 @@ public class Parent extends ChildrenBaseEntity {
   @Column(unique = true, nullable = false)
   private String  parentEmail;    // 학부모 이메일(학부모 구분을 위해 유니크 설정)
 
-  @Column(nullable = false)
+  @Column
   private String parentPassword;   // 학부모 비밀번호
 
   @Column(nullable = false)
@@ -78,11 +80,30 @@ public class Parent extends ChildrenBaseEntity {
   @PrePersist
   @PreUpdate
   public void validateFields() {
-    if (!isErpRegistered && (parentEmail == null || parentPassword == null)) {
-      throw new IllegalStateException("회원가입 시에는 이메일과 비밀번호가 필수입니다.");
+    // ERP 등록이 아닌 경우에는 기본 필수 필드만 검증
+    if (!isErpRegistered) {
+      if (parentEmail == null || parentName == null || parentPhone == null || parentAddress == null) {
+        throw new IllegalStateException("필수 정보가 누락되었습니다.");
+      }
     }
   }
 
+  @Enumerated(EnumType.STRING)
+  @Column(name = "registration_status", nullable = false)
+  @Builder.Default
+  private RegistrationStatus registrationStatus = RegistrationStatus.PENDING;
+
+  @Column(name = "reject_reason")
+  private String rejectReason;
+
+  @Column(name = "approved_at")
+  private LocalDateTime approvedAt;
+
+  @Column(name = "approved_by")
+  private String approvedBy;
+
+  @OneToOne(mappedBy = "parent", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  private ParentConsent parentConsent;  // ParentConsent와의 1:1 관계 추가
 
   /*
   Hibernate:
