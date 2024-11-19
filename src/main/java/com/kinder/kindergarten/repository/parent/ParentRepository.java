@@ -28,4 +28,6 @@ public interface ParentRepository extends JpaRepository<Parent, Long> {
     Page<Parent> findByParentNameContaining(String keyword, Pageable pageable);
     // 학부모 성함으로 검색하는 메서드
 
+    boolean existsByParentEmail(String parentEmail);
+    // 이메일 존재 여부 확인하는 메서드
 }

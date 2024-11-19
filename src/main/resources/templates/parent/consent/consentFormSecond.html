@@ -53,9 +53,11 @@
 <div class="consent-container">
     <h3 class="mb-4">학부모 동의서 2단계</h3>
 
-    <form th:action="@{/consent/submit}" method="post" th:object="${consent}">
-        <!-- 이전 동의 상태를 hidden input으로 유지 -->
-        <input type="hidden" name="previousConsents" th:value="${previousConsents}">
+    <form th:action="@{/consent/submit}" method="post" th:object="${consent}" onsubmit="return prepareAndSubmit()">
+        <!-- 각 동의 항목의 상태를 hidden input으로 추가 -->
+        <input type="hidden" name="photoConsent" id="photoConsent">
+        <input type="hidden" name="medicalInfoConsent" id="medicalInfoConsent">
+        <input type="hidden" name="emergencyInfoConsent" id="emergencyInfoConsent">
 
         <div class="consent-item mb-4">
             <label class="d-flex align-items-center">
@@ -126,14 +128,31 @@
 
         <div class="d-flex justify-content-between mt-4">
             <button type="button" class="btn btn-secondary" onclick="location.href='/consent'">이전 단계</button>
-            <button type="submit" class="btn btn-primary">모두 동의하고 완료하기</button>
+            <button type="submit" class="btn btn-primary" onclick="return prepareAndSubmit()">다음 단계</button>
         </div>
     </form>
 </div>
 
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-<!-- Custom JS -->
 <script src="/js/consent/consent.js"></script>
+<script>
+    function prepareAndSubmit() {
+        // localStorage의 값을 hidden input에 설정
+        document.getElementById('photoConsent').value = localStorage.getItem('photoConsent');
+        document.getElementById('medicalInfoConsent').value = localStorage.getItem('medicalInfoConsent');
+        document.getElementById('emergencyInfoConsent').value = localStorage.getItem('emergencyInfoConsent');
+
+        // 모든 동의가 완료되었는지 확인
+        const allConsented = ['photoConsent', 'medicalInfoConsent', 'emergencyInfoConsent']
+            .every(consent => localStorage.getItem(consent) === 'true');
+
+        if (!allConsented) {
+            alert('모든 항목에 동의해주셔야 다음 단계로 진행할 수 있습니다.');
+            return false;
+        }
+
+        return true;
+    }
+</script>
 </body>
 </html>

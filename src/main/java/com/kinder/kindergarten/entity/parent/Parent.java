@@ -43,6 +43,8 @@ public class Parent extends ChildrenBaseEntity {
   @Column(nullable = false)
   private String parentAddress;  // 학부모 주소
 
+  private String detailAddress; // 상세 주소 -> 11.19 추가
+
   /*@Enumerated(EnumType.STRING)
   private Children_Role childrenRole; // 권한
    */
@@ -80,6 +82,7 @@ public class Parent extends ChildrenBaseEntity {
       throw new IllegalStateException("회원가입 시에는 이메일과 비밀번호가 필수입니다.");
     }
   }
+
 
   /*
   Hibernate:

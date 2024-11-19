@@ -1,6 +1,8 @@
+
 package com.kinder.kindergarten.service.parent;
 
 import com.kinder.kindergarten.DTO.parent.ParentConsentDTO;
+import com.kinder.kindergarten.DTO.parent.ParentInfoDTO;
 import com.kinder.kindergarten.entity.parent.Parent;
 import com.kinder.kindergarten.entity.parent.ParentConsent;
 import com.kinder.kindergarten.repository.parent.ParentConsentRepository;
@@ -59,18 +61,6 @@ public class ParentConsentService {
         return convertToDTO(savedConsent);
     }
 
-    public boolean isAllConsented(ParentConsentDTO consentDTO) {
-        // 모든 동의서, 약관의 필수 동의 항목이 체크 되어있는지 확인하는 메서드
-
-        return consentDTO.getTermsConsent() != null && consentDTO.getTermsConsent() &&
-                consentDTO.getPhotoConsent() != null && consentDTO.getPhotoConsent() &&
-                consentDTO.getCommunityConsent() != null && consentDTO.getCommunityConsent() &&
-                consentDTO.getMedicalInfoConsent() != null && consentDTO.getMedicalInfoConsent() &&
-                consentDTO.getPrivateConsent() != null && consentDTO.getPrivateConsent() &&
-                consentDTO.getEmergencyInfoConsent() != null & consentDTO.getEmergencyInfoConsent();
-
-    }
-
     public boolean hasPartialConsent(Long parentId) {
         // 부분적으로 동의한 항목이 있는지 확인하는 메서드
 
@@ -93,6 +83,118 @@ public class ParentConsentService {
                 parentConsent.getEmergencyInfoConsent();
 
     }
+
+    @Transactional
+    public void saveTemporaryConsent(ParentConsentDTO consentDTO) {
+        try {
+            ParentConsent consent = ParentConsent.builder()
+                    .termsConsent(consentDTO.getTermsConsent())
+                    .photoConsent(consentDTO.getPhotoConsent())
+                    .medicalInfoConsent(consentDTO.getMedicalInfoConsent())
+                    .privateConsent(consentDTO.getPrivateConsent())
+                    .communityConsent(consentDTO.getCommunityConsent())
+                    .emergencyInfoConsent(consentDTO.getEmergencyInfoConsent())
+                    .build();
+
+            parentConsentRepository.save(consent);
+        } catch (Exception e) {
+            log.error("임시 동의 정보 저장 중 오류 발생: ", e);
+            throw new RuntimeException("동의 정보 저장에 실패했습니다.");
+        }
+    }
+
+    @Transactional
+    public void saveFirstStepConsent(ParentConsentDTO consentDTO) {
+        try {
+            ParentConsent consent = new ParentConsent();
+            consent.setTermsConsent(consentDTO.getTermsConsent());
+            consent.setCommunityConsent(consentDTO.getCommunityConsent());
+            consent.setPrivateConsent(consentDTO.getPrivateConsent());
+
+            parentConsentRepository.save(consent);
+        } catch (Exception e) {
+            log.error("첫 번째 단계 동의 정보 저장 중 오류 발생: ", e);
+            throw new RuntimeException("동의 정보 저장에 실패했습니다.");
+        }
+    }
+
+    // 두 번째 단계 동의 정보 저장 메소드 추가
+    @Transactional
+    public void saveSecondStepConsent(ParentConsentDTO consentDTO) {
+        try {
+            ParentConsent consent = new ParentConsent();
+            consent.setPhotoConsent(consentDTO.getPhotoConsent());
+            consent.setMedicalInfoConsent(consentDTO.getMedicalInfoConsent());
+            consent.setEmergencyInfoConsent(consentDTO.getEmergencyInfoConsent());
+
+            parentConsentRepository.save(consent);
+        } catch (Exception e) {
+            log.error("두 번째 단계 동의 정보 저장 중 오류 발생: ", e);
+            throw new RuntimeException("동의 정보 저장에 실패했습니다.");
+        }
+    }
+
+    // 동의 상태 검증 메소드 수정
+    public boolean isAllConsented(ParentConsentDTO consentDTO) {
+        return (consentDTO.getTermsConsent() != null && consentDTO.getTermsConsent()) &&
+                (consentDTO.getPhotoConsent() != null && consentDTO.getPhotoConsent()) &&
+                (consentDTO.getCommunityConsent() != null && consentDTO.getCommunityConsent()) &&
+                (consentDTO.getMedicalInfoConsent() != null && consentDTO.getMedicalInfoConsent()) &&
+                (consentDTO.getPrivateConsent() != null && consentDTO.getPrivateConsent()) &&
+                (consentDTO.getEmergencyInfoConsent() != null && consentDTO.getEmergencyInfoConsent());
+    }
+
+    // 첫 번째 단계 동의 상태만 검증하는 메소드 추가
+    public boolean isFirstStepConsented(ParentConsentDTO consentDTO) {
+        return (consentDTO.getTermsConsent() != null && consentDTO.getTermsConsent()) &&
+                (consentDTO.getCommunityConsent() != null && consentDTO.getCommunityConsent()) &&
+                (consentDTO.getPrivateConsent() != null && consentDTO.getPrivateConsent());
+    }
+
+    // 두 번째 단계 동의 상태만 검증하는 메소드 추가
+    public boolean isSecondStepConsented(ParentConsentDTO consentDTO) {
+        return (consentDTO.getPhotoConsent() != null && consentDTO.getPhotoConsent()) &&
+                (consentDTO.getMedicalInfoConsent() != null && consentDTO.getMedicalInfoConsent()) &&
+                (consentDTO.getEmergencyInfoConsent() != null && consentDTO.getEmergencyInfoConsent());
+    }
+
+    @Transactional
+    public void saveParentInfoAndConsent(ParentInfoDTO parentInfoDTO, ParentConsentDTO consentDTO) {
+        try {
+            // Parent 엔티티 생성 및 저장
+            Parent parent = Parent.builder()
+                    .parentEmail(parentInfoDTO.getParentEmail())
+                    .parentName(parentInfoDTO.getParentName())
+                    .parentPhone(parentInfoDTO.getParentPhone())
+                    .childrenEmergencyPhone(parentInfoDTO.getChildrenEmergencyPhone())
+                    .parentAddress(parentInfoDTO.getParentAddress())
+                    .detailAddress(parentInfoDTO.getDetailAddress())
+                    .build();
+
+            parent = parentRepository.save(parent);
+
+            // ParentConsent 엔티티 생성 및 저장
+            ParentConsent consent = ParentConsent.builder()
+                    .termsConsent(consentDTO.getTermsConsent())
+                    .photoConsent(consentDTO.getPhotoConsent())
+                    .medicalInfoConsent(consentDTO.getMedicalInfoConsent())
+                    .privateConsent(consentDTO.getPrivateConsent())
+                    .communityConsent(consentDTO.getCommunityConsent())
+                    .emergencyInfoConsent(consentDTO.getEmergencyInfoConsent())
+                    .parent(parent)
+                    .build();
+
+            parentConsentRepository.save(consent);
+        } catch (Exception e) {
+            log.error("학부모 정보 및 동의 정보 저장 중 오류 발생: ", e);
+            throw new RuntimeException("학부모 정보 저장에 실패했습니다.", e);
+        }
+    }
+
+    public boolean isEmailDuplicate(String email) {
+        return parentRepository.existsByParentEmail(email);
+    }
+
     private ParentConsentDTO convertToDTO(ParentConsent consent) {
         // ParentConsent Entity를 DTO로 변환하는 메서드
 

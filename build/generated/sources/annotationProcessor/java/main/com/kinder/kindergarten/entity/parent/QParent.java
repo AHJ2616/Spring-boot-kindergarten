@@ -29,6 +29,8 @@ public class QParent extends EntityPathBase<Parent> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdDate = _super.createdDate;
 
+    public final StringPath detailAddress = createString("detailAddress");
+
     public final BooleanPath isErpRegistered = createBoolean("isErpRegistered");
 
     public final StringPath parentAddress = createString("parentAddress");

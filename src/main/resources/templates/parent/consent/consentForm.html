@@ -38,8 +38,11 @@
 <body>
 <div class="consent-container">
   <h3 class="mb-4">학부모 동의서 1단계</h3>
-  <form th:action="@{/consent/submit}" method="post" th:object="${consent}">
+  <form th:action="@{/consent/first}" method="post" th:object="${consent}" onsubmit="return prepareAndSubmit()">
     <!-- 전체 동의 체크박스 -->
+    <input type="hidden" name="termsConsent" th:field="*{termsConsent}">
+    <input type="hidden" name="communityConsent" th:field="*{communityConsent}">
+    <input type="hidden" name="privateConsent" th:field="*{privateConsent}">
     <div class="consent-item mb-4">
       <label class="d-flex align-items-center">
         <input type="checkbox" id="allConsent" class="me-2" onchange="handleAllConsent()">
@@ -52,7 +55,7 @@
 
     </div>
 
-    <!-- 서비스 이용약관 -->
+    <!-- ERP 시스템 및 커뮤니티 서비스 이용 약관 -->
     <div class="consent-item">
             <span class="consent-status" th:classappend="${consent.termsConsent} ? 'status-agreed' : 'status-pending'"
                   th:text="${consent.termsConsent} ? '동의완료' : '미동의'">미동의</span>
@@ -69,7 +72,7 @@
       </div>
     </div>
 
-    <!-- 커뮤니티 동의 -->
+    <!-- 학부모 커뮤니티 활동 동의서 -->
     <div class="consent-item">
             <span class="consent-status" th:classappend="${consent.communityConsent} ? 'status-agreed' : 'status-pending'"
                   th:text="${consent.communityConsent} ? '동의완료' : '미동의'">미동의</span>
@@ -86,7 +89,7 @@
       </div>
     </div>
 
-    <!-- 개인정보 동의 -->
+    <!-- 학부모 개인정보 및 제3자 제공 동의서 -->
     <div class="consent-item">
             <span class="consent-status" th:classappend="${consent.privateConsent} ? 'status-agreed' : 'status-pending'"
                   th:text="${consent.privateConsent} ? '동의완료' : '미동의'">미동의</span>
@@ -104,7 +107,7 @@
     </div>
 
     <div class="d-flex justify-content-center mt-4">
-      <button type="button" class="btn btn-primary" onclick="checkAndProceed()">다음 단계로 (2/2)</button>
+      <button type="button" class="btn btn-primary" onclick="checkAndProceed()">다음 단계로</button>
     </div>
   </form>
 </div>

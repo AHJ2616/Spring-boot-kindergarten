@@ -31,28 +31,55 @@
 </head>
 <body>
 <div class="terms-container">
-    <h2 class="terms-title">학부모 커뮤니티 활동 동의서</h2>
+    <h2 class="terms-title">학부모 커뮤니티 활동 약관 v.1.0.0</h2>
+
+    <!-- 요약본 -->
     <div class="terms-summary">
         <h4 class="section-title">주요 내용 요약</h4>
         <ul>
-            <li class="section-title">1. 커뮤니티 활동 목적:</li>
-            <p>• 학부모 간 소통 및 정보 공유</p>
-            <p>• 원아 교육 활동 관련 의견 교환</p>
+            <li class="section-title">1. 목적</li>
+            <p>• 커뮤니티의 건전한 운영과 사용자 간 원활한 소통을 위해 규칙을 제정.</p>
         </ul>
 
         <ul>
-            <li class="section-title">2. 커뮤니티 이용 범위:</li>
-            <p>• 학부모 전용 게시판</p>
-            <p>• 공지사항 및 알림 서비스</p>
+            <li class="section-title">2. 이용 규칙</li>
+            <p>• 예의와 존중을 바탕으로 커뮤니티 기능을 성실히 사용.</p>
+            <p>• 정보의 정확성과 신뢰성을 고려하여 게시물 작성.</p>
         </ul>
 
         <ul>
-            <li class="section-title">3. 이용자 의무:</li>
-            <p>• 개인정보 보호 및 타인 존중</p>
-            <p>• 커뮤니티 규칙 준수</p>
+            <li class="section-title">3. 금지 행위</li>
+            <p>• 비방, 욕설, 불법 자료 공유, 스팸 광고, 허위 정보 유포, 사생활 침해 금지.</p>
         </ul>
+
+        <ul>
+            <li class="section-title">4. 책임 소재</li>
+            <p>• 운영자는 부적절한 게시물을 사전 통지 없이 삭제 가능.</p>
+            <p>• 게시물에 대한 법적 책임은 작성자에게 있음.</p>
+            <p>• 규칙 위반 시 경고, 제한 또는 계정 정지 조치.</p>
+        </ul>
+
+        <ul>
+            <li class="section-title">5. 신고 절차</li>
+            <p>• 부적절한 게시물이나 갈등 발생 시 운영자에게 신고 가능.</p>
+        </ul>
+
+        <ul>
+            <li class="section-title">6. 개인정보 보호</li>
+            <p>• 사용자는 개인정보 보호 책임이 있으며, 위반 시 법적 책임 발생 가능.</p>
+        </ul>
+
+        <ul>
+            <li class="section-title">7. 동의 조건</li>
+            <p>• 커뮤니티 사용 시 약관에 동의한 것으로 간주.</p>
+        </ul>
+
+        <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#communityModal">
+            전체 약관 보기
+        </button>
     </div>
 
+    <!-- 동의, 미동의 버튼 -->
     <div class="d-flex justify-content-center gap-3 mt-4">
         <button type="button" class="btn btn-primary" style="width: 150px;" onclick="agreeAndReturn()">
             동의함
@@ -60,6 +87,74 @@
         <button type="button" class="btn btn-secondary" style="width: 150px;" onclick="location.href='/consent'">
             동의하지 않음
         </button>
+    </div>
+
+    <div class="text-center mt-3">
+        <small class="text-muted">
+            서비스 이용을 위해서는 약관에 동의해주셔야 합니다.
+        </small>
+    </div>
+</div>
+
+<!-- Modal (전체 내용) -->
+<div class="modal fade" id="communityModal" tabindex="-1" aria-labelledby="communityModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="communityModalLabel">학부모 커뮤니티 활동 동의서 v.1.0.0</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="terms-content">
+                    <h3 class="section-title">제1조 목적</h3>
+                    <p>이 약관은 학부모 커뮤니티 사용자가 게시판, 댓글 및 기타 서비스를 이용할 때 준수해야 할 규칙과 책임을 규정합니다. 이를 통해 건전하고 안전한 커뮤니티 환경을 조성하는 것을 목적으로 합니다.</p>
+
+                    <h3 class="section-title">제2조 커뮤니티 이용 규칙</h3>
+                    <p>1. 사용자는 게시판 및 댓글 등 커뮤니티의 모든 기능을 성실하고 바르게 사용해야 합니다.</p>
+                    <p>2. 다음과 같은 원칙을 준수해야 합니다:</p>
+                    <p>• 예의와 존중을 바탕으로 한 대화.</p>
+                    <p>• 정보의 정확성과 신뢰성을 고려한 게시물 작성.</p>
+                    <p>• 타인의 권리를 존중하며, 사생활 침해나 저작권 위반 금지.</p>
+
+                    <h3 class="section-title">제3조 금지 행위</h3>
+                    <p>사용자는 다음 행위를 금지합니다:</p>
+                    <p>1. 비방 및 욕설: 타인을 비난하거나 모욕적인 언어를 사용하는 행위.</p>
+                    <p>2. 불법 자료 공유: 저작권을 위반하거나 법적으로 문제가 되는 자료를 업로드 또는 링크로 제공하는 행위.</p>
+                    <p>3. 스팸 및 광고 행위: 커뮤니티의 목적과 무관한 상업적 광고 또는 무차별적 홍보 행위.</p>
+                    <p>4. 허위 정보 게시: 의도적으로 잘못된 정보를 유포하여 타인에게 혼란을 야기하는 행위.</p>
+                    <p>5. 사생활 침해: 타인의 개인정보를 동의 없이 게시하거나 유출하는 행위.</p>
+
+                    <h3 class="section-title">제4조 책임 소재 및 관리 정책</h3>
+                    <ul>
+                        <li>📌게시물 관리 권한</li>
+                        <li>커뮤니티 운영자는 규칙을 위반한 게시물에 대해 사전 통지 없이 삭제할 수 있습니다.</li>
+                        <li>부적절한 게시물 작성자는 경고, 활동 제한 또는 계정 정지 등의 제재를 받을 수 있습니다.</li>
+                    </ul>
+
+                    <ul>
+                        <li>📌책임 한계</li>
+                        <li>사용자가 게시한 내용에 대한 법적 책임은 전적으로 게시물 작성자에게 있습니다.</li>
+                        <li>운영자는 모든 게시물을 사전 검열하지 않으며, 신고가 접수되거나 규칙 위반 사항이 발견된 경우에 한해 대응합니다.</li>
+                    </ul>
+
+                    <ul>
+                        <li>📌신고 절차</li>
+                        <li>사용자 간 갈등이 발생하거나 부적절한 게시물이 발견될 경우, 운영자에게 신고하여 조치를 요청할 수 있습니다.</li>
+                    </ul>
+
+                    <h3 class="section-title">제5조 개인정보 보호</h3>
+                    <p>1. 사용자는 커뮤니티 이용 시 개인정보를 보호할 책임이 있으며, 운영자는 개인정보 보호법에 따라 사용자의 정보를 적법하게 관리합니다.</p>
+                    <p>2. 타인의 개인정보를 게시하거나 공유할 경우, 법적 책임이 부과될 수 있습니다.</p>
+
+                    <h3 class="section-title">제6조 약관 동의</h3>
+                    <p>사용자는 커뮤니티 서비스를 이용함으로써 본 약관에 동의하는 것으로 간주됩니다.</p>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </div>
     </div>
 </div>
 
