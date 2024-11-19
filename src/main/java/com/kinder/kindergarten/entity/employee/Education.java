@@ -1,13 +1,12 @@
 package com.kinder.kindergarten.entity.employee;
 
 import com.kinder.kindergarten.entity.Member;
-import com.kinder.kindergarten.entity.employee.Employee;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
 
-@Table(name = "Education")
+@Table(name = "education")
 @Entity
 @Getter @Setter
 @Builder
@@ -20,7 +19,7 @@ public class Education {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // 교육이력 기본키
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member; // 직원 기본키
 

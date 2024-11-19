@@ -1,22 +1,17 @@
 package com.kinder.kindergarten.entity;
 
 
-import com.kinder.kindergarten.DTO.MemberDTO;
-import com.kinder.kindergarten.DTO.employee.EmployeeDTO;
 import com.kinder.kindergarten.constant.employee.Role;
 import com.kinder.kindergarten.entity.employee.Employee;
-import com.kinder.kindergarten.entity.employee.Employee_File;
+import com.kinder.kindergarten.entity.employee.Member_File;
 import com.kinder.kindergarten.entity.employee.Leave;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 
-@Table(name = "Member")
+@Table(name = "member")
 @Entity
 @Getter @Setter
 @Builder
@@ -25,26 +20,26 @@ import java.util.List;
 public class Member extends TimeEntity{
 
     @Id
-    @Column(name="member_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "member_id")
     private Long id;
 
     @Column(name = "member_profile")
     private String profileImage;
 
-    @Column(name = "member_email")
+    @Column(name = "member_email", unique = true)
     private String email;
 
-    @Column(name = "member_password")
+    @Column(name = "member_password", nullable = false)
     private String password;
 
-    @Column(name = "member_name")
+    @Column(name = "member_name", nullable = false)
     private String name;
 
-    @Column(name = "member_address")
+    @Column(name = "member_address", nullable = false)
     private String address;
 
-    @Column(name = "member_phone")
+    @Column(name = "member_phone", nullable = false)
     private String phone;
 
     @Column(name = "member_role")
@@ -56,16 +51,17 @@ public class Member extends TimeEntity{
     @Builder.Default
     private List<Employee> employees = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<Employee_File> files;
-
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    private List<Member_File> files = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Leave> leaves = new ArrayList<>();
 
-    // 2차 합본 합치면서 추가 - 2024 11 13
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    @OneToMany(mappedBy = "member",orphanRemoval = true)
     private List<FcmTokenEntity> fcmTokens = new ArrayList<>();
 
 }

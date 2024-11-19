@@ -6,6 +6,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SurveyRepository extends JpaRepository<SurveyEntity, String> {
-    // Spring Data JPA의 명명 규칙을 따르는 메서드로 변경
-    SurveyEntity findSurveyEntityByBoardId(String boardId);
 } 

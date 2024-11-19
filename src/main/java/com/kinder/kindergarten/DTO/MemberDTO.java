@@ -1,6 +1,5 @@
 package com.kinder.kindergarten.DTO;
 
-import com.kinder.kindergarten.DTO.employee.EmployeeDTO;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;

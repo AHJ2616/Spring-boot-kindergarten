@@ -18,7 +18,7 @@ public class MaterialOrderEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String orderId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "material_id")
     private MaterialEntity material;
 

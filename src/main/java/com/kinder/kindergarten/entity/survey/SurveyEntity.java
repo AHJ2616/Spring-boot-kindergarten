@@ -2,6 +2,7 @@ package com.kinder.kindergarten.entity.survey;
 
 import com.github.f4b6a3.ulid.UlidCreator;
 import com.kinder.kindergarten.entity.TimeEntity;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,13 +32,6 @@ public class SurveyEntity extends TimeEntity {
     @OneToMany(mappedBy = "survey", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<QuestionEntity> questions = new ArrayList<>();
 
-    @Column(name = "board_id")
-    private String boardId;
-
-    // ID 설정을 위한 메소드 추가
-    public void setId(String id) {
-        this.id = UlidCreator.getUlid().toString();
-    }
 
     // 양방향 관계 설정을 위한 편의 메소드
     public void addQuestion(QuestionEntity question) {

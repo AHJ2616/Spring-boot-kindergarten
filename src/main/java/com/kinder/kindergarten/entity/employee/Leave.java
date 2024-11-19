@@ -2,14 +2,12 @@ package com.kinder.kindergarten.entity.employee;
 
 import com.kinder.kindergarten.constant.employee.DayOff;
 import com.kinder.kindergarten.entity.Member;
-import com.kinder.kindergarten.entity.employee.Employee;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 
-@Table(name = "Employee_Leave")
+@Table(name = "employee_Leave")
 @Entity
 @Getter @Setter
 @Builder
@@ -22,7 +20,7 @@ public class Leave {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // 휴가 기본키
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member; // 직원 기본키
 

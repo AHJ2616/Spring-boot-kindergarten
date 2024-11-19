@@ -11,7 +11,6 @@ import com.kinder.kindergarten.constant.board.BoardType;
 import com.kinder.kindergarten.entity.Member;
 import com.kinder.kindergarten.entity.board.BoardEntity;
 import com.kinder.kindergarten.entity.board.BoardFileEntity;
-import com.kinder.kindergarten.repository.QueryDSL;
 import com.kinder.kindergarten.repository.board.BoardFileRepository;
 import com.kinder.kindergarten.repository.board.BoardRepository;
 import com.kinder.kindergarten.service.FileService;
@@ -120,6 +119,9 @@ import java.util.zip.ZipOutputStream;
             String id = ulid.toString();
             boardFormDTO.setBoardId(id); // UUID대신 사용할 ULID
             BoardEntity board = boardFormDTO.wirteBoard();
+            Member member = new Member();
+            member.setId(boardFormDTO.getMemeberId());
+            board.setMember(member);
 
             //게시물 정보 먼저 저장
             boardRepository.save(board);
@@ -174,15 +176,14 @@ import java.util.zip.ZipOutputStream;
             boardDTO.setBoardTitle(boardEntity.getBoardTitle());
             boardDTO.setBoardContents(boardEntity.getBoardContents());
             boardDTO.setBoardType(boardEntity.getBoardType());
-            boardDTO.setWriter(boardEntity.getMember().getName());
             
             // Member null 체크 추가
             if (boardEntity.getMember() != null) {
                 boardDTO.setWriter(boardEntity.getMember().getName());
                 boardDTO.setEmail(boardEntity.getMember().getEmail());
             } else {
-                boardDTO.setWriter("알 수 없음");
-                boardDTO.setEmail("anonymous@example.com");
+                boardDTO.setWriter("탈퇴한 회원");
+                boardDTO.setEmail("unknown@example.com");
             }
             
             boardDTO.setViews(boardEntity.getViews());
@@ -281,7 +282,7 @@ import java.util.zip.ZipOutputStream;
                 BoardFileEntity boardFile = new BoardFileEntity();
                 String originalFilename = file.getOriginalFilename();
 
-                // FileService를 사용하여 파일 ��장
+                // FileService를 사용하여 파일 저장
                 String savedFileName = fileService.uploadFile(uploadPath, originalFilename, file.getBytes());
                 String filePath = fileService.getFullPath(savedFileName);
 
@@ -362,6 +363,9 @@ import java.util.zip.ZipOutputStream;
             String boardId = ulid.toString();
             boardFormDTO.setBoardId(boardId);
             BoardEntity board = boardFormDTO.wirteBoard();
+            Member member = new Member();
+            member.setId(boardFormDTO.getMemeberId());
+            board.setMember(member);
             boardRepository.save(board);
 
             if (boardFileList != null && !boardFileList.isEmpty()) {
@@ -447,6 +451,12 @@ import java.util.zip.ZipOutputStream;
                 // 임시 디렉토리 삭제
                 deleteDirectory(tempFolder);
               }
+            }
+
+            // memberId가 제대로 설정되었는지 확인
+            Long memberId = boardFormDTO.getMemeberId();
+            if (memberId == null) {
+                throw new IllegalArgumentException("Member ID is not set");
             }
           }
 

@@ -1,26 +1,23 @@
 package com.kinder.kindergarten.entity;
 
-import com.github.f4b6a3.ulid.UlidCreator;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class FcmTokenEntity {
+@Table(name = "fcm_token_entity")
+public class FcmTokenEntity extends TimeEntity {
 
   @Id
-  @Column(name="fcm_id")
-  private String id;
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name= "member_email")
+  @JoinColumn(name = "member_id")
   private Member member;
 
+  @Column(nullable = false)
   private String token;
 
   public FcmTokenEntity(Member member, String token){
-    this.id = UlidCreator.getUlid().toString();
     this.member = member;
     this.token = token;
   }

@@ -1,20 +1,17 @@
 package com.kinder.kindergarten.entity.employee;
 import com.kinder.kindergarten.DTO.employee.EmployeeDTO;
 import com.kinder.kindergarten.constant.employee.Position;
-import com.kinder.kindergarten.constant.employee.Role;
 import com.kinder.kindergarten.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 
 
-@Table(name = "Employee")
+
+@Table(name = "employee")
 @Entity
 @Getter @Setter
 @NoArgsConstructor
@@ -29,7 +26,7 @@ public class Employee {
     @Column(name = "employee_cleanup", nullable = false, unique = true)
     private String cleanup; // 직원 사번
 
-    @Column(name = "employee_position")
+    @Column(name = "employee_position", unique = true)
     private String position; // 직원 직위
 
     @Column(name = "employee_department")
@@ -51,7 +48,7 @@ public class Employee {
     private Integer positionLevel; // 직급 레벨
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", insertable = false, updatable = false)
+    @JoinColumn(name = "member_id")
     private Member member;
 
     // 사번 자동 번호 생성자

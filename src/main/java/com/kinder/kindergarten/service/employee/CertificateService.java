@@ -27,9 +27,6 @@ public class CertificateService {
     // 자격증 등록
     public void saveCertificate(CertificateDTO certificateDTO, MultipartFile file, Member member) {
         String pdfPath = null;
-        if (file != null && !file.isEmpty()) {
-            pdfPath = fileService.uploadAndConvertToPdf(file, member);
-        }
 
         Certificate certificate = Certificate.builder()
                 .member(member)
@@ -83,9 +80,6 @@ public class CertificateService {
             if (certificate.getPath() != null) {
                 fileService.deleteFile(certificate.getPath());
             }
-            // 새 파일 업로드
-            String newPdfPath = fileService.uploadAndConvertToPdf(file, member);
-            certificate.setPath(newPdfPath);
         }
 
         certificateRepository.save(certificate);

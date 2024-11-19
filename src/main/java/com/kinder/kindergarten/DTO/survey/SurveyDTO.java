@@ -18,5 +18,4 @@ public class SurveyDTO {
     private List<QuestionDTO> questions = new ArrayList<>();
     private LocalDateTime regiDate;
     private LocalDateTime modifiedDate;
-    private String boardId;
 } 

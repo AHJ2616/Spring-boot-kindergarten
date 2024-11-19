@@ -79,16 +79,7 @@ public class EmployeeController {
                     break;
             }
 
-            Member member = Member.builder()
-                    .email(memberDTO.getEmail())
-                    .name(memberDTO.getName())
-                    .password(passwordEncoder.encode(memberDTO.getPassword()))
-                    .address(memberDTO.getAddress())
-                    .phone(memberDTO.getPhone())
-                    .profileImage("Default-profile.png")
-                    .role(role)
-                    .build();
-            memberService.saveMember(member);
+            Member member = memberService.saveMember(memberDTO);
 
             Employee employee = Employee.createEmployee(employeeDTO, member);
 

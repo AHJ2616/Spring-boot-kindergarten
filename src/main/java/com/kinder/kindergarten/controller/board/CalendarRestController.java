@@ -3,6 +3,8 @@ package com.kinder.kindergarten.controller.board;
 import com.github.f4b6a3.ulid.Ulid;
 import com.github.f4b6a3.ulid.UlidCreator;
 import com.kinder.kindergarten.DTO.board.ScheduleDTO;
+import com.kinder.kindergarten.annotation.CurrentUser;
+import com.kinder.kindergarten.config.PrincipalDetails;
 import com.kinder.kindergarten.service.board.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -20,7 +22,7 @@ public class CalendarRestController {
   private final ScheduleService scheduleService;
 
   @GetMapping("/events")
-  public ResponseEntity<List<ScheduleDTO>> getEvents() {
+  public ResponseEntity<List<ScheduleDTO>> getEvents(@CurrentUser PrincipalDetails principalDetails) {
     try {
       List<ScheduleDTO> events = scheduleService.getAllSchedules();
       events.forEach(event -> {
@@ -133,4 +135,5 @@ public class CalendarRestController {
     List<ScheduleDTO> schedules = scheduleService.findSchedulesByType(type);
     return ResponseEntity.ok(schedules);
   }
+
 }

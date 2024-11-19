@@ -1,23 +1,20 @@
 package com.kinder.kindergarten.controller;
 
 import com.kinder.kindergarten.DTO.MemberDTO;
-import com.kinder.kindergarten.entity.Member;
-import com.kinder.kindergarten.service.MemberService;
+import com.kinder.kindergarten.annotation.CurrentUser;
+import com.kinder.kindergarten.config.PrincipalDetails;
+
 import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.kinder.kindergarten.DTO.MemberDTO;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,8 +26,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RequiredArgsConstructor
 public class MainController {
 
-  private final MemberService memberService;
-  private final PasswordEncoder passwordEncoder;
 
   @GetMapping(value={"/main","/"})
   String main(Model model){
@@ -40,7 +35,9 @@ public class MainController {
 
   //캘린더
   @GetMapping(value = "/calendar")
-  public String showCalendar(){
+  public String showCalendar(@CurrentUser PrincipalDetails principalDetails,Model model){
+    String userRole = principalDetails.getMember().getRole().toString();
+    model.addAttribute("userRole",userRole);
     return "calendar";
   }
 

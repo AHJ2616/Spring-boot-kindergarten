@@ -49,7 +49,7 @@ public class CommentsService {
   }
 
 
-  public CommentsDTO createComment(CommentsDTO commentsDTO, String memberId) {
+  public CommentsDTO createComment(CommentsDTO commentsDTO, Long memberId) {
     BoardEntity board = boardRepository.findById(commentsDTO.getBoardId())
             .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
 
@@ -75,7 +75,7 @@ public class CommentsService {
             .collect(Collectors.toList());
   }
 
-  public void deleteComment(String commentId, String memberId) {
+  public void deleteComment(String commentId, Long memberId) {
     CommentsEntity comment = commentsRepository.findById(commentId)
             .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
 
@@ -89,7 +89,7 @@ public class CommentsService {
     commentsRepository.delete(comment);
   }
 
-  public CommentsDTO updateComment(String commentId, CommentsDTO commentsDTO, String memberId) {
+  public CommentsDTO updateComment(String commentId, CommentsDTO commentsDTO, Long memberId) {
     CommentsEntity comment = commentsRepository.findById(commentId)
             .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
             

@@ -4,6 +4,58 @@
     <link rel="stylesheet" href="/css/employee/login.css">
     <meta charset="UTF-8">
     <title>Login</title>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-messaging.js"></script>
+    <script>
+        // Firebase 초기화
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const messaging = firebase.messaging();
+
+        function requestPermissionAndSaveToken(memberId) {
+            messaging.getToken({vapidKey: 'YOUR_PUBLIC_VAPID_KEY'})
+                .then((currentToken) => {
+                    if (currentToken) {
+                        // 서버로 토큰 전송
+                        fetch('/api/fcm/save-token', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: new URLSearchParams({
+                                memberId: memberId,
+                                token: currentToken
+                            })
+                        })
+                        .then(response => response.text())
+                        .then(data => {
+                            alert('토큰 저장 응답: ' + data);
+                        })
+                        .catch((error) => {
+                            console.error('토큰 저장 실패:', error);
+                        });
+                    } else {
+                        console.log('No registration token available. Request permission to generate one.');
+                    }
+                })
+                .catch((err) => {
+                    console.log('An error occurred while retrieving token. ', err);
+                });
+        }
+
+        function onLoginSuccess(memberId) {
+            if (confirm("FCM 토큰을 저장하시겠습니까?")) {
+                requestPermissionAndSaveToken(memberId);
+            }
+        }
+    </script>
 </head>
 <body>
 <div class="login">
@@ -24,7 +76,7 @@
         <div th:if="${param.invalid}" class="error-message">
             유효하지 않은 세션입니다. 다시 로그인해주세요.
         </div>
-        <button type="submit" class="btn btn-primary btn-block btn-large">Let me in</button>
+        <button type="submit" class="btn btn-primary btn-block btn-large" onclick="onLoginSuccess(1)">Let me in</button>
     </form>
 </div>
 </body>

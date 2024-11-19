@@ -1,6 +1,5 @@
 package com.kinder.kindergarten.service;
 
-import com.github.f4b6a3.ulid.UlidCreator;
 import com.kinder.kindergarten.DTO.MemberDTO;
 import com.kinder.kindergarten.DTO.MultiDTO;
 import com.kinder.kindergarten.DTO.employee.EmployeeDTO;
@@ -22,8 +21,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.lang.StackWalker.Option;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,8 +34,11 @@ public class MemberService implements UserDetailsService {
 
     private final MemberRepository memberRepository;
     private final FileService fileService;
-    private final FcmTokenRepository fcmTokenRepository;
     private final EmployeeRepository employeeRepository;
+
+  private final ModelMapper modelMapper;
+
+  private final PasswordEncoder passwordEncoder;
 
     @Override
     // 0. 로그인
@@ -48,11 +50,17 @@ public class MemberService implements UserDetailsService {
         return new PrincipalDetails(member, employee);
     }
 
-    // 1. 회원 등록
-    public Member saveMember(Member member){
-        validateDuplicateMember(member);
-        return memberRepository.save(member);
-    }
+  // 1. 회원 등록
+  public Member saveMember(MemberDTO memberDTO) {
+    Member member = modelMapper.map(memberDTO, Member.class);
+
+    // 비밀번호 암호화
+    String encodedPassword = passwordEncoder.encode(member.getPassword());
+    member.setPassword(encodedPassword);
+
+    // 회원 저장
+    return memberRepository.save(member);
+  }
 
     // 1-1. 등록 회원 확인
     private void validateDuplicateMember(Member member){
@@ -105,22 +113,6 @@ public class MemberService implements UserDetailsService {
         memberRepository.save(member);
     }
 
-    // 3-1. 프로필 이미지 업데이트
-    @Transactional
-    public void updateProfileImage(Long id, MultipartFile file) {
-        Member member = memberRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("직원을 찾을 수 없습니다."));
-
-        // 기존 프로필 이미지가 있다면 삭제
-        if (member.getProfileImage() != null) {
-            fileService.deleteFile(fileService.getFullPath(member.getProfileImage()));
-        }
-
-        // 새 이미지 업로드 및 저장
-        String newImageName = fileService.uploadProfileImage(file, member);
-        member.setProfileImage(newImageName);
-        memberRepository.save(member);
-    }
 
     // 3-2. 프로필 이미지 삭제
     @Transactional
@@ -163,10 +155,9 @@ public class MemberService implements UserDetailsService {
         return dto;
     }
 
-    public void addFCMToken(String email, String fcmToken){
-        Optional<Member> member = Optional.ofNullable(memberRepository.findByEmail(email));
-        FcmTokenEntity token = new FcmTokenEntity(member.orElseThrow(), fcmToken);
-        fcmTokenRepository.save(token);
+    public Optional<Member> findById(Long Id){
+        return memberRepository.findById(Id);
     }
+
 
 }
