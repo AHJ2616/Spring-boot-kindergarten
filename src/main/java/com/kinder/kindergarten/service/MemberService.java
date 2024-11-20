@@ -1,6 +1,5 @@
 package com.kinder.kindergarten.service;
 
-import com.github.f4b6a3.ulid.UlidCreator;
 import com.kinder.kindergarten.DTO.MemberDTO;
 import com.kinder.kindergarten.DTO.MultiDTO;
 import com.kinder.kindergarten.DTO.employee.EmployeeDTO;
@@ -38,6 +37,10 @@ public class MemberService implements UserDetailsService {
     private final FcmTokenRepository fcmTokenRepository;
     private final EmployeeRepository employeeRepository;
 
+    private final ModelMapper modelMapper;
+
+    private final PasswordEncoder passwordEncoder;
+
     @Override
     // 0. 로그인
     public UserDetails loadUserByUsername(String email){
@@ -51,6 +54,18 @@ public class MemberService implements UserDetailsService {
     // 1. 회원 등록
     public Member saveMember(Member member){
         validateDuplicateMember(member);
+        return memberRepository.save(member);
+    }
+
+        // 1. 회원 등록
+        public Member saveMember2(MemberDTO memberDTO) {
+            Member member = modelMapper.map(memberDTO, Member.class);
+
+    // 비밀번호 암호화
+        String encodedPassword = passwordEncoder.encode(member.getPassword());
+        member.setPassword(encodedPassword);
+
+    // 회원 저장
         return memberRepository.save(member);
     }
 
@@ -88,24 +103,7 @@ public class MemberService implements UserDetailsService {
                 .collect(Collectors.toList());
     }
 
-    // 3. 정보 수정
-    @Transactional
-    public void updateMember(MemberDTO memberDTO) {
-        Member member = memberRepository.findById(memberDTO.getId())
-                .orElseThrow(() -> new EntityNotFoundException("직원을 찾을 수 없습니다."));
-
-        // 기본 수정 가능 필드 (모든 권한)
-        member.setEmail(memberDTO.getEmail());
-        member.setPassword(memberDTO.getPassword());
-        member.setName(memberDTO.getName());
-        member.setPhone(memberDTO.getPhone());
-        member.setAddress(memberDTO.getAddress());
-        member.setProfileImage(memberDTO.getProfileImage());
-
-        memberRepository.save(member);
-    }
-
-    // 3-1. 프로필 이미지 업데이트
+    // 3. 프로필 이미지 업데이트
     @Transactional
     public void updateProfileImage(Long id, MultipartFile file) {
         Member member = memberRepository.findById(id)
@@ -133,6 +131,23 @@ public class MemberService implements UserDetailsService {
             member.setProfileImage(null);
             memberRepository.save(member);
         }
+    }
+
+    // 3-3. 정보 수정
+    @Transactional
+    public void updateMember(MemberDTO memberDTO) {
+        Member member = memberRepository.findById(memberDTO.getId())
+                .orElseThrow(() -> new EntityNotFoundException("직원을 찾을 수 없습니다."));
+
+        // 기본 수정 가능 필드 (모든 권한)
+        member.setEmail(memberDTO.getEmail());
+        member.setPassword(memberDTO.getPassword());
+        member.setName(memberDTO.getName());
+        member.setPhone(memberDTO.getPhone());
+        member.setAddress(memberDTO.getAddress());
+        member.setProfileImage(memberDTO.getProfileImage());
+
+        memberRepository.save(member);
     }
 
 
@@ -168,5 +183,41 @@ public class MemberService implements UserDetailsService {
         FcmTokenEntity token = new FcmTokenEntity(member.orElseThrow(), fcmToken);
         fcmTokenRepository.save(token);
     }
+
+    // 이메일 중복 여부 체크
+    public boolean isEmailExists(String email) {
+        return memberRepository.existsByEmail(email);
+    }
+
+    // 전화번호 중복 여부 체크
+    public boolean isPhoneExists(String phone) {
+        return memberRepository.existsByPhone(phone);
+    }
+
+    // 메신저
+    @Transactional(readOnly = true)
+    public List<MemberDTO> getAllChatableUsers(Long currentUserId) {
+        return memberRepository.findAll().stream()
+                .filter(member -> !member.getId().equals(currentUserId)) // 현재 사용자 제외
+                .map(member -> {
+                    MemberDTO dto = new MemberDTO();
+                    dto.setId(member.getId());
+                    dto.setName(member.getName());
+                    if (member.getEmployees() != null) {
+                        EmployeeDTO employeeDTO = covertToEmployeeDTO(member.getEmployees());
+                        dto.setRole(member.getRole().name()); // Role 정보 설정
+                        // 직위 정보는 별도의 필드나 메시지로 전달
+                        dto.setMessage(employeeDTO.getPosition()); // MemberDTO에 메시지 필드 추가 필요
+                    }
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
+
+    public Optional<Member> findById(Long Id){
+        return memberRepository.findById(Id);
+    }
+
+
 
 }

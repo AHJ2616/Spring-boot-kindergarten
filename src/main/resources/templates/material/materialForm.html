@@ -52,14 +52,141 @@
 <!-- 사용자 CSS 추가 -->
 <th:block layout:fragment="css">
     <style>
-        .input-group {
-            margin-bottom : 15px
+        /* 공통 스타일 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f7; /* 애플의 배경 색상 */
+            color: #333;
         }
-        .img-div {
-            margin-bottom : 10px
+
+        .form-group, .input-group, .btn-container {
+            margin-bottom: 20px;
         }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 500;
+            margin: 0;
+            color: #1d1d1f; /* 애플 다크 텍스트 컬러 */
+        }
+
+        .h2 {
+            font-size: 24px;
+            text-align: center;
+            margin: 30px 0;
+            color: #1d1d1f;
+        }
+
+        /* 인풋 필드와 버튼 스타일 */
+        input, textarea, select {
+            width: 100%;
+            padding: 10px 15px;
+            font-size: 16px;
+            border: 1px solid #d1d1d6;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            color: #1d1d1f;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            border-color: #007aff; /* 애플 블루 */
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 122, 255, 0.5);
+        }
+
+        .form-control[readonly] {
+            background-color: #f2f2f7;
+            color: #8e8e93; /* 애플 회색 텍스트 */
+        }
+
+        textarea {
+            resize: none;
+            height: 100px;
+        }
+
+        .btn-submit {
+            width: 100%;
+            background-color: #007aff; /* 애플 블루 */
+            color: white;
+            font-size: 16px;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .btn-submit:hover {
+            background-color: #0051a8; /* 애플 블루 다크 */
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 라벨 스타일 */
+        .input-group-text, label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        /* 첨부 파일 스타일 */
+        .file-upload input[type="file"] {
+            font-size: 14px;
+            padding: 10px;
+            border: 1px dashed #d1d1d6;
+            border-radius: 10px;
+            background-color: #f2f2f7;
+            color: #555;
+        }
+
+        .file-upload input[type="file"]:focus {
+            border-color: #007aff;
+            outline: none;
+            background-color: #eaf4ff;
+        }
+
+        /* 에러 메시지 스타일 */
         .fieldError {
-            color: #bd2130;
+            font-size: 12px;
+            color: #ff3b30; /* 애플 에러 레드 */
+            margin-top: 5px;
+        }
+
+        /* 기존 파일 리스트 스타일 */
+        h6 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+            margin: 20px 0 10px;
+        }
+
+        /* 버튼 그룹 */
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 애플 스타일 카드 레이아웃 */
+        form {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px 30px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 애플스러운 미니멀한 강조 */
+        .input-group, .form-group {
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 10px;
         }
     </style>
 </th:block>
@@ -70,9 +197,18 @@
         자재 등록
     </p>
 
-    <input type="text" th:value="${writer}" name="materialWriter"  class="form-control" readonly>
+    <div class="form-group">
+        <span class="input-group-text">작성자</span>
+        <input type="text" th:value="${writer}" name="materialWriter"  class="form-control" readonly>
+    </div>
 
     <div class="form-group">
+        <span class="input-group-text">이메일 주소</span>
+        <input type="text" th:value="${writerEmail}" name="materialWriterEmail"  class="form-control" readonly>
+    </div>
+
+    <div class="form-group">
+        <span class="input-group-text">자재 상태</span>
         <select th:field="*{materialStatus}" class="custom-select">
             <option value="NORMAL">정상</option>
             <option value="REPAIR">수리중</option>
@@ -146,7 +282,7 @@
             <div class="input-group-prepend">
                 <span class="input-group-text">자재 입고일</span>
             </div>
-            <input type="date" th:value="*{materialRegdate}" name="material_regdate" class="form-control" placeholder="자재 입고일을 입력해주세요">
+            <input type="date" th:value="*{materialRegdate}" name="materialRegdate" class="form-control" placeholder="자재 입고일을 입력해주세요">
         </div>
         <p th:if="${#fields.hasErrors('materialRegdate')}" th:errors="*{materialRegdate}" class="fieldError">Incorrect date</p>
     </div>

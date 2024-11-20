@@ -3,13 +3,13 @@ package com.kinder.kindergarten.controller.board;
 import com.github.f4b6a3.ulid.Ulid;
 import com.github.f4b6a3.ulid.UlidCreator;
 import com.kinder.kindergarten.DTO.board.ScheduleDTO;
+import com.kinder.kindergarten.annotation.CurrentUser;
 import com.kinder.kindergarten.config.PrincipalDetails;
 import com.kinder.kindergarten.service.board.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,7 +22,7 @@ public class CalendarRestController {
   private final ScheduleService scheduleService;
 
   @GetMapping("/events")
-  public ResponseEntity<List<ScheduleDTO>> getEvents() {
+  public ResponseEntity<List<ScheduleDTO>> getEvents(@CurrentUser PrincipalDetails principalDetails) {
     try {
       List<ScheduleDTO> events = scheduleService.getAllSchedules();
       events.forEach(event -> {
@@ -47,20 +47,33 @@ public class CalendarRestController {
   }
 
   @PostMapping("/events/add")
-  public ResponseEntity<ScheduleDTO> createEvent(@RequestBody ScheduleDTO scheduleDTO,@AuthenticationPrincipal PrincipalDetails principal) {
+  public ResponseEntity<ScheduleDTO> createEvent(@RequestBody ScheduleDTO scheduleDTO) {
     try {
       log.info("일정 저장 요청 데이터: {}", scheduleDTO);
       
       // 필수 필드 검증
       if (scheduleDTO.getTitle() == null || scheduleDTO.getTitle().trim().isEmpty()) {
+        log.warn("일정 제목이 비어있습니다.");
         return ResponseEntity.badRequest().build();
+      }
+      
+      // 날짜 형식 검증 및 변환
+      if (scheduleDTO.getStart() == null || scheduleDTO.getEnd() == null) {
+        log.warn("시작일 또는 종료일이 비어있습니다.");
+        return ResponseEntity.badRequest().build();
+      }
+      
+      // 시간이 없는 경우 기본 시간 추가
+      if (!scheduleDTO.getStart().contains("T")) {
+        scheduleDTO.setStart(scheduleDTO.getStart() + "T00:00:00");
+      }
+      if (!scheduleDTO.getEnd().contains("T")) {
+        scheduleDTO.setEnd(scheduleDTO.getEnd() + "T23:59:59");
       }
       
       // ID 생성
       Ulid ulid = UlidCreator.getUlid();
       scheduleDTO.setId(ulid.toString());
-      /*scheduleDTO.setUsername(principal.getName());*/
-      scheduleDTO.setUsername(principal.getUsername()); // 위코드 오류나서 이렇게 수정해 남깁니다. 2024 11 13
 
       // 기본값 설정
       if (scheduleDTO.getDescription() == null) {
@@ -69,14 +82,19 @@ public class CalendarRestController {
       if (scheduleDTO.getTextColor() == null) {
         scheduleDTO.setTextColor("#ffffff");
       }
+      if (scheduleDTO.getBackgroundColor() == null) {
+        scheduleDTO.setBackgroundColor("#3788d8");
+      }
+      
       
       ScheduleDTO savedSchedule = scheduleService.createSchedule(scheduleDTO);
       log.info("저장된 일정: {}", savedSchedule);
       
       return ResponseEntity.ok(savedSchedule);
     } catch (Exception e) {
-      log.error("일정 저장 중 오류 발생", e);
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+      log.error("일정 저장 중 오류 발생: {}", e.getMessage(), e);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body(null);
     }
   }
 
@@ -117,4 +135,5 @@ public class CalendarRestController {
     List<ScheduleDTO> schedules = scheduleService.findSchedulesByType(type);
     return ResponseEntity.ok(schedules);
   }
+
 }

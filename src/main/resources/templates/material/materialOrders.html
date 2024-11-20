@@ -6,63 +6,324 @@
     <meta name="_csrf" th:content="${_csrf.token}">
     <meta name="_csrf_header" th:content="${_csrf.headerName}">
 
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f4; /* Light grey background for a clean feel */
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
+            border-radius: 15px; /* Rounded corners */
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 20px;
+            background-color: #007aff; /* iOS blue color */
+            color: white;
+            text-align: center;
+            border-radius: 25px; /* Smooth rounded edges */
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            border: 1px solid transparent;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15); /* Slight shadow */
+        }
+
+        .btn:hover {
+            background-color: #0051a8;
+            transform: translateY(-2px);
+        }
+
+        .btn-warning {
+            background-color: #ff3b30;
+        }
+
+        .btn-warning:hover {
+            background-color: #e00000;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 18px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            font-size: 16px;
+        }
+
+        th {
+            background-color: #f0f0f5; /* Light grey background for header */
+            color: #007aff; /* iOS blue for header text */
+        }
+
+        td {
+            background-color: #ffffff;
+        }
+
+        .order-total {
+            color: #4caf50; /* Green color for total price */
+            font-weight: bold;
+        }
+
+        tfoot {
+            background-color: #f9f9f9;
+            font-size: 18px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        tfoot td {
+            color: #333;
+        }
+
+        #grand-total {
+            color: #007aff;
+        }
+
+        .status-badge {
+            padding: 8px 24px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: 500;
+            display: inline-block;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .status-pending {
+            background-color: #ffb900; /* Yellow for pending status */
+            color: white;
+        }
+
+        .status-ordered {
+            background-color: #33c9a7; /* Green for ordered status */
+            color: white;
+        }
+
+
+        .pagination-controls {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .pagination-controls button {
+            margin: 0 5px;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 5px;
+            background-color: #007aff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .pagination-controls button:hover {
+            background-color: #005bb5;
+        }
+
+        .pagination-controls span {
+            font-size: 16px;
+            margin: 0 10px;
+        }
+
+        .modal {
+            display: none; /* 기본적으로 숨김 */
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
+        }
+
+        .modal-dialog {
+            margin: 10% auto; /* 화면 중앙 배치 */
+            width: 80%;
+            max-width: 500px;
+        }
+
+
+    </style>
 </head>
 <body>
-<h2>주문 완료 목록</h2>
 
-<div class="orders-container">
-    <div th:each="order : ${orders}">
-        <div class="order-item">
-            <span th:text="${order.orderMaterialName}"></span>
-            <span th:text="${order.orderDate}"></span>
-            <span th:text="${order.status}"></span>
+<div class="container">
+    <h2>주문 접수 목록</h2>
 
-            <button th:if="${order.status == 'ORDERED'}"
-                    class="btn btn-warning"
-                    th:onclick="cancelOrder([[${order.id}]])">
-                주문 취소
-            </button>
-        </div>
+    <div>
+        <a th:href="'/material/materials'" class="btn">자재 페이지</a><br>
     </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>주문번호</th>
+            <th>자재명</th>
+            <th>주문수량</th>
+            <th>단가</th>
+            <th>합계</th>
+            <th>상태</th>
+            <th>액션</th>
+            <th>등록일</th>
+            <th>작성자</th>
+            <th>이메일</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="order : ${orders}">
+            <td th:text="${order.orderId}"></td>
+            <td th:text="${order.orderMaterialName}"></td>
+            <td th:text="${#numbers.formatInteger(order.quantity, 0, 'COMMA')}"></td>
+            <td th:text="${#numbers.formatInteger(order.orderMaterialPrice, 0, 'COMMA')}"></td>
+            <td th:text="${#numbers.formatInteger(order.orderMaterialTotalPrice, 0, 'COMMA')}" class="order-total" ></td>
+            <td>
+                    <span th:class="${order.status == 'PENDING' ? 'status-badge status-pending' : 'status-badge status-ordered'}"
+                          th:text="${order.status == 'PENDING' ? '대기중' : '주문 완료'}"></span>
+            </td>
+            <td>
+                <button th:if="${order.status == 'PENDING'}"
+                        th:attr="data-order-id=${order.orderId}"
+                        onclick="orderOrdered(this.getAttribute('data-order-id'))"
+                        class="btn">주문 하기
+                </button>
+                <button th:if="${order.status == 'PENDING'}"
+                        th:attr="data-order-id=${order.orderId}"
+                        onclick="openRejectModal(this.getAttribute('data-order-id'))"
+                        class="btn btn-warning">요청 반려
+                </button>
+                <button th:if="${order.status == 'ORDERED'}"
+                        th:attr="data-order-id=${order.orderId}"
+                        onclick="openRejectModal(this.getAttribute('data-order-id'))"
+                        class="btn btn-warning">주문 취소
+                </button>
+
+                <button th:if="${order.status == 'ORDERED'}"
+                        th:attr="data-order-id=${order.orderId}"
+                        onclick="completeOrder(this.getAttribute('data-order-id'))"
+                        class="btn">입고 완료
+                </button>
+            </td>
+            <td th:text="${#temporals.format(order.orderDate, 'yyyy.MM.dd')}"></td>
+            <td th:text="${order.orderWriter}"></td>
+            <td th:text="${order.orderWriterEmail}"></td>
+        </tr>
+        </tbody>
+        <tfoot>
+        <tr>
+            <td colspan="4">전체 합계:</td>
+            <td id="grand-total">0원</td>
+            <td colspan="2"></td>
+        </tr>
+        </tfoot>
+    </table>
 </div>
 
-<table class="table">
-    <thead>
-    <tr>
-        <th><input type="checkbox" id="selectAll" onclick="selectAll()"></th>
-        <th>주문번호</th>
-        <th>자재명</th>
-        <th>주문수량</th>
-        <th>상태</th>
-        <th>액션</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="order : ${orders}">
-        <td><input type="checkbox" class="order-checkbox" th:value="${order.orderId}"></td>
-        <td th:text="${order.orderId}"></td>
-        <td th:text="${order.orderMaterialName}"></td>
-        <td th:text="${order.quantity}"></td>
-        <td th:text="${order.status}"></td>
-        <td>
-            <button th:if="${order.status != 'COMPLETED'}"
-                    th:attr="data-order-id=${order.orderId}"
-                    onclick="completeOrder(this.getAttribute('data-order-id'))"
-                    class="btn btn-success">입고완료</button>
+<!-- Pagination Controls -->
+<div class="pagination-controls">
+    <form th:action="@{/material/orders}" method="get" style="display:inline;">
+        <input type="hidden" name="page" th:value="${currentPage - 1}" />
+        <input type="hidden" name="size" value="5" />
+        <button type="submit" th:if="${currentPage > 0}" class="btn">이전</button>
+    </form>
 
-        </td>
-    </tr>
-    </tbody>
-</table>
+    <span th:text="'페이지 ' + (${currentPage + 1}) + ' / ' + ${totalPages}"></span>
+
+    <form th:action="@{/material/orders}" method="get" style="display:inline;">
+        <input type="hidden" name="page" th:value="${currentPage + 1}" />
+        <input type="hidden" name="size" value="5" />
+        <button type="submit" th:if="${currentPage + 1 < totalPages}" class="btn">다음</button>
+    </form>
+</div>
+
+
+<!-- 반려/취소 사유 모달창 처리 -->
+<div class="modal" tabindex="-1" role="dialog" id="imodal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">반려/취소 사유 작성</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="modalForm">
+
+                    <div>
+                        <label>반려/취소 사유</label>
+                        <textarea class="form-control" name="materialReject" id="materialReject" readonly></textarea>
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary completeSave">완료</button>
+                <button type="button" class="btn btn-outline-secondary replyClose" data-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div><!-- 반려/취소 사유 모달창 처리 -->
+
+
+</div>
+
 
 <!--Thymeleaf에서 th:onclick을 사용하여 JavaScript 함수에 변수를 전달하려 할 때 발생합니다. Thymeleaf는 onclick 속성에 텍스트(문자열) 데이터를 직접 렌더링하는 것을 허용하지 않음-->
 <script>
 
-    function completeOrder(orderId) {
+    /* 총액 합계*/
+    document.addEventListener('DOMContentLoaded', function () {
+        updateGrandTotal(); // When the page is loaded, update the total sum
+
+        function updateGrandTotal() {
+            let grandTotal = 0;
+            const totalElements = document.querySelectorAll('.order-total'); // Select all the total price cells
+
+            totalElements.forEach(function (element) {
+                const priceText = element.textContent.replace(/[^0-9]/g, ''); // Remove non-numeric characters (e.g., "원")
+                const price = parseInt(priceText);
+                if (!isNaN(price)) {
+                    grandTotal += price; // Add to the grand total
+                }
+            });
+
+            document.getElementById('grand-total').textContent = grandTotal.toLocaleString() + '원'; // Display the total in formatted currency
+        }
+    });
+
+
+    // PENDDING 에서 주문 하기 버튼 눌렀을 때.
+    function orderOrdered(orderId) {
         const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
         const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
-        fetch(`/material/order/complete/${orderId}`, {
+        fetch(`/material/order/ordered/${orderId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -89,19 +350,108 @@
             });
     }
 
-    /* 반려 기능 구현중 */
+    // ORDERED 에서 입고 완료 버튼 눌렀을 때.
+    function completeOrder(orderId) {
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
-    function cancelOrder(orderId) {
-        if(confirm('이 주문을 취소하시겠습니까?')) {
-            fetch(`/api/material/order/cancel/${orderId}`, {
-                method: 'POST'
-            }).then(response => {
-                if(response.ok) {
-                    location.reload();
+        fetch(`/material/order/completed/${orderId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
                 }
+                return response.json(); // 서버가 JSON이 아닌 HTML을 반환할 경우 예외 발생 가능
+            })
+            .then(data => {
+                if (data.success) {
+                    alert("입고가 완료되었습니다.");
+                    location.reload(); // 페이지 새로고침하여 업데이트 반영
+                } else {
+                    alert("입고에 실패했습니다.");
+                }
+            })
+            .catch(error => {
+                console.error("Error completing order:", error);
+                alert("입고 처리 중 오류가 발생했습니다.");
             });
-        }
     }
+
+
+    // 반려 / 주문 취소 버튼 -> 모달창 사유 작성 후 조치 설정
+
+    // 모달 열기
+    function openRejectModal(orderId) {
+        const modal = document.getElementById('imodal'); // 모달 요소 선택
+        const reasonTextarea = document.getElementById('materialReject'); // 사유 입력 필드
+
+        reasonTextarea.removeAttribute('readonly'); // 사유 입력 가능하도록 설정
+        reasonTextarea.value = ''; // 초기화
+
+        // 주문 번호를 모달 내부에서 사용할 수 있도록 저장
+        modal.setAttribute('data-order-id', orderId);
+
+        // 모달 표시
+        modal.style.display = 'block';
+    }
+
+    // 모달 닫기
+    document.querySelector('.replyClose').addEventListener('click', function () {
+        const modal = document.getElementById('imodal');
+        modal.style.display = 'none';
+    });
+
+    // 모달 제출
+    document.querySelector('.completeSave').addEventListener('click', function () {
+        const modal = document.getElementById('imodal');
+        const orderId = modal.getAttribute('data-order-id'); // 저장된 주문 번호
+        const reason = document.getElementById('materialReject').value; // 입력된 사유
+
+        if (!reason.trim()) {
+            alert("사유를 입력해주세요.");
+            return;
+        }
+
+        // CSRF 토큰 가져오기
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+        // 서버로 요청 전송
+        fetch(`/material/order/canceled/${orderId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken
+            },
+            body: JSON.stringify({ reason }) // JSON 데이터로 사유 전송
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    alert("취소/반려가 완료되었습니다.");
+                    location.reload(); // 페이지 새로고침
+                } else {
+                    alert("취소/반려에 실패했습니다.");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("처리 중 오류가 발생했습니다.");
+            });
+
+        // 모달 닫기
+        modal.style.display = 'none';
+    });
 
 
 </script>

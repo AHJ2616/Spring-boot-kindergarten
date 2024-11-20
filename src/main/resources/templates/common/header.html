@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <!-- CSRF 토큰 메타 태그 추가 -->
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+
 <body>
 <header th:fragment="header">
   <!-- 사이드바 메뉴 -->
@@ -8,16 +14,41 @@
     <ul>
       <!-- 공통 메뉴-->
       <li class="active">
-        <a th:href="@{/admin/dashboard}">
-          <i class="fa-solid fa-house" style="color: white;"></i></a>
+        <a sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{/admin/dashboard}">
+          <i class="fa-solid fa-house" style="color: white;"></i>
+        </a>
+        <a sec:authorize="hasRole('ROLE_USER')" th:href="@{/teacher/dashboard}">
+          <i class="fa-solid fa-house" style="color: white;"></i>
+        </a>
+        <a sec:authorize="hasRole('ROLE_MANAGER')" th:href="@{/manager/dashboard}">
+          <i class="fa-solid fa-house" style="color: white;"></i>
+        </a>
         <span class="tooltip">Home</span>
       </li>
       <li class="ui-menu-item">
         <i class="fa-solid fa-pen-to-square" style="color: white;"></i></a>
         <ul class="side-menu">
+          <li sec:authorize="
+          #authentication.principal.employee.position == '부장' or
+          #authentication.principal.employee.position == '임원' or
+          #authentication.principal.employee.position == '대표'">
+            <a th:href="@{/approval/pending}">결재 대기</a>
+          </li>
           <li><a th:href="@{/approval/request}">결재 요청</a></li>
-          <li><a th:href="@{/approval/pending}">결재 대기</a></li>
-          <li><a th:href="@{/approval/list}">결재 목록</a></li>
+          <!-- ROLE_ADMIN은 전체 결재 목록으로 이동 -->
+          <li sec:authorize="
+          #authentication.principal.employee.position == '부장' or
+          #authentication.principal.employee.position == '임원' or
+          #authentication.principal.employee.position == '대표'">
+            <a th:href="@{/approval/AllList}">결재 목록</a>
+          </li>
+          <!-- ROLE_USER는 자신의 결재 목록으로 이동 -->
+          <li sec:authorize="
+          #authentication.principal.employee.position == '사원' or
+          #authentication.principal.employee.position == '대리' or
+          #authentication.principal.employee.position == '과장'">
+            <a th:href="@{/approval/list}">결재 목록</a>
+          </li>
         </ul>
       </li>
 
@@ -60,7 +91,7 @@
         </ul>
       </li>
       <li class="ui-menu-item">
-          <i class="fa-regular fa-calendar" style="color: white;"></i></a>
+        <i class="fa-regular fa-calendar" style="color: white;"></i></a>
         <ul class="side-menu">
           <li><a th:href="@{/teacher/dashboard}">게시판 일정</a></li>
         </ul>
@@ -80,42 +111,42 @@
           <i class="fas fa-redo"></i> 연장
         </button>
       </div>
-      <!-- 알림 아이콘 -->
+      <!-- 알림 아이콘 부분 -->
       <div class="notification-wrapper">
         <div class="icon-button" id="notificationButton">
           <i class="fas fa-bell"></i>
-          <span class="notification-badge" th:text="${unreadCount}">0</span>
+          <span class="notification-badge">0</span>
         </div>
         <div class="notification-dropdown" style="display: none;">
           <div class="notification-header">
             <h3>알림</h3>
-            <button class="mark-all-read">모두 읽음</button>
+            <button class="mark-all-read" onclick="markAllAsRead()">모두 읽음</button>
           </div>
           <div class="notification-list">
             <!-- 알림 항목들이 여기에 동적으로 추가됨 -->
+            <div class="no-notifications">새로운 알림이 없습니다.</div>
           </div>
         </div>
       </div>
 
-      <!-- 메일 아이콘 -->
+      <!-- 메신저 아이콘 -->
       <div class="icon-button">
-        <i class="fas fa-envelope"></i>
-        <span class="notification-badge">5</span>
+        <a th:href="@{/chat}" style="text-decoration: none; color: inherit;">
+          <i class="fas fa-comments"></i>
+          <span class="notification-badge" id="unreadChatCount">0</span>
+        </a>
       </div>
 
       <!-- 프로필 섹션 -->
       <div class="dropdown">
         <div class="profile-section" id="profileSection" style="cursor: pointer;">
+          <input type="hidden" id="userId" th:data-user-id="${#authentication.principal.member.id}">
           <img th:src="@{'/upload/' + ${#authentication.principal.member.profileImage}}"
                alt="프로필" class="profile-image">
           <div class="profile-info">
             <span class="profile-name" th:text="${#authentication.principal.member.name}">사용자명</span>
-            <span class="profile-role" th:text="${#authentication.principal.employee.position}">직위</span>
+            <span class="profile-role" th:text="${#authentication.principal.member.position}">직위</span>
           </div>
-        </div>
-        <!-- WebSocket 상태 표시 -->
-        <div id="websocket-status" class="websocket-status disconnected">
-          연결 끊김
         </div>
         <ul class="dropdown-menu" aria-labelledby="profileSection" style="display: none;">
           <li><a class="dropdown-item" th:href="@{/employee/mypage/{id}(id=${#authentication.principal.member.id})}">마이페이지</a></li>
@@ -125,5 +156,6 @@
       </div>
     </div>
 </header>
+<!-- 웹소켓 라이브러리 추가 -->
 </body>
 </html>

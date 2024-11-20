@@ -30,13 +30,13 @@ public class QCommentsEntity extends EntityPathBase<CommentsEntity> {
 
     public final StringPath contents = createString("contents");
 
+    public final com.kinder.kindergarten.entity.QMember member;
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> modiDate = _super.modiDate;
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> regiDate = _super.regiDate;
-
-    public final com.kinder.kindergarten.entity.QMember writer;
 
     public QCommentsEntity(String variable) {
         this(CommentsEntity.class, forVariable(variable), INITS);
@@ -57,7 +57,7 @@ public class QCommentsEntity extends EntityPathBase<CommentsEntity> {
     public QCommentsEntity(Class<? extends CommentsEntity> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.boardId = inits.isInitialized("boardId") ? new QBoardEntity(forProperty("boardId"), inits.get("boardId")) : null;
-        this.writer = inits.isInitialized("writer") ? new com.kinder.kindergarten.entity.QMember(forProperty("writer")) : null;
+        this.member = inits.isInitialized("member") ? new com.kinder.kindergarten.entity.QMember(forProperty("member"), inits.get("member")) : null;
     }
 
 }

@@ -14,8 +14,8 @@
     <h2>휴가 신청</h2>
 
     <form th:action="@{/leave/request}" method="post">
-      <div th:object="${employeeDTO}">
-        <input type="hidden" th:field="*{id}">
+      <div th:object="${multiDTO}">
+        <input type="hidden" th:field="*{memberDTO.id}">
       </div>
       <div th:object="${leaveDTO}">
         <input type="hidden" th:field="*{le_total}" id="le_total">
@@ -44,7 +44,7 @@
         </div>
         <div id="durationDisplay">
           사용휴가 : 0일
-          <p>잔여휴가 : <span th:text="${employeeDTO.annualLeave}"></span></p>
+          <p>잔여휴가 : <span th:text="${multiDTO.employeeDTO.annualLeave}"></span></p>
         </div>
       </div>
       <button type="submit">신청</button>

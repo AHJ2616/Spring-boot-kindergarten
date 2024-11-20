@@ -1,17 +1,17 @@
 package com.kinder.kindergarten.entity.employee;
+
 import com.kinder.kindergarten.DTO.employee.EmployeeDTO;
 import com.kinder.kindergarten.constant.employee.Position;
-import com.kinder.kindergarten.constant.employee.Role;
 import com.kinder.kindergarten.entity.Member;
 import jakarta.persistence.*;
-import lombok.*;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 
 
 @Table(name = "Employee")
@@ -29,7 +29,7 @@ public class Employee {
     @Column(name = "employee_cleanup", nullable = false, unique = true)
     private String cleanup; // 직원 사번
 
-    @Column(name = "employee_position")
+    @Column(name = "employee_position", unique = true)
     private String position; // 직원 직위
 
     @Column(name = "employee_department")
@@ -50,8 +50,16 @@ public class Employee {
     @Column(name = "employee_position_level")
     private Integer positionLevel; // 직급 레벨
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", insertable = false, updatable = false)
+/*    @OneToOne
+    @JoinColumn(name = "member_id", insertable = true, updatable = true)
+    private Member member;*/
+
+/*    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;*/
+
+    @OneToOne
+    @JoinColumn(name = "member_id", insertable = true, updatable = true)
     private Member member;
 
     // 사번 자동 번호 생성자
@@ -74,8 +82,10 @@ public class Employee {
         employee.setDepartment(employeeDTO.getDepartment());
         employee.setStatus(employeeDTO.getStatus());
         employee.setAnnualLeave(pos.getAnnualLeave()); // 직급별 연차 설정
+        employee.setPositionLevel(pos.getPositionLevel()); // 직급 레벨 설정
         employee.setSalary(employeeDTO.getSalary());
         employee.setHireDate(employeeDTO.getHireDate());
+        employee.setMember(member); // Member 객체와 관계 설정
         return employee;
     }
 

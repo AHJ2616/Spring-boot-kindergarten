@@ -19,7 +19,6 @@ public class ScheduleDTO {
 
   private String type; //카테고리
 
-  private String username;
 
   private String backgroundColor = "#3788d8";
 

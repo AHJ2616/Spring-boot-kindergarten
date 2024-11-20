@@ -1,7 +1,7 @@
 package com.kinder.kindergarten.controller.employee;
 
-import com.kinder.kindergarten.config.PrincipalDetails;
 import com.kinder.kindergarten.DTO.employee.EducationDTO;
+import com.kinder.kindergarten.config.PrincipalDetails;
 import com.kinder.kindergarten.service.employee.EducationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +45,7 @@ public class EducationController {
         }
     }
 
-    @GetMapping("/history")
+    @GetMapping("/education_list")
     public String getEducationHistory(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                       Model model) {
         List<EducationDTO> history = educationService.getEducationHistory(principalDetails.getMember());
@@ -53,7 +53,7 @@ public class EducationController {
         return "/employee/education_list";
     }
 
-    @GetMapping("/download/{id}")
+    @GetMapping("/view/{id}")
     public ResponseEntity<Resource> downloadCertificate(@PathVariable Long id) {
         EducationDTO education = educationService.getEducationById(id);
         try {
@@ -75,7 +75,7 @@ public class EducationController {
                                     @AuthenticationPrincipal PrincipalDetails principalDetails,
                                     Model model) {
         if (!educationService.isEducationOwnedByEmployee(id, principalDetails.getMember())) {
-            return "redirect:/education/history";
+            return "redirect:/education/education_list";
         }
 
         EducationDTO education = educationService.getEducationById(id);
@@ -91,7 +91,7 @@ public class EducationController {
                                   Model model) {
         try {
             educationService.updateEducation(id, educationDTO, file, principalDetails.getMember());
-            return "redirect:/education/history";
+            return "redirect:/education/education_list";
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("educationDTO", educationDTO);
@@ -105,7 +105,7 @@ public class EducationController {
         if (educationService.isEducationOwnedByEmployee(id, principalDetails.getMember())) {
             educationService.deleteEducation(id, principalDetails.getMember());
         }
-        return "redirect:/education/history";
+        return "redirect:/education/education_list";
     }
 
 }

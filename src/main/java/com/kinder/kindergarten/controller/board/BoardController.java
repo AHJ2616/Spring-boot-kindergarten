@@ -4,15 +4,12 @@ import com.kinder.kindergarten.DTO.board.BoardDTO;
 import com.kinder.kindergarten.DTO.board.BoardFileDTO;
 import com.kinder.kindergarten.DTO.board.BoardFormDTO;
 import com.kinder.kindergarten.DTO.board.CommentsDTO;
-import com.kinder.kindergarten.DTO.survey.SurveyDTO;
 import com.kinder.kindergarten.annotation.CurrentUser;
 import com.kinder.kindergarten.config.PrincipalDetails;
 import com.kinder.kindergarten.constant.board.BoardType;
-import com.kinder.kindergarten.entity.Member;
 import com.kinder.kindergarten.repository.QueryDSL;
 import com.kinder.kindergarten.service.board.BoardService;
 import com.kinder.kindergarten.service.board.CommentsService;
-import com.kinder.kindergarten.service.board.SurveyService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +23,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -52,7 +48,6 @@ public class BoardController {
   private final BoardService boardService;
 
   private final CommentsService commentsService;
-  private final SurveyService surveyService;
 
   private final QueryDSL queryDSL;
 
@@ -119,13 +114,15 @@ public class BoardController {
   @PostMapping(value="/write")
   public ResponseEntity<?> postWriteBoard(@Valid BoardFormDTO boardFormDTO,
                                           BindingResult bindingResult,
-                                          @RequestParam(value = "boardFile", required = false) List<MultipartFile> boardFileList,@AuthenticationPrincipal PrincipalDetails principalDetails) {
+                                          @RequestParam(value = "boardFile", required = false) List<MultipartFile> boardFileList,
+                                          @CurrentUser PrincipalDetails principalDetails) {
     try {
       if (bindingResult.hasErrors()) {
         return ResponseEntity.badRequest().body("입력값이 올바르지 않습니다.");
       }
 
-      boardFormDTO.setBoardWriter(principalDetails.getUsername());
+        //로그인 아이디
+        boardFormDTO.setMemeberId(principalDetails.getMember().getId());
 
       // 파일 존재 여부와 ZIP 생성 옵션에 따른 처리
       if (boardFileList != null && !boardFileList.isEmpty() && !boardFileList.get(0).isEmpty()) {
@@ -162,26 +159,16 @@ public class BoardController {
 
   @GetMapping("/{id}")
   public String getBoard(@PathVariable String id, 
-                      @CurrentUser Member member,  // @AuthenticationPrincipal 대신 @CurrentUser 사용
-                      Model model, 
-                      HttpServletRequest request) {
-    queryDSL.increaseViews(id, request); // 조회수 1 증가시키기
+                    @CurrentUser PrincipalDetails principalDetails,  // Member를 PrincipalDetails로 변경
+                    Model model, 
+                    HttpServletRequest request) {
+    queryDSL.increaseViews(id, request);
     
     try {
         BoardDTO boardDTO = boardService.getBoard(id);
         model.addAttribute("boardDTO", boardDTO);
-        model.addAttribute("isAuthenticated", member != null);
+        model.addAttribute("isAuthenticated", principalDetails != null);  // principalDetails로 수정
         
-        // 설문조사 데이터 조회
-        try {
-            SurveyDTO surveyDTO = surveyService.getSurveyByBoardId(id);
-            if (surveyDTO != null) {
-                model.addAttribute("surveyDTO", surveyDTO);
-            }
-        } catch (Exception e) {
-            // 설문조사가 없는 경우 무시
-            log.debug("No survey found for board id: " + id);
-        }
         
         // 댓글 목록 조회
         List<CommentsDTO> comments = commentsService.getCommentsByBoardId(id);
@@ -190,7 +177,7 @@ public class BoardController {
         return "board/get";
     } catch (Exception e) {
         log.error("Error while getting board: ", e);
-        return "redirect:/board/list/common";
+        return "board/get";
     }
   }
 
@@ -232,7 +219,6 @@ public class BoardController {
       boardFormDTO.setBoardTitle(boardDTO.getBoardTitle());
       boardFormDTO.setBoardContents(boardDTO.getBoardContents());
       boardFormDTO.setBoardType(boardDTO.getBoardType());
-      boardFormDTO.setBoardWriter(boardDTO.getEmail());
       boardFormDTO.setBoardFileList(boardDTO.getBoardFileList());
 
       model.addAttribute("boardFormDTO", boardFormDTO);
@@ -266,7 +252,7 @@ public class BoardController {
   }
   @DeleteMapping("/delete/{boardId}")
   public ResponseEntity<?> deleteBoard(@PathVariable String boardId,
-                                       @AuthenticationPrincipal PrincipalDetails principal) {
+  @CurrentUser PrincipalDetails principal) {
     try {
       BoardDTO board = boardService.getBoard(boardId);
 

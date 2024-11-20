@@ -1,9 +1,16 @@
 package com.kinder.kindergarten.controller.material;
 
+import com.kinder.kindergarten.DTO.employee.EmployeeDTO;
 import com.kinder.kindergarten.DTO.material.*;
+import com.kinder.kindergarten.DTO.money.MoneyDTO;
+import com.kinder.kindergarten.DTO.money.MoneyFormDTO;
+import com.kinder.kindergarten.config.PrincipalDetails;
+import com.kinder.kindergarten.entity.employee.Employee;
 import com.kinder.kindergarten.entity.material.MaterialEntity;
-import com.kinder.kindergarten.entity.material.MaterialOrderHistory;
+import com.kinder.kindergarten.entity.material.MaterialOrderHistoryEntity;
+import com.kinder.kindergarten.service.employee.EmployeeService;
 import com.kinder.kindergarten.service.material.MaterialService;
+import com.kinder.kindergarten.service.money.MoneyService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.extern.log4j.Log4j2;
@@ -15,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,21 +43,33 @@ public class MaterialController {
 
     private final MaterialService materialService;
 
-    public MaterialController(MaterialService materialService) {
-        this.materialService = materialService;
-    }
+    // 로그인 아이디 가져오기 2024 11 18
+    public EmployeeService employeeService;
 
+    // 회계관리 자동등록 테스트 2024 11 19
+    private final MoneyService moneyService;
+
+    public MaterialController(MaterialService materialService, EmployeeService employeeService, MoneyService moneyService) {
+        this.materialService = materialService;
+        this.employeeService = employeeService;
+        this.moneyService = moneyService;
+    }
 
 
     // 자재 Create 작성 1
     @GetMapping(value = "/new")
-    public String materialForm(Model model){
+    public String materialForm(@AuthenticationPrincipal PrincipalDetails principalDetails, Model model){
 
         // loading - login - id
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String writer = auth.getName();  // Assuming the username is the name to display
+        Employee employee = employeeService.getEmployeeEntity(principalDetails.getEmployee().getId());
+        String writer = employee.getMember().getName();
+        String writerEmail = employee.getMember().getEmail();
+
         log.info("materialWriter 값 체크 :" + writer);
+        log.info("materialWriterEmail 값 체크 :" + writerEmail);
+
         model.addAttribute("writer", writer);  // Pass username to Thymeleaf
+        model.addAttribute("writerEmail", writerEmail);  // Pass username to Thymeleaf
         model.addAttribute("materialFormDTO", new MaterialFormDTO());
 
         return "material/materialForm"; // materialForm.html의 경로에 보냄
@@ -130,7 +150,6 @@ public class MaterialController {
         // materialMng.html로 리턴함.
     }
 
-
     // Update 자재 수정 - 기존 내용 불러오기
     @GetMapping(value = "/{materialId}")
     public String materialEditLoad(@PathVariable("materialId") String materialId, Model model){
@@ -170,7 +189,9 @@ public class MaterialController {
     }
 
     // 장바구니 구현 2024 11 12
-    @GetMapping("/cart") // 주문하기 누르면 나오는 장바구니
+
+    // 자재관리 메인페이지에서 '주문하기' 누르면 나오는 장바구니
+    @GetMapping("/cart")
     public String showCart(@RequestParam String ids, Model model) {
         List<String> materialIds = Arrays.asList(ids.split(","));
         List<MaterialDTO> materials = materialService.getMaterialsByIds(materialIds);
@@ -178,7 +199,8 @@ public class MaterialController {
         return "material/materialCart";
     }
 
-    @PostMapping("/order") // 수량입력하고 주문하는 페이지
+    // 수량입력하고 주문하는 페이지 (장바구니 로 표시됨 현재는)
+    @PostMapping("/order")
     public String createOrder(@RequestParam Map<String, String> quantities,
                               @RequestParam List<String> materialIds,
                               RedirectAttributes redirectAttributes) {
@@ -186,56 +208,69 @@ public class MaterialController {
         return "redirect:/material/orders";
     }
 
+    // 주문 목록을 보여주는 페이지
     @GetMapping("/orders")
-    public String showOrders(Model model) {
-        List<MaterialOrderDTO> orders = materialService.getAllOrders();
-        model.addAttribute("orders", orders);
+    public String showOrders(@RequestParam(defaultValue = "0") int page,
+                             @RequestParam(defaultValue = "5") int size,
+                             Model model) {
+        Page<MaterialOrderDTO> ordersPage = materialService.getAllOrders(PageRequest.of(page, size));
+        model.addAttribute("orders", ordersPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", ordersPage.getTotalPages());
         return "material/materialOrders";
     }
 
-
-    @PostMapping("/order/complete/{orderId}")
-    public ResponseEntity<Map<String, Object>> completeOrder(@PathVariable String orderId) {
-        boolean result = materialService.completeOrder(orderId);
+    // 주문 목록에서 PENDDING 상태에서 '주문 하기' 버튼 눌렀을 때.
+    @PostMapping("/order/ordered/{orderId}")
+    public ResponseEntity<Map<String, Object>> orderOrdered(@PathVariable String orderId) {
+        boolean result = materialService.orderedOrder(orderId);
         Map<String, Object> response = new HashMap<>();
         response.put("success", result);
         return ResponseEntity.ok(response);
     }
 
-    // 장바구니 후처리 구현중 2024 11 13
-    @PostMapping("/api/material/cart/delete-selected")
-    @ResponseBody
-    public ResponseEntity<?> deleteSelectedCartItems(@RequestBody List<String> orderIds) {
-        materialService.deleteCartItems(orderIds);
-        return ResponseEntity.ok().build();
+    // 주문 목록에서 ORDERED 에서 '입고 완료' 버튼 눌렀을 때.
+    @PostMapping("/order/completed/{orderId}")
+    public ResponseEntity<Map<String, Object>> completeOrder(@PathVariable String orderId) {
+        // 주문 완료 표시, orderHistory로 들어감
+        boolean result = materialService.completeOrder(orderId);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", result);
+        return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/api/material/cart/delete/{itemId}")
-    @ResponseBody
-    public ResponseEntity<?> deleteCartItem(@PathVariable String orderIds) {
-        materialService.deleteCartItem(orderIds);
-        return ResponseEntity.ok().build();
+
+    // 주문 목록에서 '주문 반려', '주문 취소' 버튼 눌렀을 때.
+    @PostMapping("/order/canceled/{orderId}")
+    public ResponseEntity<Map<String, Object>> cancelOrder(@PathVariable String orderId, @RequestBody Map<String, String> body) {
+        String reason = body.get("reason"); // 요청에서 반려/취소 사유 추출
+        boolean result = materialService.cancelOrder(orderId, reason); // 사유와 함께 서비스 호출
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", result);
+        return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/api/material/order/cancel/{orderId}")
-    @ResponseBody
-    public ResponseEntity<?> cancelOrder(@PathVariable Long orderHistoryId) {
-        materialService.cancelOrder(orderHistoryId);
-        return ResponseEntity.ok().build();
+    // OrderHistory 관련 구현 2024 11 14
+    // 자재 History 리스트 출력
+    @GetMapping("/history")
+    public String showOrderHistory(@RequestParam(defaultValue = "0") int page,
+                                   @RequestParam(defaultValue = "5") int size,
+                                   Model model) {
+        Page<MaterialOrderHistoryDTO> historiesPage = materialService.getAllOrderHistory(PageRequest.of(page, size));
+        model.addAttribute("histories", historiesPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", historiesPage.getTotalPages());
+        return "material/materialOrderHistory";
     }
 
-    @GetMapping("/api/material/order-history/{orderId}")
-    @ResponseBody
-    public ResponseEntity<MaterialOrderHistory> getOrderHistory(@PathVariable Long orderId) {
-        return ResponseEntity.ok(materialService.getOrderHistory(orderId));
+    // materialOrderHistory 삭제
+    @PostMapping("/history/delete")
+    public String deleteHistoryRecord(@RequestParam String historyId) {
+        materialService.deleteHistoryRecord(historyId);
+        return "redirect:/material/history";
     }
 
-    @DeleteMapping("/api/material/order-history/delete/{historyId}")
-    @ResponseBody
-    public ResponseEntity<?> deleteOrderHistory(@PathVariable Long historyId) {
-        materialService.deleteOrderHistory(historyId);
-        return ResponseEntity.ok().build();
-    }
 
 
 

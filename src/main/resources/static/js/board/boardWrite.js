@@ -4,23 +4,7 @@ $(document).ready(function() {
     initializeFormSubmit();
 });
 
-
 function initializeSummernote() {
-    // Summernote 커스텀 버튼 정의
-    var SurveyButton = function(context) {
-        var ui = $.summernote.ui;
-        
-        var button = ui.button({
-            contents: '<i class="fas fa-poll"></i> 설문조사',
-            tooltip: '설문조사 추가',
-            click: function() {
-                openSurveyModal();
-            }
-        });
-        
-        return button.render();
-    };
-
     $('#summernote').summernote({
         height: 300,
         lang: 'ko-KR',
@@ -34,7 +18,6 @@ function initializeSummernote() {
             ['para', ['ul', 'ol', 'paragraph']],
             ['height', ['height']],
             ['insert', ['picture', 'link', 'video']],
-            ['mybutton', ['survey']], // 설문조사 버튼 추가
             ['view', ['fullscreen','help']]
         ],
         fontNames: ['Arial', '맑은 고딕', '궁서', '굴림', '굴림체', '돋움체', 'sans-serif'],
@@ -46,10 +29,6 @@ function initializeSummernote() {
                 }
             }
         },
-        // 커스텀 버튼 등록
-        buttons: {
-            survey: SurveyButton
-        }
     });
 }
 
@@ -84,17 +63,7 @@ function initializeFileUpload() {
 function initializeFormSubmit() {
     document.querySelector('form').addEventListener('submit', async function(e) {
         e.preventDefault();
-
         const formData = new FormData(this);
-        
-        // 설문조사 데이터가 있다면 추가
-        if (typeof getSurveyData === 'function') {
-            const surveyData = getSurveyData();
-            if (surveyData) {
-                formData.append('surveyData', JSON.stringify(surveyData));
-            }
-        }
-
         try {
             const response = await $.ajax({
                 url: this.action,
@@ -117,9 +86,18 @@ function initializeFormSubmit() {
     });
 }
 
-function openSurveyModal() {
-    // Bootstrap 모달 열기
-    const surveyModal = new bootstrap.Modal(document.getElementById('surveyModal'));
-    surveyModal.show();
+// 페이지 로드 시 실행
+document.addEventListener('DOMContentLoaded', function() {
+    const boardTypeSelect = document.getElementById('board_type');
+    const userRoleValue = userRole; // write.html에서 전달받은 userRole 값
 
-}
+    // ROLE_ADMIN이 아닌 경우, 공지와 필독 옵션 선택 시 경고 메시지 표시
+    boardTypeSelect.addEventListener('change', function() {
+        if (userRoleValue !== 'ROLE_ADMIN') {
+            if (this.value === 'NOTIFICATION' || this.value === 'ABSOLUTE') {
+                alert('관리자만 공지/필독 게시글을 작성할 수 있습니다.');
+                this.value = 'COMMON'; // 일반 게시글로 되돌림
+            }
+        }
+    });
+});

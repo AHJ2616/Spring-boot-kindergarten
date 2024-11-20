@@ -3,8 +3,8 @@ package com.kinder.kindergarten.service;
 import com.github.f4b6a3.ulid.Ulid;
 import com.github.f4b6a3.ulid.UlidCreator;
 import com.kinder.kindergarten.entity.Member;
-import com.kinder.kindergarten.entity.employee.Employee;
 import com.kinder.kindergarten.entity.employee.Employee_File;
+import com.kinder.kindergarten.entity.employee.Member_File;
 import com.kinder.kindergarten.repository.employee.FileRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -119,13 +119,13 @@ public class FileService {
             if ("pdf".equalsIgnoreCase(extension)) {
                 String pdfPath = uploadPath + newFileName + ".pdf";
 
-                Employee_File employee_file = Employee_File.builder()
+                Member_File member_File = Member_File.builder()
                         .member(member)
                         .name(newFileName + ".pdf")
                         .original(originalFilename)
                         .path(pdfPath)
                         .build();
-                fileRepository.save(employee_file);
+                fileRepository.save(member_File);
 
                 file.transferTo(new File(pdfPath));
                 return newFileName + ".pdf";
@@ -163,13 +163,13 @@ public class FileService {
             String pdfPath = uploadPath + newFileName + ".pdf";
             document.save(pdfPath);
 
-            Employee_File employee_file = Employee_File.builder()
+            Member_File member_File = Member_File.builder()
                     .member(member)
                     .name(newFileName + ".pdf")
                     .original(file.getOriginalFilename())
                     .path(pdfPath)
                     .build();
-            fileRepository.save(employee_file);
+            fileRepository.save(member_File);
 
             return newFileName + ".pdf";
         } finally {
@@ -197,13 +197,13 @@ public class FileService {
             file.transferTo(new File(imagePath));
 
             // 파일 정보 저장
-            Employee_File employee_file = Employee_File.builder()
+            Member_File member_File = Member_File.builder()
                     .member(member)
                     .name(newFileName)
                     .original(originalFilename)
                     .path(imagePath)
                     .build();
-            fileRepository.save(employee_file);
+            fileRepository.save(member_File);
 
             return newFileName;
         } catch (IOException e) {

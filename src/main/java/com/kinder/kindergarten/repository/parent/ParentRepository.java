@@ -1,11 +1,14 @@
 package com.kinder.kindergarten.repository.parent;
 
+import com.kinder.kindergarten.constant.parent.RegistrationStatus;
 import com.kinder.kindergarten.entity.parent.Parent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ParentRepository extends JpaRepository<Parent, Long> {
@@ -28,4 +31,10 @@ public interface ParentRepository extends JpaRepository<Parent, Long> {
     Page<Parent> findByParentNameContaining(String keyword, Pageable pageable);
     // 학부모 성함으로 검색하는 메서드
 
+    boolean existsByParentEmail(String parentEmail);
+    // 이메일 존재 여부 확인하는 메서드
+
+    // 상태별 학부모 목록 조회 - JPQL 쿼리로 명시적 작성
+    @Query("SELECT p FROM Parent p WHERE p.registrationStatus = :status")
+    List<Parent> findByRegistrationStatus(@Param("status") RegistrationStatus status);
 }

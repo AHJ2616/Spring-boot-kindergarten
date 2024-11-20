@@ -37,7 +37,7 @@ public class BoardEntity extends TimeEntity {
   private BoardType boardType;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(referencedColumnName = "member_email" , name="board_writer")
+  @JoinColumn(referencedColumnName = "member_id" , name="member_id")
   private Member member;
 
   @ColumnDefault("0")

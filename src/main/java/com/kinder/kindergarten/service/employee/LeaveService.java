@@ -1,15 +1,12 @@
 package com.kinder.kindergarten.service.employee;
 
-import com.kinder.kindergarten.constant.employee.DayOff;
 import com.kinder.kindergarten.DTO.employee.LeaveDTO;
-
+import com.kinder.kindergarten.constant.employee.DayOff;
 import com.kinder.kindergarten.entity.Member;
 import com.kinder.kindergarten.entity.employee.Employee;
 import com.kinder.kindergarten.entity.employee.Leave;
-import com.kinder.kindergarten.repository.employee.EmployeeRepository;
 import com.kinder.kindergarten.repository.employee.LeaveRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,10 +28,7 @@ public class LeaveService {
     @Transactional
     public void requestLeave(LeaveDTO leaveDTO, Member member) {
         // Member에 포함된 Employee 객체를 가져옵니다.
-        Employee employee = member.getEmployees()
-                .stream()
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("회원에 대한 직원 정보가 없습니다."));
+        Employee employee = member.getEmployees();
 
         // 연차 잔여일수 확인
         double requestedLeaveDays = calculateLeaveDays(leaveDTO);

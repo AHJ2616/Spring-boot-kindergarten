@@ -1,11 +1,9 @@
 package com.kinder.kindergarten.service.employee;
 
-import com.kinder.kindergarten.constant.employee.Status;
 import com.kinder.kindergarten.DTO.employee.AttendanceDTO;
-
+import com.kinder.kindergarten.constant.employee.Status;
 import com.kinder.kindergarten.entity.Member;
 import com.kinder.kindergarten.entity.employee.Attendance;
-import com.kinder.kindergarten.entity.employee.Employee;
 import com.kinder.kindergarten.repository.employee.AttendanceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

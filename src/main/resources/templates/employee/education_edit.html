@@ -30,7 +30,7 @@
                 <label>수료증</label>
                 <div th:if="${educationDTO.ed_path != null}" class="current-file">
                     <p>현재 파일: <span th:text="${educationDTO.ed_path}"></span></p>
-                    <a th:href="@{'/education/download/' + ${educationDTO.ed_id}}"
+                    <a th:href="@{'/education/view/' + ${educationDTO.ed_id}}"
                        target="_blank">현재 파일 보기</a>
                 </div>
                 <input type="file" name="file" accept="application/pdf" class="form-control">

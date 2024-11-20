@@ -1,18 +1,14 @@
 package com.kinder.kindergarten.entity;
 
 
-import com.kinder.kindergarten.DTO.MemberDTO;
-import com.kinder.kindergarten.DTO.employee.EmployeeDTO;
 import com.kinder.kindergarten.constant.employee.Role;
 import com.kinder.kindergarten.entity.employee.Employee;
 import com.kinder.kindergarten.entity.employee.Employee_File;
 import com.kinder.kindergarten.entity.employee.Leave;
+import com.kinder.kindergarten.entity.employee.Member_File;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,20 +48,20 @@ public class Member extends TimeEntity{
     private Role role;
 
     // member 필드 기준 연관관계
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Employee employees;
+
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<Employee> employees = new ArrayList<>();
+    @ToString.Exclude
+    private List<Member_File> files = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<Employee_File> files;
-
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Leave> leaves = new ArrayList<>();
 
-    // 2차 합본 합치면서 추가 - 2024 11 13
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    @OneToMany(mappedBy = "member",orphanRemoval = true)
     private List<FcmTokenEntity> fcmTokens = new ArrayList<>();
 
 }

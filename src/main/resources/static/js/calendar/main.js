@@ -29,8 +29,8 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         
         // 기본 설정
-        editable: true,
-        selectable: true,
+        editable: userRole === 'ROLE_ADMIN',
+        selectable: userRole === 'ROLE_ADMIN',
         dayMaxEvents: false, // "more" 링크를 없애고 모든 이벤트 표시
         navLinks: true,
         nowIndicator: true,
@@ -49,10 +49,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         id: event.id,
                         title: event.title,
                         start: event.start,
-                        end: event.end,
+                        end: moment(event.end).add(1, 'days').format('YYYY-MM-DD'),
                         description: event.description,
                         type: event.type,
-                        username: event.username,
                         backgroundColor: event.backgroundColor,
                         textColor: event.textColor || '#ffffff',
                         allDay: event.allDay
@@ -68,11 +67,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 이벤트 클릭
         eventClick: function(info) {
-            editEvent(info.event);
+            viewEvent(info.event);
         },
 
         // 짜 선택
         select: function(info) {
+            if (userRole !== 'ROLE_ADMIN') {
+                return; // 관리자가 아니면 선택 이벤트 무시
+            }
             const startDate = moment(info.start).format('YYYY-MM-DD HH:mm');
             const endDate = moment(info.end).format('YYYY-MM-DD HH:mm');
             
@@ -93,32 +95,35 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 이벤트 드래그 & 리사이즈
         eventDrop: function(info) {
-            const event = info.event;
-            const newStart = moment(event.start).format('YYYY-MM-DDTHH:mm:ss');
-            const newEnd = event.end ? moment(event.end).format('YYYY-MM-DDTHH:mm:ss') : newStart;
-
-            // 종일 이벤트와 시간 이벤트 간의 변환 방지
-            if (info.view.type === 'timeGridWeek' || info.view.type === 'timeGridDay') {
-                if (draggedEventIsAllDay !== event.allDay) {
-                    alert('종일 일정은 시간 일정으로 변경할 수 없습니다.');
-                    info.revert();
-                    return;
-                }
+            if (userRole !== 'ROLE_ADMIN') {
+                info.revert();
+                return;
             }
 
-            const eventData = {
-                start: newStart,
-                end: newEnd,
-                allDay: event.allDay
+            var token = $("meta[name='_csrf']").attr("content");
+            var header = $("meta[name='_csrf_header']").attr("content");
+
+            var eventData = {
+                start: moment(info.event.start).format('YYYY-MM-DDTHH:mm:ss'),
+                end: moment(info.event.end || info.event.start).format('YYYY-MM-DDTHH:mm:ss'),
+                title: info.event.title,
+                description: info.event.extendedProps.description,
+                type: info.event.extendedProps.type,
+                backgroundColor: info.event.backgroundColor,
+                textColor: info.event.textColor,
+                allDay: info.event.allDay
             };
 
             $.ajax({
-                url: `/events/drag/${event.id}`,
+                url: '/events/drag/' + info.event.id,
                 type: 'PUT',
                 data: JSON.stringify(eventData),
                 contentType: 'application/json',
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader(header, token);  // CSRF 토큰 추가
+                },
                 success: function(response) {
-                    alert('일정이 수정되었습니다.');
+                    calendar.refetchEvents();
                 },
                 error: function() {
                     alert('일정 수정 중 오류가 발생했습니다.');
@@ -128,6 +133,11 @@ document.addEventListener('DOMContentLoaded', function() {
         },
 
         eventResize: function(info) {
+            if (userRole !== 'ROLE_ADMIN') {
+                info.revert();
+                return;
+            }
+
             const event = info.event;
             const eventData = {
                 start: moment(event.start).format('YYYY-MM-DDTHH:mm:ss'),
@@ -227,3 +237,25 @@ $(document).ready(function() {
     // 초기 로드 시 이미 선택된 색상이 있다면 적용
     $('#edit-color').css('color', $('#edit-color').val());
 });
+
+// 일정 상세보기 함수
+function viewEvent(event) {
+    const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+    const modalTitle = document.querySelector('.modal-title');
+    
+    modalTitle.textContent = '일정 확인';
+    
+    // 폼 필드 설정
+    document.getElementById('edit-title').value = event.title;
+    document.getElementById('edit-start').value = moment(event.start).format('YYYY-MM-DDTHH:mm');
+    document.getElementById('edit-end').value = moment(event.end || event.start).subtract(1, 'days').format('YYYY-MM-DDTHH:mm');
+    document.getElementById('edit-type').value = event.extendedProps.type;
+    document.getElementById('edit-desc').value = event.extendedProps.description;
+    document.getElementById('edit-color').value = event.backgroundColor;
+    document.getElementById('edit-allDay').checked = event.allDay;
+
+    document.querySelector('.modalBtnContainer-addEvent').style.display = 'none';
+    document.querySelector('.modalBtnContainer-modifyEvent').style.display = 'none';
+    
+    eventModal.show();
+}

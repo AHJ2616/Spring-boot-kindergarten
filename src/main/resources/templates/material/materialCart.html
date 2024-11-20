@@ -1,99 +1,213 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>장바구니</title>
-
-
+  <title>주문 목록</title>
 </head>
 <body>
+<style>
+  /* 전역 스타일 */
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+  }
+
+  h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #007bff;
+  }
+
+  /* 테이블 스타일 */
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+
+  .table th, .table td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+  }
+
+  .table th {
+    background-color: #007bff;
+    color: white;
+  }
+
+  .table tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+
+  .table tbody tr:hover {
+    background-color: #e9ecef;
+  }
+
+  /* 버튼 스타일 */
+  .btn {
+    padding: 8px 15px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+
+  .btn-primary {
+    background-color: #007bff;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background-color: #0056b3;
+  }
+
+  .btn-danger {
+    background-color: #dc3545;
+    color: white;
+  }
+
+  .btn-danger:hover {
+    background-color: #a71d2a;
+  }
+
+  /* 입력 필드 스타일 */
+  input[type="number"] {
+    width: 80px;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-align: center;
+  }
+
+  /* 총액 표시 스타일 */
+  #grandTotal {
+    font-weight: bold;
+    font-size: 18px;
+    color: #28a745;
+  }
+
+  /* 폼 하단 스타일 */
+  form > div {
+    text-align: right;
+    margin-top: 10px;
+  }
+
+</style>
 <h2>장바구니</h2>
 <form th:action="@{/material/order}" method="post">
   <table class="table">
     <thead>
     <tr>
-      <th>자재명</th>
-      <th>현재 수량</th>
+      <th>자재 이름</th>
+      <th>자재 설명</th>
+      <th>현재 보유 수량</th>
+      <th>단가</th>
       <th>주문 수량</th>
-      <th>삭제</th> <!-- 삭제 열 추가 -->
+      <th>총 금액 [단가 x 수량]</th>
+      <th>삭제</th>
     </tr>
     </thead>
     <tbody>
     <tr th:each="material : ${materials}">
       <td th:text="${material.materialName}"></td>
+      <td th:text="${material.materialDetail}"></td>
       <td th:text="${material.materialEa}"></td>
-      <td>
-        <input type="number" th:name="'quantities[' + ${material.materialId} + ']'"
-               min="1" value="1" class="form-control">
-        <input type="hidden" th:name="'materialIds'" th:value="${material.materialId}">
-        <input type="hidden" name="_csrf" th:value="${_csrf.token}" id="csrfToken">
+      <td
+              th:text="${material.materialPrice}"
+              th:attr="data-price=${material.materialPrice}"
+              th:id="'price_' + ${material.materialId}">
       </td>
       <td>
-        <button type="button" class="btn btn-danger" onclick="deleteFromCart([[${material.materialId}]])">x</button>
-      </td> <!-- 삭제 버튼 추가 -->
+        <input
+                type="number"
+                th:name="'quantities[' + ${material.materialId} + ']'"
+                th:id="'quantity_' + ${material.materialId}"
+                min="1"
+                value="1"
+                class="form-control"
+                th:attr="data-material-id=${material.materialId}"
+                onchange="updateTotalPrice(this)">
+        <input type="hidden" th:name="'materialIds'" th:value="${material.materialId}">
+        <input type="text" th:name="'materialWriter'" th:value="${material.materialWriter}">
+        <input type="text" th:name="'materialWriterEmail'" th:value="${material.materialWriterEmail}">
+        <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+      </td>
+      <td
+              th:attr="id='totalPrice_' + ${material.materialId}"
+              class="total-price">
+        0원
+      </td>
+      <td>
+        <button
+                type="button"
+                class="btn btn-danger"
+                th:data-material-id="${material.materialId}"
+                onclick="deleteCartItem(this)">
+          x
+        </button>
+      </td>
     </tr>
     </tbody>
   </table>
+  <div>
+    전체 총액: <span id="grandTotal">0원</span>
+  </div>
   <button type="submit" class="btn btn-primary">주문하기</button>
 </form>
 
-<div class="cart-container">
-  <div class="cart-header">
-    <input type="checkbox" id="selectAll" th:onclick="selectAllItems()">
-    <button class="btn btn-danger" onclick="deleteSelectedItems()">선택 삭제</button>
-  </div>
-
-  <div class="cart-items" th:each="item : ${cartItems}">
-    <input type="checkbox" class="item-checkbox" th:value="${item.id}">
-    <span th:text="${item.materialName}"></span>
-    <button class="btn btn-sm btn-danger" th:onclick="deleteCartItem([[${item.id}]])">삭제</button>
-  </div>
-</div>
-
 <script>
-  function selectAllItems() {
-    const mainCheckbox = document.getElementById('selectAll');
-    const itemCheckboxes = document.getElementsByClassName('item-checkbox');
-    Array.from(itemCheckboxes).forEach(checkbox => {
-      checkbox.checked = mainCheckbox.checked;
-    });
-  }
+  // 개별 항목 삭제
+  function deleteCartItem(element) {
+    const materialId = element.getAttribute('data-material-id');
+    if (confirm('이 항목을 삭제하시겠습니까?')) {
+      const url = new URL(window.location.href);
+      let ids = url.searchParams.get("ids");
 
-  function deleteSelectedItems() {
-    const selectedItems = Array.from(document.getElementsByClassName('item-checkbox'))
-            .filter(checkbox => checkbox.checked)
-            .map(checkbox => checkbox.value);
+      if (!ids) return;
 
-    if(selectedItems.length === 0) {
-      alert('삭제할 항목을 선택해주세요.');
-      return;
-    }
+      const idArray = ids.split(',').filter(id => id !== materialId);
+      url.searchParams.set("ids", idArray.join(','));
 
-    fetch('/api/material/cart/delete-selected', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(selectedItems)
-    }).then(response => {
-      if(response.ok) {
-        location.reload();
-      }
-    });
-  }
-
-  function deleteCartItem(itemId) {
-    if(confirm('이 항목을 삭제하시겠습니까?')) {
-      fetch(`/api/material/cart/delete/${itemId}`, {
-        method: 'DELETE'
-      }).then(response => {
-        if(response.ok) {
-          location.reload();
-        }
-      });
+      // URL 갱신
+      window.location.href = url.toString();
     }
   }
+
+  // 항목별 총 가격 업데이트
+  function updateTotalPrice(element) {
+    const materialId = element.getAttribute("data-material-id");
+    const priceElement = document.getElementById(`price_${materialId}`);
+    const quantity = parseInt(element.value);
+    const price = parseFloat(priceElement.getAttribute("data-price"));
+    const totalPrice = price * quantity;
+
+    const totalPriceElement = document.getElementById(`totalPrice_${materialId}`);
+    totalPriceElement.textContent = totalPrice.toLocaleString() + '원';
+
+    updateGrandTotal();
+  }
+
+  // 전체 총액 계산
+  function updateGrandTotal() {
+    let grandTotal = 0;
+    const totalElements = document.getElementsByClassName('total-price');
+
+    Array.from(totalElements).forEach(element => {
+      const total = parseInt(element.textContent.replace(/[^0-9]/g, ''));
+      grandTotal += isNaN(total) ? 0 : total;
+    });
+
+    document.getElementById('grandTotal').textContent = grandTotal.toLocaleString() + '원';
+  }
+
+  // 초기화: 페이지 로드 시 총 금액 계산
+  document.addEventListener('DOMContentLoaded', () => {
+    const quantityInputs = document.querySelectorAll('input[type="number"]');
+    quantityInputs.forEach(input => updateTotalPrice(input));
+  });
 </script>
-
-
 </body>
 </html>

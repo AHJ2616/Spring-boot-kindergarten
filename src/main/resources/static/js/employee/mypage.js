@@ -1,3 +1,6 @@
+const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
 function toggleEditMode() {
     const editables = document.querySelectorAll('.info-value.editable');
     editables.forEach(el => {
@@ -31,10 +34,6 @@ function handleEditFormSubmit(e) {
     const field = document.getElementById('editField').value;
     const value = document.getElementById('editInput').value;
 
-    // CSRF 토큰을 메타 태그에서 읽어오기
-    const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
-
     // AJAX 요청으로 서버에 업데이트 요청
     fetch(`/employee/update/${field}`, {
         method: 'POST',
@@ -56,6 +55,7 @@ function handleEditFormSubmit(e) {
                     element.textContent = value;  // 새로 입력된 값을 화면에 반영
                 }
                 closeModal();  // 모달을 닫음
+                alert('수정이 완료되었습니다.');
             } else {
                 alert('업데이트 실패');
             }
@@ -68,30 +68,54 @@ function handleEditFormSubmit(e) {
 // 출퇴근 기능
 function checkIn() {
     fetch('/attendance/check-in', {
-        method: 'POST'
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            [csrfHeader]: csrfToken  // CSRF 토큰을 헤더에 추가
+        }
     })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert(data.message);
-                location.reload();
+                if (data.attendance && data.attendance.message === "이미 출근 처리되었습니다.") {
+                    // 이미 출근한 경우
+                    alert("이미 출근되었습니다.");
+                } else {
+                    // 출근 성공
+                    alert(data.message);
+                    location.reload();  // 페이지 새로고침
+                }
             } else {
-                alert(data.message);
+                alert(data.message);  // 실패 메시지
             }
         })
-        .catch(error => alert('출근 처리 중 오류가 발생했습니다.'));
+        .catch(error => {
+            alert('출근 처리 중 오류가 발생했습니다.' + error);
+            console.log(error);
+        });
 }
 
 function checkOut() {
     fetch('/attendance/check-out', {
-        method: 'POST'
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            [csrfHeader]: csrfToken  // CSRF 토큰을 헤더에 추가
+        }
     })
         .then(response => response.json())
         .then(data => {
-            alert('퇴근 처리되었습니다.');
-            location.reload();
+            if (data.success) {
+                alert(data.message);  // 퇴근 성공 메시지
+                location.reload();  // 페이지 새로고침
+            } else {
+                alert(data.message);  // 실패 메시지
+            }
         })
-        .catch(error => alert('퇴근 처리 중 오류가 발생했습니다.'));
+        .catch(error => {
+            alert('퇴근 처리 중 오류가 발생했습니다.' + error);
+            console.log(error);
+        });
 }
 
 function toggleCertificateForm() {
