@@ -2,12 +2,10 @@ package com.kinder.kindergarten.entity.employee;
 
 import com.kinder.kindergarten.constant.employee.DayOff;
 import com.kinder.kindergarten.entity.Member;
-import com.kinder.kindergarten.entity.employee.Employee;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 
 @Table(name = "Employee_Leave")
 @Entity

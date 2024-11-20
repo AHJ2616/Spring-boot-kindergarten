@@ -9,26 +9,7 @@
 </head>
 <body>
 <div layout:fragment="content">
-<!--<div class="container-empl" >
-    <div sec:authorize="isAuthenticated()">
-        <h2>환영합니다, <span sec:authentication="name"></span>님!</h2>
-        <div class="menu-section">
-            <a th:href="@{/employee/mypage/{id}(id=${#authentication.principal.employee.id})}" class="btn">마이페이지</a>
-            <a th:href="@{/attendance/my-records}" class="btn">근태관리</a>
-            <a th:href="@{/leave/my-leaves}" class="btn">휴가관리</a>
-            <div sec:authorize="hasRole('ADMIN')">
-                <a th:href="@{/admin/employees}" class="btn">직원관리</a>
-            </div>
-            <a th:href="@{/main/logout}" class="btn">로그아웃</a>
-        </div>
-    </div>
-    <div sec:authorize="!isAuthenticated()">
-        <div class="login-section">
-            <a th:href="@{/main/login}" class="btn">로그인</a>
-            <a th:href="@{/employee/new}" class="btn">직원등록</a>
-        </div>
-    </div>
-</div>-->
+
 </div>
 </body>
 </html>

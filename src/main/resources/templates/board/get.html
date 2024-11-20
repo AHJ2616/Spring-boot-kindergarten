@@ -118,7 +118,7 @@
       <a th:href="@{/board/modify/{boardId}(boardId=${boardDTO.boardId})}"
          class="btn btn-primary">수정</a>
 
-      <button onclick="deleteBoard([[${boardDTO.boardId}]])"
+      <button onclick="deleteBoard([[${boardDTO.boardId}]]);"
               class="btn btn-danger">삭제</button>
       <a href="javascript:history.back()" class="btn btn-secondary">뒤로가기</a>
     </div>
@@ -177,8 +177,8 @@
     <!-- script 섹션 수정 -->
     <script th:inline="javascript">
         // 기존 변수 선언 유지
-        const boardId = [[${boardDTO.boardId}]];
-        const boardFiles = [[${boardDTO.BoardFileList}]];
+        const boardId = /*[[${boardDTO.boardId}]]*/ '[[${boardDTO.boardId}]]';
+        const boardFiles = /*[[${boardDTO.BoardFileList}]]*/ '[[${boardDTO.BoardFileList}]]';
         
         // 설문 제출 함수 추가
         function submitSurvey() {

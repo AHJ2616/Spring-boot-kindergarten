@@ -31,6 +31,8 @@ public class MaterialDTO {
 
     private String materialWriter; // 글작성자
 
+    private String materialWriterEmail; // 글작성자 이메일
+
     // TimeEntity 대응
     private String regiDate;
 

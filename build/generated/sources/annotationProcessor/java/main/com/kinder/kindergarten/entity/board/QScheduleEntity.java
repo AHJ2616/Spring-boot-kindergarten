@@ -37,8 +37,6 @@ public class QScheduleEntity extends EntityPathBase<ScheduleEntity> {
 
     public final StringPath type = createString("type");
 
-    public final StringPath username = createString("username");
-
     public QScheduleEntity(String variable) {
         super(ScheduleEntity.class, forVariable(variable));
     }

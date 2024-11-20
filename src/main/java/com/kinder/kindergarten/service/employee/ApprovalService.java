@@ -8,10 +8,10 @@ import com.kinder.kindergarten.entity.Member;
 import com.kinder.kindergarten.entity.employee.Approval;
 import com.kinder.kindergarten.entity.employee.Employee;
 import com.kinder.kindergarten.entity.employee.Leave;
-import com.kinder.kindergarten.repository.MemberRepository;
 import com.kinder.kindergarten.repository.employee.ApprovalRepository;
 import com.kinder.kindergarten.repository.employee.EmployeeRepository;
 import com.kinder.kindergarten.repository.employee.LeaveRepository;
+import com.kinder.kindergarten.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,13 +29,13 @@ public class ApprovalService {
     private final LeaveRepository leaveRepository;
     private final EmployeeRepository employeeRepository;
 
-    private final MemberRepository memberRepository;
+    private final NotificationService notificationService;
 
     // 휴가 결재 요청 생성
-    public void createLeaveApproval(Member requester, Employee approver, Leave leave) {
+    public void createLeaveApproval(Member member, Employee employee, Leave leave) {
         Approval approval = Approval.builder()
-                .requester(requester)  // Member 객체
-                .position(approver)    // Employee 객체 (부서장)
+                .requester(member)  // Member 객체
+                .position(employee)    // Employee 객체 (부서장)
                 .type(ApprovalType.LEAVE)
                 .title(leave.getTitle())
                 .content(leave.getLe_reason())
@@ -45,7 +45,17 @@ public class ApprovalService {
                 .build();
 
         approvalRepository.save(approval);
+
+        // 결재자에게 알림 전송
+        notificationService.sendNotification(
+                employee.getMember().getEmail(),
+                "새로운 휴가 결재 요청",
+                member.getName() + "님이 휴가 결재를 요청했습니다.",
+                "APPROVAL",
+                "/approval/pending"
+        );
     }
+
 
     // 결재 처리
     @Transactional
@@ -67,10 +77,7 @@ public class ApprovalService {
 
             // Leave와 연결된 Member에서 Employee 정보 가져오기
             Member member = leave.getMember();  // Leave는 Member를 참조함
-            Employee employee = member.getEmployees()
-                    .stream()
-                    .findFirst()
-                    .orElseThrow(() -> new RuntimeException("직원 정보를 찾을 수 없습니다."));
+            Employee employee = member.getEmployees();
 
             // 결재 승인 처리
             if (status == ApprovalStatus.APPROVED) {
@@ -88,7 +95,22 @@ public class ApprovalService {
 
         // 결재 처리 완료 후 결재 정보 저장
         approvalRepository.save(approval);
+
+        // 요청자에게 결과 알림 전송
+        String title = status == ApprovalStatus.APPROVED ? "결재 승인" : "결재 반려";
+        String content = status == ApprovalStatus.APPROVED ?
+                "귀하의 결재가 승인되었습니다." :
+                "귀하의 결재가 반려되었습니다. 사유: " + rejectReason;
+
+        notificationService.sendNotification(
+                approval.getRequester().getEmail(),
+                title,
+                content,
+                "APPROVAL_RESULT",
+                "/approval/list"
+        );
     }
+
 
     //결재 정보 조회
     public Approval findApprovalById(Long id) {
@@ -96,14 +118,24 @@ public class ApprovalService {
                 .orElseThrow(() -> new RuntimeException("결재 정보를 찾을 수 없습니다."));
     }
 
+    // 결재 목록 전체 조회
+    public List<ApprovalDTO> getRequestedApprovalsAll() {
+        // Approval 리스트를 가져오고, DTO로 변환
+        List<Approval> approvals = approvalRepository.findAllApprovals(); // 개선된 메서드 호출
+        return approvals.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
     // 결재 대기 목록 조회
     public List<ApprovalDTO> getPendingApprovals(Member member) {
-        // Member의 Employee 리스트를 가져옵니다.
-        List<Employee> employees = member.getEmployees();
+        // Member의 Employee 객체를 가져옵니다.
+        Employee employee = member.getEmployees();
 
-        // Employee 리스트를 사용해 결재 대기 목록을 조회합니다.
-        return approvalRepository.findByPositionInAndStatus(employees, ApprovalStatus.PENDING)
-                .stream()
+        // 단일 Employee와 결재 상태를 사용해 결재 대기 목록을 조회합니다.
+        List<Approval> approvals = approvalRepository.findByPositionAndStatus(employee, ApprovalStatus.PENDING);
+
+        // Approval 엔티티를 DTO로 변환하여 반환합니다.
+        return approvals.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -117,11 +149,11 @@ public class ApprovalService {
     }
 
     // 결재 요청 생성
-    public void createApproval(Member requester, Employee position, String title,
+    public void createApproval(Member member, Employee employee, String title,
                                String content, ApprovalType type) {
         Approval approval = Approval.builder()
-                .requester(requester)
-                .position(position)
+                .requester(member)  // Member 객체
+                .position(employee)    // Employee 객체 (부서장)
                 .type(type)
                 .status(ApprovalStatus.PENDING)
                 .requestDate(LocalDateTime.now())
@@ -130,6 +162,15 @@ public class ApprovalService {
                 .build();
 
         approvalRepository.save(approval);
+
+        // 결재자에게 알림 전송
+        notificationService.sendNotification(
+                employee.getMember().getEmail(),
+                "새로운 결재 요청",
+                member.getName() + "님이 결재를 요청했습니다.",
+                "APPROVAL",
+                "/approval/pending"
+        );
     }
 
     private ApprovalDTO convertToDTO(Approval approval) {

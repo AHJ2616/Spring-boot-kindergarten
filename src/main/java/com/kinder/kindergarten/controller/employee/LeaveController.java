@@ -2,10 +2,9 @@ package com.kinder.kindergarten.controller.employee;
 
 import com.kinder.kindergarten.DTO.MultiDTO;
 import com.kinder.kindergarten.DTO.employee.EmployeeDTO;
-import com.kinder.kindergarten.config.PrincipalDetails;
 import com.kinder.kindergarten.DTO.employee.LeaveDTO;
+import com.kinder.kindergarten.config.PrincipalDetails;
 import com.kinder.kindergarten.service.MemberService;
-import com.kinder.kindergarten.service.employee.EmployeeService;
 import com.kinder.kindergarten.service.employee.LeaveService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +12,10 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
@@ -23,7 +25,6 @@ import java.util.List;
 public class LeaveController {
 
     private final LeaveService leaveService;
-    private final EmployeeService employeeService;
 
     private final MemberService memberService;
     @GetMapping("/request")
@@ -69,7 +70,7 @@ public class LeaveController {
         return "redirect:"+ redirectUrl;
     }
 
-    @GetMapping("/my-leaves")
+    @GetMapping("/leave_list")
     public String getMyLeaves(@AuthenticationPrincipal PrincipalDetails principalDetails,
                               Model model) {
         List<LeaveDTO> leaves = leaveService.getLeavesByEmployee(principalDetails.getMember());

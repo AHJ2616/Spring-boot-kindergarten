@@ -5,15 +5,18 @@ package com.kinder.kindergarten.service.material;
 import com.github.f4b6a3.ulid.Ulid;
 import com.github.f4b6a3.ulid.UlidCreator;
 import com.kinder.kindergarten.DTO.material.*;
-import com.kinder.kindergarten.constant.material.MaterialOrderStatus;
+import com.kinder.kindergarten.DTO.money.MoneyFormDTO;
+import com.kinder.kindergarten.constant.money.MoneyStatus;
 import com.kinder.kindergarten.entity.material.MaterialEntity;
 import com.kinder.kindergarten.entity.material.MaterialFileEntity;
 import com.kinder.kindergarten.entity.material.MaterialOrderEntity;
-import com.kinder.kindergarten.entity.material.MaterialOrderHistory;
+import com.kinder.kindergarten.entity.material.MaterialOrderHistoryEntity;
+import com.kinder.kindergarten.entity.money.MoneyEntity;
 import com.kinder.kindergarten.repository.material.MaterialFileRepository;
 import com.kinder.kindergarten.repository.material.MaterialOrderHistoryRepository;
 import com.kinder.kindergarten.repository.material.MaterialOrderRepository;
 import com.kinder.kindergarten.repository.material.MaterialRepository;
+import com.kinder.kindergarten.repository.money.MoneyRepository;
 import com.kinder.kindergarten.service.FileService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +32,7 @@ import org.springframework.web.util.UriUtils;
 
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -41,7 +45,6 @@ public class MaterialService {
 
     private final MaterialRepository materialRepository;
 
-
     private final ModelMapper modelMapper;
 
     private final FileService fileService;
@@ -51,9 +54,12 @@ public class MaterialService {
     // 장바구니 구현 2024 11 12
     private final MaterialOrderRepository materialOrderRepository;
 
-    // 장바구니 후처리 구현 2024 11 13
-    private final MaterialOrderHistoryRepository orderHistoryRepository;
+    // OrderHistory 관련 구현 중 2024 11 14
+    private final MaterialOrderHistoryRepository materialOrderHistoryRepository;
 
+    // 자재 주문 완료시 회계쪽으로
+    private final MoneyRepository moneyRepository;
+    
     //파일 업로드 경로
     @Value("${uploadPathMaterial1}")
     private String uploadPath;
@@ -200,6 +206,14 @@ public class MaterialService {
     } // 페이지 처리되는 아이템 처리용
 
 
+    public List<MaterialOrderDTO> getAllOrdersPage() {
+        List<MaterialOrderEntity> orders = materialOrderRepository.findAll();
+        return orders.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+
     @Transactional
     public void deleteMaterial(String materialId) throws Exception {
         // 자재 이미지 먼저 삭제
@@ -229,6 +243,11 @@ public class MaterialService {
 
             MaterialOrderEntity order = MaterialOrderEntity.builder()
                     .orderMaterialName(material.getMaterialName())
+                    .orderMaterialDetail(material.getMaterialDetail())
+                    .orderMaterialPrice(material.getMaterialPrice())
+                    .orderMaterialTotalPrice(material.getMaterialPrice()*quantity)
+                    .orderWriter(material.getMaterialWriter())
+                    .orderWriterEmail(material.getMaterialWriterEmail())
                     .material(material)
                     .quantity(quantity)
                     .status("PENDING")
@@ -242,7 +261,7 @@ public class MaterialService {
     }
 
     @Transactional
-    public boolean completeOrder(String orderId) {
+    public boolean orderedOrder(String orderId) {
         MaterialOrderEntity order = materialOrderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
@@ -251,12 +270,90 @@ public class MaterialService {
         }
 
         MaterialEntity material = order.getMaterial();
-        material.setMaterialEa((material.getMaterialEa() + order.getQuantity()));
-        materialRepository.save(material);
 
-        order.setStatus("COMPLETED");
+        order.setStatus("ORDERED");
         materialOrderRepository.save(order);
 
+        return true;
+    }
+
+    // 제작중 - 주문 접소 목록에서 입고 완료 버튼 클릭시 동작 - 2024 11 14
+    @Transactional
+    public boolean completeOrder(String orderId) {
+
+        MaterialOrderEntity order = materialOrderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        MaterialEntity material = order.getMaterial();
+        material.setMaterialEa(material.getMaterialEa() + order.getQuantity());
+        materialRepository.save(material);
+
+        MaterialOrderHistoryEntity history = MaterialOrderHistoryEntity.builder()
+                .orderMaterialName(order.getOrderMaterialName())
+                .orderMaterialDetail(order.getOrderMaterialDetail())
+                .orderMaterialPrice(order.getOrderMaterialPrice())
+                .orderMaterialTotalPrice(order.getOrderMaterialTotalPrice())
+                .quantity(order.getQuantity())
+                .status("COMPLETED")
+                .orderWriter(order.getOrderWriter())
+                .orderWriterEmail(order.getOrderWriterEmail())
+                .orderDate(order.getOrderDate())
+                .statusChangeDate(LocalDate.now())
+                .deletionDate(LocalDateTime.now().plusDays(7))
+                .material(order.getMaterial())
+                .build();
+
+        Ulid ulid = UlidCreator.getUlid();
+        String id = ulid.toString();
+
+
+        MaterialToMoneyDTO materialToMoneyDTO = MaterialToMoneyDTO.builder()
+                .moneyId(id)
+                .moneyUseDate(history.getStatusChangeDate())
+                .moneyContent(history.getOrderMaterialDetail())
+                .moneyWho(history.getOrderWriter())
+                .moneyCompany("교내")
+                .moneyName(history.getOrderMaterialName())
+                .moneyHowMuch(history.getOrderMaterialTotalPrice())
+                .moneyStatus(MoneyStatus.EXPENDITURE)
+                .moneyApproval("완료")
+                .build();
+
+        MoneyEntity moneyEntity = materialToMoneyDTO.createMoney();
+        moneyRepository.save(moneyEntity);
+
+        materialOrderHistoryRepository.save(history);
+        materialOrderRepository.delete(order);
+        // 주문한거 저장
+
+
+        return true;
+
+    }
+
+    @Transactional
+    public boolean cancelOrder(String orderId, String reason) {
+        MaterialOrderEntity order = materialOrderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        MaterialOrderHistoryEntity history = MaterialOrderHistoryEntity.builder()
+                .orderMaterialName(order.getOrderMaterialName())
+                .orderMaterialDetail(order.getOrderMaterialDetail())
+                .orderMaterialPrice(order.getOrderMaterialPrice())
+                .quantity(order.getQuantity())
+                .orderMaterialTotalPrice(order.getOrderMaterialTotalPrice())
+                .status("CANCELED")
+                .orderWriter(order.getOrderWriter())
+                .orderWriterEmail(order.getOrderWriterEmail())
+                .orderDate(order.getOrderDate())
+                .statusChangeDate(LocalDate.now())
+                .deletionDate(LocalDateTime.now().plusDays(7))
+                .material(order.getMaterial())
+                .rejectReason(reason)
+                .build();
+
+        materialOrderHistoryRepository.save(history);
+        materialOrderRepository.delete(order);
         return true;
     }
 
@@ -269,20 +366,27 @@ public class MaterialService {
     }
 
     // 모든 주문 조회
-    public List<MaterialOrderDTO> getAllOrders() {
-        List<MaterialOrderEntity> orders = materialOrderRepository.findAll();
-        return orders.stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
+    public Page<MaterialOrderDTO> getAllOrders(Pageable pageable) {
+        Page<MaterialOrderEntity> ordersPage = materialOrderRepository.findAll(pageable);
+        return ordersPage.map(this::convertToDTO);
     }
+
+    public Page<MaterialOrderHistoryDTO> getAllOrderHistory(Pageable pageable) {
+        Page<MaterialOrderHistoryEntity> ordersHistoryPage = materialOrderHistoryRepository.findAll(pageable);
+        return ordersHistoryPage.map(this::convertToDTO);
+    }
+
 
     // MaterialEntity를 MaterialDTO로 변환
     private MaterialDTO convertToDTO(MaterialEntity entity) {
         return MaterialDTO.builder()
                 .materialId(entity.getMaterialId())
                 .materialName(entity.getMaterialName())
+                .materialDetail(entity.getMaterialDetail())
                 .materialEa(entity.getMaterialEa())
-                //.materialStatus((entity.getMaterialStatus())
+                .materialPrice(entity.getMaterialPrice())
+                .materialWriter(entity.getMaterialWriter())
+                .materialWriterEmail(entity.getMaterialWriterEmail())
                 .build();
     }
 
@@ -292,65 +396,50 @@ public class MaterialService {
                 .orderId(entity.getOrderId())
                 .orderMaterialName(entity.getOrderMaterialName())
                 .quantity(entity.getQuantity())
+                .orderMaterialPrice(entity.getOrderMaterialPrice())
+                .orderMaterialTotalPrice(entity.getOrderMaterialTotalPrice())
                 .status(entity.getStatus())
                 .orderDate(entity.getOrderDate())
+                .orderWriter(entity.getOrderWriter())
+                .orderWriterEmail(entity.getOrderWriterEmail())
                 .build();
     }
 
-    // 장바구니 후처리 구현중 2024 11 13
-    // 장바구니 항목 삭제
-    public void deleteCartItems(List<String> orderIds) {
-        orderIds.forEach(this::deleteCartItem);
+    private MaterialOrderHistoryDTO convertToDTO(MaterialOrderHistoryEntity entity) {
+        return MaterialOrderHistoryDTO.builder()
+                .historyId(entity.getHistoryId())
+                .orderMaterialName(entity.getOrderMaterialName())
+                .orderMaterialDetail(entity.getOrderMaterialDetail())
+                .orderMaterialPrice(entity.getOrderMaterialPrice())
+                .quantity(entity.getQuantity())
+                .orderMaterialTotalPrice(entity.getOrderMaterialTotalPrice())
+                .orderWriter(entity.getOrderWriter())
+                .orderWriterEmail(entity.getOrderWriterEmail())
+                .status(entity.getStatus())
+                .orderDate(entity.getOrderDate())
+                .rejectReason(entity.getRejectReason())
+                .statusChangeDate(entity.getStatusChangeDate())
+                .deletionDate(entity.getDeletionDate())
+                .material(entity.getMaterial())
+                .build();
     }
 
-    // 장바구니 개별 항목 삭제
-    public void deleteCartItem(String orderId) {
-        // 장바구니 항목 삭제 로직
-        materialOrderRepository.deleteById(orderId);
+
+
+    
+    // 주문 처리 목록 출력
+/*
+    public List<MaterialOrderHistory> getOrderHistory() {
+        return materialOrderHistoryRepository.findAll();
+    }
+*/
+
+    // 주문 처리 삭제
+    @Transactional
+    public void deleteHistoryRecord(String historyId) {
+        materialOrderHistoryRepository.deleteById(historyId);
     }
 
-    // 주문 취소
-    public void cancelOrder(Long orderHistoryId) {
-        MaterialOrderHistory order = orderHistoryRepository.findById(orderHistoryId)
-                .orElseThrow(() -> new RuntimeException("주문을 찾을 수 없습니다."));
-
-        order.setMaterialOrderStatus(MaterialOrderStatus.CANCELED);
-        order.setStatusChangeDate(LocalDateTime.now());
-        orderHistoryRepository.save(order);
-    }
-
-    // 주문 이력 조회
-    public MaterialOrderHistory getOrderHistory(Long orderId) {
-        return orderHistoryRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("주문 이력을 찾을 수 없습니다."));
-    }
-
-    // 주문 이력 삭제
-    public void deleteOrderHistory(Long historyId) {
-        orderHistoryRepository.deleteById(historyId);
-    }
-
-    // 7일 이상 된 주문 이력 삭제
-    public void deleteOldOrderHistories() {
-        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
-        List<MaterialOrderHistory> oldHistories = orderHistoryRepository.findByOrderDateBefore(sevenDaysAgo);
-        orderHistoryRepository.deleteAll(oldHistories);
-    }
-
-    // 완료/취소된 주문 목록 조회
-    public List<MaterialOrderHistory> getCompletedOrCanceledOrders() {
-        return orderHistoryRepository.findAllCompletedOrCanceled();
-    }
-
-    // 주문 완료 처리
-    public void completeOrder(Long orderId) {
-        MaterialOrderHistory order = orderHistoryRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("주문을 찾을 수 없습니다."));
-
-        order.setMaterialOrderStatus(MaterialOrderStatus.COMPLETED);
-        order.setStatusChangeDate(LocalDateTime.now());
-        orderHistoryRepository.save(order);
-    }
 
 
 }

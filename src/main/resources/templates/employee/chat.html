@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout}">
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="/css/employee/chat.css">
+  <script th:src="@{/js/employee/chat.js}"></script>
+    <meta charset="UTF-8">
+    <title>chat</title>
+</head>
+<body>
+<div layout:fragment="content">
+  <div class="chat-container">
+    <div class="chat-header">
+      <h2>실시간 채팅</h2>
+      <div class="online-status">
+        <span id="connectionStatus">연결 중...</span>
+      </div>
+    </div>
+
+    <div class="chat-content">
+      <div class="chat-sidebar">
+        <div class="search-box">
+          <input type="text" id="userSearch" placeholder="사용자 검색..." />
+        </div>
+        <div class="user-list-container">
+          <h3>대화 상대</h3>
+          <ul id="userList">
+            <!-- 사용자 목록이 동적으로 추가됨 -->
+          </ul>
+        </div>
+        <div class="chat-rooms">
+          <h3>진행 중인 채팅</h3>
+          <ul id="chatRoomList">
+            <!-- 채팅방 목록이 동적으로 추가됨 -->
+          </ul>
+        </div>
+      </div>
+
+      <div class="chat-main">
+        <div class="current-chat-header">
+          <div id="selectedUserInfo">
+            <!-- 선택된 사용자 정보 표시 -->
+          </div>
+          <div class="chat-actions">
+            <button id="refreshChat" title="새로고침"><i class="fas fa-sync-alt"></i></button>
+            <button id="clearChat" title="채팅창 비우기"><i class="fas fa-trash-alt"></i></button>
+          </div>
+        </div>
+
+        <div id="messageArea" class="message-area">
+          <!-- 메시지들이 동적으로 추가됨 -->
+          <div class="message-date-divider">
+            <!-- 날짜 구분선이 동적으로 추가됨 -->
+          </div>
+        </div>
+
+        <div class="message-input-container">
+          <form id="messageForm" onsubmit="sendMessage(event)">
+            <input type="hidden" id="receiverId" />
+            <div class="input-group">
+              <input type="text" id="message"
+                     placeholder="메시지를 입력하세요..."
+                     autocomplete="off"
+                     maxlength="1000" />
+              <div class="input-group-append">
+                <button type="submit" class="send-button">
+                  <i class="fas fa-paper-plane"></i>
+                </button>
+              </div>
+            </div>
+          </form>
+          <div class="message-length-counter">
+            <span id="currentLength">0</span>/1000
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 알림 모달 -->
+  <div id="notificationModal" class="modal fade">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">새 메시지 알림</h5>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p id="notificationMessage"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id="viewMessage">메시지 보기</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+<script>
+  // 현재 로그인한 사용자 정보
+  const userId = /*[[${#authentication.principal.member.id}]]*/ null;
+  const username = /*[[${#authentication.principal.member.name}]]*/ '';
+  const userRole = /*[[${#authentication.principal.member.role}]]*/ '';
+</script>
+</html>

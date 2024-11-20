@@ -38,7 +38,7 @@
         <label>자격증 파일</label>
         <div th:if="${certificateDTO.ce_path != null}" class="current-file">
           <p>현재 파일: <span th:text="${certificateDTO.ce_path}"></span></p>
-          <a th:href="@{'/certificate/download/' + ${certificateDTO.ce_id}}"
+          <a th:href="@{'/certificate/view/' + ${certificateDTO.ce_id}}"
              target="_blank">현재 파일 보기</a>
         </div>
         <input type="file"

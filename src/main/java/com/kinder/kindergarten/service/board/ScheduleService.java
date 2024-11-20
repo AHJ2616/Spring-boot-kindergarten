@@ -1,7 +1,5 @@
 package com.kinder.kindergarten.service.board;
 
-import com.github.f4b6a3.ulid.Ulid;
-import com.github.f4b6a3.ulid.UlidCreator;
 import com.kinder.kindergarten.DTO.board.ScheduleDTO;
 import com.kinder.kindergarten.entity.board.ScheduleEntity;
 import com.kinder.kindergarten.repository.board.ScheduleRepository;
@@ -51,8 +49,6 @@ public class ScheduleService {
   // 일정 생성
   public ScheduleDTO createSchedule(ScheduleDTO scheduleDTO) {
     ScheduleEntity schedule = modelMapper.map(scheduleDTO, ScheduleEntity.class);
-    Ulid ulid = UlidCreator.getUlid();
-    schedule.setId(ulid.toString());
 
     ScheduleEntity savedSchedule = scheduleRepository.save(schedule);
     return modelMapper.map(savedSchedule, ScheduleDTO.class);
@@ -71,7 +67,6 @@ public class ScheduleService {
     schedule.setEnd(scheduleDTO.getEnd());
     schedule.setBackgroundColor(scheduleDTO.getBackgroundColor());
     schedule.setAllDay(scheduleDTO.isAllDay());
-    schedule.setUsername(scheduleDTO.getUsername());
 
     ScheduleEntity updatedSchedule = scheduleRepository.save(schedule);
     return modelMapper.map(updatedSchedule, ScheduleDTO.class);

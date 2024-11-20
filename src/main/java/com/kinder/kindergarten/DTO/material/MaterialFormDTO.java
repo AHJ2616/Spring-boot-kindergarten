@@ -37,6 +37,7 @@ public class MaterialFormDTO {
     
     private String materialWriter; // 글작성자
 
+    private String materialWriterEmail; // 글작성자 이메일
 
     private MaterialStatus materialStatus;
 

@@ -1,11 +1,11 @@
 package com.kinder.kindergarten.controller.employee;
 
+import com.kinder.kindergarten.DTO.employee.ApprovalDTO;
 import com.kinder.kindergarten.config.PrincipalDetails;
 import com.kinder.kindergarten.constant.employee.ApprovalStatus;
 import com.kinder.kindergarten.constant.employee.ApprovalType;
 import com.kinder.kindergarten.entity.Member;
 import com.kinder.kindergarten.entity.employee.Employee;
-import com.kinder.kindergarten.service.MemberService;
 import com.kinder.kindergarten.service.employee.ApprovalService;
 import com.kinder.kindergarten.service.employee.EmployeeService;
 import lombok.RequiredArgsConstructor;
@@ -52,24 +52,32 @@ public class ApprovalController {
         return "/employee/approval_list";
     }
 
+    @GetMapping("/AllList")
+    public String getApprovalAllList(Model model) {
+        List<ApprovalDTO> approvalList = approvalService.getRequestedApprovalsAll();
+        approvalList.forEach(approval -> System.out.println(approval.getTitle())); // 확인용 출력
+        model.addAttribute("approvals", approvalList);
+        return "/employee/approval_allList";
+    }
+
     @GetMapping("/request")
     public String showRequestForm(Model model) {
-        // 결재자 목록 조회 (예: 부서장 이상)
+        // 결재자 목록 조회
         List<Employee> approvers = employeeService.findApprovers();
         model.addAttribute("approvers", approvers);
         return "/employee/approval_request";
     }
 
-//    @PostMapping("/submit")
-//    public String submitApproval(@RequestParam Map<String, String> params,
-//                                 @AuthenticationPrincipal PrincipalDetails principalDetails) {
-//        Member requester = principalDetails.getMember();
-//        //Employee approver = memberService.getEmployeeEntity(Long.parseLong(params.get("approverId")));
-//
-//        // 결재 요청 생성
-//        approvalService.createApproval(requester, approver, params.get("title"),
-//                params.get("content"), ApprovalType.GENERAL);
-//
-//        return "redirect:/approval/list";
-//    }
+    @PostMapping("/submit")
+    public String submitApproval(@RequestParam Map<String, String> params,
+                                 @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        Member requester = principalDetails.getMember();
+        Employee approver = employeeService.getEmployeeEntity(Long.parseLong(params.get("approverId")));
+
+        // 결재 요청 생성
+        approvalService.createApproval(requester, approver, params.get("title"),
+                params.get("content"), ApprovalType.GENERAL);
+
+        return "redirect:/approval/list";
+    }
 }

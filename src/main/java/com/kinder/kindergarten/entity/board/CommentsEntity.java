@@ -21,8 +21,8 @@ public class CommentsEntity extends TimeEntity {
 
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name="writer", referencedColumnName = "member_email")
-  private Member writer;
+  @JoinColumn(name="member_id", referencedColumnName = "member_id")
+  private Member member;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name="board_id")

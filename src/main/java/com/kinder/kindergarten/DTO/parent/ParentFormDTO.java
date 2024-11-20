@@ -15,7 +15,11 @@ import org.hibernate.validator.constraints.Length;
 @Log4j2
 public class ParentFormDTO {
 
-  // 학부모가 회원가입 할 때 넘어오는 가입 정보
+  /* 학부모가 회원가입 할 때 넘어오는 가입 정보
+
+   11.18 -> 현 프로젝트의 취지에 맞지 않는 학부모가 회원 가입할 때 DTO 입니다.
+   삭제하진 않았으나 미래의 용도를 위해 남겨 두겠습니다.
+   */
 
   @NotBlank(message = "성함은 필수 입력 값 입니다.")
   private String parent_name; // 학부모 이름

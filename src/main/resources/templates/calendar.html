@@ -4,8 +4,8 @@
       layout:decorate="~{common/layout2}">
 <head>
   <meta charset="UTF-8">
-  <meta name="_csrf" content="${_csrf.token}">
-  <meta name="_csrf_header" content="${_csrf.headerName}">
+  <meta name="_csrf" th:content="${_csrf.token}">
+  <meta name="_csrf_header" th:content="${_csrf.headerName}">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>캘린더</title>
 
@@ -28,6 +28,10 @@
 
   <!-- Custom CSS -->
   <link rel="stylesheet" href="css/calendar.css">
+
+  <script th:inline="javascript">
+   const userRole = /*[[${userRole}]]*/ 'ROLE_USER'; // 기본값을 'ROLE_USER'로 설정
+  </script>
 </head>
 
 <body>
@@ -36,7 +40,7 @@
     <input type="hidden" id="currentEventId"/>
 
     <!-- 일자 클릭시 메뉴오픈 -->
-    <div id="contextMenu" class="dropdown clearfix">
+    <div id="contextMenu" class="dropdown clearfix" th:if="${userRole == 'ROLE_ADMIN'}" style="display: none;">
       <ul class="dropdown-menu dropNewEvent" role="menu" aria-labelledby="dropdownMenu"
           style="display:block;position:static;margin-bottom:5px;">
         <li><a class="dropdown-item" href="#">카테고리1</a></li>
@@ -149,7 +153,6 @@
   <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/list@6.1.10/main.min.js'></script>
   <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/interaction@6.1.10/main.min.js'></script>
 
-  <!-- Custom Scripts -->
   <script src="js/calendar/main.js"></script>
   <script src="js/calendar/addEvent.js"></script>
   <script src="js/calendar/editEvent.js"></script>

@@ -18,28 +18,6 @@ public class SurveyRestController {
 
     private final SurveyService surveyService;
 
-    // 설문조사 생성
-    @PostMapping
-    public ResponseEntity<?> createSurvey(@RequestBody SurveyDTO surveyDTO) {
-        try {
-            log.info("Received survey request: {}", surveyDTO);
-            
-            // 기본 유효성 검사
-            if (surveyDTO.getTitle() == null || surveyDTO.getTitle().trim().isEmpty()) {
-                return ResponseEntity.badRequest().body("설문 제목은 필수입니다.");
-            }
-            if (surveyDTO.getQuestions() == null || surveyDTO.getQuestions().isEmpty()) {
-                return ResponseEntity.badRequest().body("최소 하나의 질문이 필요합니다.");
-            }
-
-            SurveyDTO createdSurvey = surveyService.createSurvey(surveyDTO);
-            return ResponseEntity.ok(createdSurvey);
-        } catch (Exception e) {
-            log.error("설문 생성 중 오류 발생", e);
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
     // 설문조사 조회
     @GetMapping("/{surveyId}")
     public ResponseEntity<SurveyDTO> getSurvey(@PathVariable String surveyId) {
@@ -52,7 +30,7 @@ public class SurveyRestController {
     }
 
     // 모든 설문조사 조회
-    @GetMapping
+    @GetMapping(value = "/research")
     public ResponseEntity<List<SurveyDTO>> getAllSurveys() {
         try {
             List<SurveyDTO> surveys = surveyService.getAllSurveys();
@@ -83,6 +61,19 @@ public class SurveyRestController {
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
+        }
+    }
+
+    // 설문 응답 저장
+    @PostMapping("/{surveyId}/responses")
+    public ResponseEntity<?> saveSurveyResponses(
+            @PathVariable String surveyId,
+            @RequestBody List<Map<String, Object>> responses) {
+        try {
+            surveyService.saveSurveyResponses(surveyId, responses);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 }

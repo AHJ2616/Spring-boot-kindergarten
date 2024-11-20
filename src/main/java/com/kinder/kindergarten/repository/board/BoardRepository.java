@@ -14,7 +14,7 @@ public interface BoardRepository extends JpaRepository<BoardEntity, String> {
 
   //게시판 타입별로 전체 불러오기
   Page<BoardEntity> findByBoardType(BoardType boardType, Pageable pageable);
-
+  List<BoardEntity> findByBoardType(BoardType boardType);
   // 기본 검색 메소드 수정
   @Query("SELECT b FROM BoardEntity b JOIN b.member m " +
          "WHERE b.boardTitle LIKE %:keyword% " +
@@ -62,6 +62,6 @@ public interface BoardRepository extends JpaRepository<BoardEntity, String> {
       Pageable pageable
   );
 
-  List<BoardEntity> findByBoardType(BoardType boardType);
+
 
 }

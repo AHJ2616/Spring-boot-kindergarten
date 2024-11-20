@@ -56,7 +56,6 @@ var newEvent = function (start, end, eventType) {
             end: editEnd.value,
             description: editDesc.value.trim() || '', // 빈 문자열이면 빈 문자열로 설정
             type: document.getElementById('edit-type').value,
-            username: '사나',
             backgroundColor: document.getElementById('edit-color').value,
             textColor: '#ffffff',
             allDay: document.getElementById('edit-allDay').checked
@@ -64,12 +63,17 @@ var newEvent = function (start, end, eventType) {
 
         console.log('전송할 일정 데이터:', eventData);
 
+        var token = $("meta[name='_csrf']").attr("content");
+        var header = $("meta[name='_csrf_header']").attr("content");
 
         $.ajax({
             url: '/events/add',
             type: 'POST',
-            data: JSON.stringify(eventData),
             contentType: 'application/json',
+            data: JSON.stringify(eventData),
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader(header, token);  // CSRF 토큰 설정
+            },
             success: function(response) {
                 console.log('저장된 일정:', response);
                 calendar.refetchEvents();

@@ -62,7 +62,7 @@ public class QBoardEntity extends EntityPathBase<BoardEntity> {
 
     public QBoardEntity(Class<? extends BoardEntity> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.member = inits.isInitialized("member") ? new com.kinder.kindergarten.entity.QMember(forProperty("member")) : null;
+        this.member = inits.isInitialized("member") ? new com.kinder.kindergarten.entity.QMember(forProperty("member"), inits.get("member")) : null;
     }
 
 }

@@ -27,7 +27,7 @@
         <td th:text="${education.ed_end}"></td>
         <td>
           <div th:if="${education.ed_path != null}" class="pdf-preview">
-          <a th:href="@{'/education/download/' + ${education.ed_id}}"
+          <a th:href="@{'/education/view/' + ${education.ed_id}}"
              class="btn btn-primary" target="_blank">보기</a>
           </div>
         </td>

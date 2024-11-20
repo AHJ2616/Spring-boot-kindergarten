@@ -24,16 +24,16 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="emp : ${employees}">
-      <td th:text="${emp.cleanup}"></td>
-      <td th:text="${emp.name}"></td>
-      <td th:text="${emp.email}"></td>
-      <td th:text="${emp.position}"></td>
-      <td th:text="${emp.department}"></td>
-      <td th:text="${emp.status}"></td>
+    <tr th:each="dto : ${multiDTO}">
+      <td th:text="${dto.getEmployeeDTO().cleanup}"></td>
+      <td th:text="${dto.getMemberDTO().name}"></td>
+      <td th:text="${dto.getMemberDTO().email}"></td>
+      <td th:text="${dto.getEmployeeDTO().position}"></td>
+      <td th:text="${dto.getEmployeeDTO().department}"></td>
+      <td th:text="${dto.getEmployeeDTO().status}"></td>
       <td>
-        <a th:href="@{/employee/mypage/{id}(id=${emp.id})}">수정</a>
-        <a th:href="@{/employee/delete/{id}(id=${emp.id})}"
+        <a th:href="@{/employee/edit/{id}(id=${dto.getMemberDTO().id})}">수정</a>
+        <a th:href="@{/employee/delete/{id}(id=${dto.getMemberDTO().id})}"
            onclick="return confirm('정말 삭제하시겠습니까?')">삭제</a>
       </td>
     </tr>

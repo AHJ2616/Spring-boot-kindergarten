@@ -6,6 +6,7 @@ import com.kinder.kindergarten.entity.board.QBoardEntity;
 import com.kinder.kindergarten.repository.board.BoardRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.servlet.http.HttpServletRequest;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
