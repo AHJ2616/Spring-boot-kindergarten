@@ -1,7 +1,5 @@
 
 n
-java:S1192."LDefine a constant instead of duplicating this literal "/main/login" 4 times.(ïþ™Ðýÿÿÿÿ8¾³®Ä²2
-e
-java:S11922"HDefine a constant instead of duplicating this literal "MANAGER" 5 times.(ƒ›Õ»8Æ³®Ä²2
-c
-java:S11921"FDefine a constant instead of duplicating this literal "ADMIN" 5 times.(ö¿Äæ8Ç³®Ä²2
+java:S11924"LDefine a constant instead of duplicating this literal "/main/login" 4 times.(Õ£Åžûÿÿÿÿ8À’Øó²2
+]
+java:S1128";Remove this unused import 'lombok.RequiredArgsConstructor'.(ÑØŽúøÿÿÿÿ8Üüßó²2

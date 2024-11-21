@@ -1,0 +1,20 @@
+
+^
+java:S6208G"CMerge the previous cases into this one using comma-separated label.(ÍÒîÀıÿÿÿÿ
+d
+java:S11921"IDefine a constant instead of duplicating this literal "multiDTO" 3 times.(ûÆ‚ùÿÿÿÿÿ
+m
+java:S11922"WDefine a constant instead of duplicating this literal "/employee/employee_reg" 3 times.(õ”‹
+k	java:S117g"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(´¹üÔøÿÿÿÿ
+h	java:S100+"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(İ¿¨éüÿÿÿÿ
+Z
+java:S1854D"8Remove this useless assignment to local variable "role".(¥ö¤õùÿÿÿÿ8­é³ó²2
+U
+java:S1854H"8Remove this useless assignment to local variable "role".(·ïÙ¬8­é³ó²2
+Z
+java:S1854K"8Remove this useless assignment to local variable "role".(í´Ãòşÿÿÿÿ8­é³ó²2
+Z
+java:S1854N"8Remove this useless assignment to local variable "role".(Î©âäúÿÿÿÿ8¯é³ó²2
+K
+java:S1481A")Remove this unused "role" local variable.(Ùû‰šúÿÿÿÿ8°é³ó²2
+W	java:S125‰"<This block of commented-out lines of code should be removed.(¡ôÖÌùÿÿÿÿ

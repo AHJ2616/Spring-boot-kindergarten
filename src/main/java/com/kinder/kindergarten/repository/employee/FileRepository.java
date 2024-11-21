@@ -1,12 +1,10 @@
 package com.kinder.kindergarten.repository.employee;
 
 
-import com.kinder.kindergarten.entity.Member;
-import com.kinder.kindergarten.entity.employee.Employee_File;
+import com.kinder.kindergarten.entity.employee.Member_File;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
 
-public interface FileRepository extends JpaRepository<Employee_File, Long> {
-    // List<Employee_File> findByMember(Member member);
+public interface FileRepository extends JpaRepository<Member_File, Long> {
+    // List<Member_File> findByMember(Member member);
 }

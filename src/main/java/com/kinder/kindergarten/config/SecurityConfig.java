@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.context.annotation.Primary;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -24,7 +23,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import javax.sql.DataSource;
 
 @Configuration
-@RequiredArgsConstructor
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig{
 
@@ -32,6 +30,16 @@ public class SecurityConfig{
   private final CustomAuthenticationSuccessHandler successHandler;
 
   private final DataSource dataSource;
+
+  public SecurityConfig(
+          @Lazy MemberService memberService,
+          @Lazy CustomAuthenticationSuccessHandler successHandler,
+          DataSource dataSource) {
+    this.memberService = memberService;
+    this.successHandler = successHandler;
+    this.dataSource = dataSource;
+  }
+
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
     http

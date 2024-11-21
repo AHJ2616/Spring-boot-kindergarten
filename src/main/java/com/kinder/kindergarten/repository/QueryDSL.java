@@ -3,10 +3,10 @@ package com.kinder.kindergarten.repository;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.kinder.kindergarten.entity.board.QBoardEntity;
-import com.kinder.kindergarten.repository.board.BoardRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +18,6 @@ import java.util.concurrent.TimeUnit;
 public class QueryDSL {
 
   private final JPAQueryFactory queryFactory;
-  private BoardRepository boardRepository;
 
   //Guava CacheBuilder 사용하기
   private final Cache<String, LocalDateTime> viewLogCache = CacheBuilder.newBuilder()
@@ -69,6 +68,5 @@ public class QueryDSL {
 
     return ip;
   }
-
 
 }//class end

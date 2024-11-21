@@ -1,0 +1,5 @@
+
+o	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(’¤š¨
+k	java:S116"VRename this field "parent_name" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(À¸¡¤
+u	java:S116"[Rename this field "parent_birthDate" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(¹Ð’€øÿÿÿÿ
+q	java:S116"WRename this field "parent_phone" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Á¬ò©øÿÿÿÿ

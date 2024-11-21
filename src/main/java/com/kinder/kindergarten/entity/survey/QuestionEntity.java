@@ -9,37 +9,41 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.transaction.annotation.Transactional;
+
 @Entity
 @Table(name = "survey_question")
 @Getter
 @Setter
+@Transactional
 public class QuestionEntity {
 
     @Id
     @Column(name = "question_id")
-    private String id;
+    private String id;//1.PK(ULID)
 
     @Column(nullable = false)
-    private String text;
+    private String text;//2.질문 내용
+
+    @Column(columnDefinition = "TEXT")
+    private String options;//3. 선택지
 
     @Enumerated(EnumType.STRING)
-    private QuestionType type;
+    private QuestionType type;//4. 답 유형
 
-    private Integer orderNumber;
+    private Integer orderNumber;//6. 순서
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "survey_id")
-    private SurveyEntity survey;
+    private SurveyEntity survey; //0. FK survey
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AnswerEntity> answers = new ArrayList<>();
+    private List<AnswerEntity> answers = new ArrayList<>();//5. 답의 PK
 
-    // ID 설정을 위한 메소드 추가
-    public void setId(String id) {
-          this.id = UlidCreator.getUlid().toString();
+    public void setId() {
+        this.id = UlidCreator.getUlid().toString();
     }
 
-    // 양방향 관계 설정을 위한 편의 메소드
     public void addAnswer(AnswerEntity answer) {
         answers.add(answer);
         answer.setQuestion(this);

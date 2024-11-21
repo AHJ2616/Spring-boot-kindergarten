@@ -29,3 +29,6 @@ replay_pid*
 
 #firebase 연결설정 파일
 serviceAccountKey.json
+
+#sonarlint 제외하기
+.idea/sonarlint/

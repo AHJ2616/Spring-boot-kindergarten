@@ -1,0 +1,9 @@
+
+^
+java:S6208?"CMerge the previous cases into this one using comma-separated label.(‡æ‘ºúÿÿÿÿ
+n	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(Øá‡
+P
+java:S1128
+"3Remove this unused import 'java.text.NumberFormat'.(¿¸»8å®°2
+O
+java:S1128"-Remove this unused import 'java.util.Locale'.(åğ×±ûÿÿÿÿ8‚å®°2

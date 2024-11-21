@@ -118,7 +118,7 @@
       <a th:href="@{/board/modify/{boardId}(boardId=${boardDTO.boardId})}"
          class="btn btn-primary">수정</a>
 
-      <button onclick="deleteBoard([[${boardDTO.boardId}]])"
+      <button onclick="deleteBoard([[${boardDTO.boardId}]]);"
               class="btn btn-danger">삭제</button>
       <a href="javascript:history.back()" class="btn btn-secondary">뒤로가기</a>
     </div>
@@ -177,72 +177,10 @@
     <!-- script 섹션 수정 -->
     <script th:inline="javascript">
         // 기존 변수 선언 유지
-        const boardId = [[${boardDTO.boardId}]];
-        const boardFiles = [[${boardDTO.BoardFileList}]];
+        const boardId = /*[[${boardDTO.boardId}]]*/ '[[${boardDTO.boardId}]]';
+        const boardFiles = /*[[${boardDTO.BoardFileList}]]*/ '[[${boardDTO.BoardFileList}]]';
         
-        // 설문 제출 함수 추가
-        function submitSurvey() {
-            const form = document.getElementById('surveyForm');
-            const answers = [];
-            
-            // CSRF 토큰 가져오기
-            const token = document.querySelector("meta[name='_csrf']").content;
-            const header = document.querySelector("meta[name='_csrf_header']").content;
-            
-            // 모든 질문에 대한 답변 수집
-            document.querySelectorAll('.question-item').forEach(questionDiv => {
-                const questionId = questionDiv.querySelector('input, textarea').name.split('_')[1];
-                let answer;
-                
-                if (questionDiv.querySelector('input[type="radio"]')) {
-                    const selectedRadio = questionDiv.querySelector('input[type="radio"]:checked');
-                    answer = selectedRadio ? selectedRadio.value : null;
-                } else {
-                    answer = questionDiv.querySelector('textarea').value;
-                }
-                
-                if (answer) {
-                    answers.push({
-                        questionId: questionId,
-                        answerText: answer
-                    });
-                }
-            });
-            
-            // 모든 필수 항목이 답변되었는지 확인
-            if (answers.length < document.querySelectorAll('.question-item').length) {
-                alert('모든 항목에 답변해주세요.');
-                return;
-            }ㅎ
-            
-            // 서버로 답변 전송
-            fetch('/api/survey/submit', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    [header]: token
-                },
-                body: JSON.stringify({
-                    boardId: boardId,
-                    answers: answers
-                })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('설문 제출에 실패했습니다.');
-                }
-                return response.json();
-            })
-            .then(data => {
-                alert('설문이 성공적으로 제출되었습니다.');
-                // 설문 폼 비활성화
-                document.querySelectorAll('#surveyForm input, #surveyForm textarea, #surveyForm button')
-                    .forEach(element => element.disabled = true);
-            })
-            .catch(error => {
-                alert(error.message);
-            });
-        }
+    
     </script>
   </div>
 </div>

@@ -1,14 +1,20 @@
 
-b	java:S112'"FDefine and throw a dedicated exception instead of using a generic one.(¦ûØ÷8ÒÙ„°2
-g	java:S112V"FDefine and throw a dedicated exception instead of using a generic one.(¢†Îüÿÿÿÿ8ÒÙ„°2
-h	java:S112ƒ"FDefine and throw a dedicated exception instead of using a generic one.(ñ¿¬¡üÿÿÿÿ8‰ÔÛ„°2
-m	java:S117q"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(îâ˜‡8‹ÔÛ„°2
-n	java:S117œ"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(îâ˜‡8’ÔÛ„°2
+b	java:S112+"FDefine and throw a dedicated exception instead of using a generic one.(¦ûØ÷8Âàâò²2
+g	java:S112^"FDefine and throw a dedicated exception instead of using a generic one.(¢†Îüÿÿÿÿ8²û˜ò²2
+h	java:S112Œ"FDefine and throw a dedicated exception instead of using a generic one.(ñ¿¬¡üÿÿÿÿ8áÃ¤ó²2
+h	java:S112Ò"FDefine and throw a dedicated exception instead of using a generic one.(“ÇÌ¶şÿÿÿÿ8áÃ¤ó²2
+m	java:S117z"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(îâ˜‡8åÃ¤ó²2
+n	java:S117¦"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(îâ˜‡8æÃ¤ó²2
+n	java:S117È"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(îâ˜‡8çÃ¤ó²2
+s
+java:S2259º"P"NullPointerException" will be thrown when invoking method "getFileExtension()".(’Ãş©ıÿÿÿÿ8íÅ¤ó²2
 t
-java:S2095"QUse try-with-resources or close this "PDPageContentStream" in a "finally" clause.(‡±®şûÿÿÿÿ8ïç’…°2
-W	java:S8996";Do something with the "boolean" value returned by "delete".(Î†ñ¥8ÌÒÙ„°2
+java:S2095˜"QUse try-with-resources or close this "PDPageContentStream" in a "finally" clause.(‡±®şûÿÿÿÿ8íÅ¤ó²2
+W	java:S899:";Do something with the "boolean" value returned by "delete".(Î†ñ¥8ãâò²2
 k
-java:S40426"NUse "java.nio.file.Files#delete" here for better messages on error conditions.(Î†ñ¥8ÌÒÙ„°2
-o	java:S100J"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ş£†¢üÿÿÿÿ8ĞÒÙ„°2
+java:S4042:"NUse "java.nio.file.Files#delete" here for better messages on error conditions.(Î†ñ¥8ãâò²2
+o	java:S100R"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ş£†¢üÿÿÿÿ8ãâò²2
 M
-java:S2093ˆ"*Change this "try" to a try-with-resources.(¡»¢üùÿÿÿÿ8·ñÛ„°2
+java:S2093’"*Change this "try" to a try-with-resources.(¡»¢üùÿÿÿÿ8¢Æ¤ó²2
+j
+java:S1128"MRemove this unused import 'com.kinder.kindergarten.entity.employee.Employee'.(§Æ®ü8ŸÑ¡ó²2

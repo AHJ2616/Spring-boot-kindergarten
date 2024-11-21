@@ -10,7 +10,7 @@ function editEvent(event) {
     // 폼 필드 설정
     document.getElementById('edit-title').value = event.title;
     document.getElementById('edit-start').value = moment(event.start).format('YYYY-MM-DDTHH:mm');
-    document.getElementById('edit-end').value = moment(event.end || event.start).format('YYYY-MM-DDTHH:mm');
+    document.getElementById('edit-end').value = moment(event.end || event.start).subtract(1, 'days').format('YYYY-MM-DDTHH:mm');
     document.getElementById('edit-type').value = event.extendedProps.type;
     document.getElementById('edit-desc').value = event.extendedProps.description;
     document.getElementById('edit-color').value = event.backgroundColor;
@@ -22,6 +22,12 @@ function editEvent(event) {
     eventModal.show();
 
     $('#updateEvent').off('click').on('click', function() {
+            
+        if (userRole !== 'ROLE_ADMIN') {
+            alert('이 기능은 관리자만 사용할 수 있습니다.');
+            info.revert();
+            return;
+        }
         if (document.getElementById('edit-title').value === '') {
             alert('일정명은 필수입니다.');
             return;

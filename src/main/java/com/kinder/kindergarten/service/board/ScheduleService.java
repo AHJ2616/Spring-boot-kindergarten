@@ -1,7 +1,5 @@
 package com.kinder.kindergarten.service.board;
 
-import com.github.f4b6a3.ulid.Ulid;
-import com.github.f4b6a3.ulid.UlidCreator;
 import com.kinder.kindergarten.DTO.board.ScheduleDTO;
 import com.kinder.kindergarten.entity.board.ScheduleEntity;
 import com.kinder.kindergarten.repository.board.ScheduleRepository;
@@ -21,7 +19,10 @@ public class ScheduleService {
   private final ScheduleRepository scheduleRepository;
   private final ModelMapper modelMapper;
 
-  // 일정 목록 조회
+  /**
+   * 모든 일정을 조회하는 메소드
+   * @return 일정 데이터 전송 객체 리스트
+   */
   @Transactional(readOnly = true)
   public List<ScheduleDTO> getAllSchedules() {
     List<ScheduleEntity> schedules = scheduleRepository.findAll();
@@ -40,7 +41,11 @@ public class ScheduleService {
             .collect(Collectors.toList());
   }
 
-  // 일정 단건 조회
+  /**
+   * 일정을 조회하는 메소드
+   * @param id 일정 ID
+   * @return 조회된 일정 데이터 전송 객체
+   */
   @Transactional(readOnly = true)
   public ScheduleDTO getSchedule(String id) {
     ScheduleEntity schedule = scheduleRepository.findById(id)
@@ -48,7 +53,11 @@ public class ScheduleService {
     return modelMapper.map(schedule, ScheduleDTO.class);
   }
 
-  // 일정 생성
+  /**
+   * 일정을 생성하는 메소드
+   * @param scheduleDTO 일정 데이터 전송 객체
+   * @return 생성된 일정 데이터 전송 객체
+   */
   public ScheduleDTO createSchedule(ScheduleDTO scheduleDTO) {
     ScheduleEntity schedule = modelMapper.map(scheduleDTO, ScheduleEntity.class);
 
@@ -56,7 +65,12 @@ public class ScheduleService {
     return modelMapper.map(savedSchedule, ScheduleDTO.class);
   }
 
-  // 일정 수정
+  /**
+   * 일정을 수정하는 메소드
+   * @param id 일정 ID
+   * @param scheduleDTO 수정할 일정 데이터 전송 객체
+   * @return 수정된 일정 데이터 전송 객체
+   */
   public ScheduleDTO updateSchedule(String id, ScheduleDTO scheduleDTO) {
     ScheduleEntity schedule = scheduleRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("일정을 찾을 수 없습니다."));
@@ -74,6 +88,12 @@ public class ScheduleService {
     return modelMapper.map(updatedSchedule, ScheduleDTO.class);
   }
 
+  /**
+   * 일정을 드래그하여 수정하는 메소드
+   * @param id 일정 ID
+   * @param scheduleDTO 수정할 일정 데이터 전송 객체
+   * @return 수정된 일정 데이터 전송 객체
+   */
   public ScheduleDTO dragUpdateSchedule(String id,ScheduleDTO scheduleDTO){
     ScheduleEntity schedule = scheduleRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("일정을 찾을 수 없습니다."));
@@ -86,11 +106,19 @@ public class ScheduleService {
     return modelMapper.map(updatedSchedule, ScheduleDTO.class);
   }
 
-  // 일정 삭제
+  /**
+   * 일정을 삭제하는 메소드
+   * @param id 일정 ID
+   */
   public void deleteSchedule(String id) {
     scheduleRepository.deleteById(id);
   }
 
+  /**
+   * 일정 타입으로 일정을 조회하는 메소드
+   * @param type 일정 타입
+   * @return 일정 데이터 전송 객체 리스트
+   */
   public List<ScheduleDTO> findSchedulesByType(String type) {
     List<ScheduleEntity> schedules = scheduleRepository.findByType(type);
     return schedules.stream()

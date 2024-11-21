@@ -17,7 +17,7 @@ public class MaterialOrderHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderHistoryId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "material_id")
     private MaterialEntity material;
 

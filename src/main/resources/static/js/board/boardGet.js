@@ -67,7 +67,7 @@ function submitComment() {
         return;
     }
 
-    fetch('/comments/write', {
+    fetch('/api/comments/write', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -95,7 +95,7 @@ function submitComment() {
 function deleteComment(commentId) {
     if (!confirm('댓글을 삭제하시겠습니까?')) return;
 
-    fetch(`/comments/delete/${commentId}`, {
+    fetch(`/api/comments/delete/${commentId}`, {
         method: 'DELETE',
         headers: {
             'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
@@ -150,7 +150,7 @@ function saveEdit(commentId, content) {
         return;
     }
 
-    fetch(`/comments/update/${commentId}`, {
+    fetch(`/api/comments/update/${commentId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',

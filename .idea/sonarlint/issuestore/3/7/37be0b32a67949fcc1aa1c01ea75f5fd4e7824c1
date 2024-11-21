@@ -1,0 +1,7 @@
+
+n	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(Øá‡
+j	java:S116"PRename this field "at_id" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÙÒ¨™ûÿÿÿÿ
+g	java:S116"RRename this field "at_date" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(–Ö®©
+o	java:S116"URename this field "at_checkIn" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÂÅºÝøÿÿÿÿ
+p	java:S116"VRename this field "at_checkOut" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ž³†òýÿÿÿÿ
+n	java:S116"TRename this field "at_status" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ûë³©ÿÿÿÿÿ

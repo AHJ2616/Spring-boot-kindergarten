@@ -1,0 +1,10 @@
+
+€
+java:S1192L"cDefine a constant instead of duplicating this literal "ì§ì›ì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤." 3 times.(šÙ×ã8‰û¬ó²2
+G	java:S1061"+Replace this use of System.out by a logger.(¼¡¨ò8‹ı¬ó²2
+9
+java:S1116L"Remove this empty statement.(šÙ×ã8•ı¬ó²2
+o
+java:S6204`"RReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()'(ª™¨¹8—ı¬ó²2
+^
+java:S1144B"<Remove this unused private "validateDuplicateMember" method.(‹èóŞÿÿÿÿÿ8®ı¬ó²2

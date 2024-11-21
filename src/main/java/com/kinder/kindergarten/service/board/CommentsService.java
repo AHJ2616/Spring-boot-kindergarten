@@ -48,8 +48,13 @@ public class CommentsService {
     });
   }
 
-
-  public CommentsDTO createComment(CommentsDTO commentsDTO, String memberId) {
+  /**
+   * 댓글을 생성하는 메소드
+   * @param commentsDTO 댓글 데이터 전송 객체
+   * @param memberId 회원 ID
+   * @return 생성된 댓글 데이터 전송 객체
+   */
+  public CommentsDTO createComment(CommentsDTO commentsDTO, Long memberId) {
     BoardEntity board = boardRepository.findById(commentsDTO.getBoardId())
             .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
 
@@ -68,6 +73,11 @@ public class CommentsService {
     return convertToDTO(savedComment);
   }
 
+  /**
+   * 게시글 ID로 댓글 목록을 조회하는 메소드
+   * @param boardId 게시글 ID
+   * @return 댓글 데이터 전송 객체 리스트
+   */
   public List<CommentsDTO> getCommentsByBoardId(String boardId) {
     return commentsRepository.findByBoardId_BoardIdOrderByRegiDateDesc(boardId)
             .stream()
@@ -75,7 +85,12 @@ public class CommentsService {
             .collect(Collectors.toList());
   }
 
-  public void deleteComment(String commentId, String memberId) {
+  /**
+   * 댓글을 삭제하는 메소드
+   * @param commentId 댓글 ID
+   * @param memberId 회원 ID
+   */
+  public void deleteComment(String commentId, Long memberId) {
     CommentsEntity comment = commentsRepository.findById(commentId)
             .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
 
@@ -89,7 +104,14 @@ public class CommentsService {
     commentsRepository.delete(comment);
   }
 
-  public CommentsDTO updateComment(String commentId, CommentsDTO commentsDTO, String memberId) {
+  /**
+   * 댓글을 수정하는 메소드
+   * @param commentId 댓글 ID
+   * @param commentsDTO 수정할 댓글 데이터 전송 객체
+   * @param memberId 회원 ID
+   * @return 수정된 댓글 데이터 전송 객체
+   */
+  public CommentsDTO updateComment(String commentId, CommentsDTO commentsDTO, Long memberId) {
     CommentsEntity comment = commentsRepository.findById(commentId)
             .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
             

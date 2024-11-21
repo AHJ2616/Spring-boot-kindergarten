@@ -1,0 +1,7 @@
+
+h	java:S112¸"FDefine and throw a dedicated exception instead of using a generic one.(–Æîßÿÿÿÿÿ8‹²—€°2
+k
+java:S2259i"NA "NullPointerException" could be thrown; "originalFilename" is nullable here.(°æ¾…8‹³—€°2
+Q	java:S125D"<This block of commented-out lines of code should be removed.(³áÙì
+p
+java:S6204¢"RReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()'(ª™¨¹8¨³—€°2

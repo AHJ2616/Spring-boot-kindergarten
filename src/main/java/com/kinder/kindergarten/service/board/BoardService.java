@@ -11,7 +11,6 @@ import com.kinder.kindergarten.constant.board.BoardType;
 import com.kinder.kindergarten.entity.Member;
 import com.kinder.kindergarten.entity.board.BoardEntity;
 import com.kinder.kindergarten.entity.board.BoardFileEntity;
-import com.kinder.kindergarten.repository.QueryDSL;
 import com.kinder.kindergarten.repository.board.BoardFileRepository;
 import com.kinder.kindergarten.repository.board.BoardRepository;
 import com.kinder.kindergarten.service.FileService;
@@ -61,6 +60,12 @@ import java.util.zip.ZipOutputStream;
           @Value("${summerImage}")
           private String summerImage;
 
+          /**
+           * 게시판 타입에 따라 게시글 목록을 조회하는 메소드
+           * @param boardType 게시판 타입
+           * @param pageable 페이징 정보
+           * @return 페이징된 게시글 데이터 전송 객체 페이지
+           */
           public Page<BoardDTO> getBoardsByType(BoardType boardType, Pageable pageable) {
             log.info("페이지 불러오기 - BoardService.getBoardsByType() 행. boardType: " + boardType + ", pageable 정보: " + pageable);
 
@@ -92,6 +97,10 @@ import java.util.zip.ZipOutputStream;
             });
           }
 
+          /**
+           * 게시글을 저장하는 메소드
+           * @param boardFormDTO 게시글 폼 데이터 전송 객체
+           */
           @Transactional
           public void saveBoard(BoardFormDTO boardFormDTO) {
             BoardEntity boardEntity = new BoardEntity();
@@ -111,6 +120,12 @@ import java.util.zip.ZipOutputStream;
             boardRepository.save(boardEntity);
           }
 
+          /**
+           * 게시글과 파일을 함께 저장하는 메소드
+           * @param boardFormDTO 게시글 폼 데이터 전송 객체
+           * @param boardFileList 게시글 파일 리스트
+           * @throws Exception 파일 저장 중 오류 발생 시
+           */
           public void saveBoardWithFile(BoardFormDTO boardFormDTO, List<MultipartFile> boardFileList) throws Exception{
             log.info("게시글+파일 저장 - BoardService.saveBoardWithFile() 실행" + boardFormDTO);
             // HTML 컨텐츠 sanitize
@@ -120,6 +135,9 @@ import java.util.zip.ZipOutputStream;
             String id = ulid.toString();
             boardFormDTO.setBoardId(id); // UUID대신 사용할 ULID
             BoardEntity board = boardFormDTO.wirteBoard();
+            Member member = new Member();
+            member.setId(boardFormDTO.getMemeberId());
+            board.setMember(member);
 
             //게시물 정보 먼저 저장
             boardRepository.save(board);
@@ -163,7 +181,11 @@ import java.util.zip.ZipOutputStream;
                     .contains(extension.toLowerCase());
           }
 
-          //페이지 상세보기 board_id로 찾아서 ModelMapper사용(entity -> DTO 로)
+          /**
+           * 게시글을 조회하는 메소드
+           * @param board_id 게시글 ID
+           * @return 조회된 게시글 데이터 전송 객체
+           */
           @Transactional(readOnly = true)
           public BoardDTO getBoard(String board_id) {
             BoardEntity boardEntity = boardRepository.findById(board_id)
@@ -174,15 +196,14 @@ import java.util.zip.ZipOutputStream;
             boardDTO.setBoardTitle(boardEntity.getBoardTitle());
             boardDTO.setBoardContents(boardEntity.getBoardContents());
             boardDTO.setBoardType(boardEntity.getBoardType());
-            boardDTO.setWriter(boardEntity.getMember().getName());
             
             // Member null 체크 추가
             if (boardEntity.getMember() != null) {
                 boardDTO.setWriter(boardEntity.getMember().getName());
                 boardDTO.setEmail(boardEntity.getMember().getEmail());
             } else {
-                boardDTO.setWriter("알 수 없음");
-                boardDTO.setEmail("anonymous@example.com");
+                boardDTO.setWriter("탈퇴한 회원");
+                boardDTO.setEmail("unknown@example.com");
             }
             
             boardDTO.setViews(boardEntity.getViews());
@@ -214,7 +235,11 @@ import java.util.zip.ZipOutputStream;
             return boardDTO;
           }
 
-          //첨부파일이 있는경우 불러오기(다운로드용)
+          /**
+           * 파일을 조회하는 메소드
+           * @param fileId 파일 ID
+           * @return 조회된 파일 데이터 전송 객체
+           */
           public BoardFileDTO getFile(String fileId) {
             BoardFileEntity fileEntity = boardFileRepository.findById(fileId)
                     .orElseThrow(() -> new RuntimeException("파일을 찾을 수 없습니다."));
@@ -227,6 +252,12 @@ import java.util.zip.ZipOutputStream;
             return fileDTO;
           }
 
+          /**
+           * Summernote 이미지 파일을 업로드하는 메소드
+           * @param file 업로드할 파일
+           * @return 업로드된 파일의 경로
+           * @throws Exception 파일 업로드 중 오류 발생 시
+           */
           public String uploadSummernoteImage(MultipartFile file) throws Exception {
             String originalFileName = file.getOriginalFilename();
             String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
@@ -247,6 +278,11 @@ import java.util.zip.ZipOutputStream;
             return "/images/summernote/" + savedFileName;
           }
 
+          /**
+           * 게시글을 수정하는 메소드
+           * @param boardId 게시글 ID
+           * @param boardFormDTO 수정할 게시글 폼 데이터 전송 객체
+           */
           @Transactional
           public void updateBoard(String boardId, BoardFormDTO boardFormDTO) {
             BoardEntity board = boardRepository.findById(boardId)
@@ -257,6 +293,13 @@ import java.util.zip.ZipOutputStream;
             board.setBoardType(boardFormDTO.getBoardType());
           }
 
+          /**
+           * 게시글과 파일을 함께 수정하는 메소드
+           * @param boardId 게시글 ID
+           * @param boardFormDTO 수정할 게시글 폼 데이터 전송 객체
+           * @param boardFileList 수정할 게시글 파일 리스트
+           * @throws Exception 파일 수정 중 오류 발생 시
+           */
           @Transactional
           public void updateBoardWithFile(String boardId, BoardFormDTO boardFormDTO,
                                           List<MultipartFile> boardFileList) throws Exception {
@@ -281,7 +324,7 @@ import java.util.zip.ZipOutputStream;
                 BoardFileEntity boardFile = new BoardFileEntity();
                 String originalFilename = file.getOriginalFilename();
 
-                // FileService를 사용하여 파일 ��장
+                // FileService를 사용하여 파일 저장
                 String savedFileName = fileService.uploadFile(uploadPath, originalFilename, file.getBytes());
                 String filePath = fileService.getFullPath(savedFileName);
 
@@ -304,7 +347,10 @@ import java.util.zip.ZipOutputStream;
             board.setBoardType(boardFormDTO.getBoardType());
           }
 
-          //게시글 삭제
+          /**
+           * 게시글을 삭제하는 메소드
+           * @param boardId 게시글 ID
+           */
           @Transactional
           public void deleteBoard(String boardId) {
             // 게시글에 연관된 파일 엔티티들을 먼저 조회
@@ -346,12 +392,24 @@ import java.util.zip.ZipOutputStream;
                 directory.delete();
               }
               
-          //게시글 검색
+          /**
+           * 게시글을 검색하는 메소드
+           * @param boardType 게시판 타입
+           * @param keyword 검색어
+           * @param pageable 페이징 정보
+           * @return 페이징된 검색 결과 게시글 데이터 전송 객체 페이지
+           */
           public Page<BoardDTO> searchBoards(BoardType boardType, String keyword, Pageable pageable) {
             Page<BoardEntity> boardEntities = boardRepository.searchBoards(boardType, keyword, pageable);
             return boardEntities.map(this::convertToDTO);
           }
 
+          /**
+           * 게시글과 ZIP 파일을 함께 저장하는 메소드
+           * @param boardFormDTO 게시글 폼 데이터 전송 객체
+           * @param boardFileList 게시글 파일 리스트
+           * @throws Exception 파일 저장 중 오류 발생 시
+           */
           @Transactional
           public void saveWithZip(BoardFormDTO boardFormDTO, List<MultipartFile> boardFileList) throws Exception {
             log.info("게시글+일반파일+ZIP파일 저장 - BoardService.saveBoardWithBothFiles() 실행" + boardFormDTO);
@@ -362,6 +420,9 @@ import java.util.zip.ZipOutputStream;
             String boardId = ulid.toString();
             boardFormDTO.setBoardId(boardId);
             BoardEntity board = boardFormDTO.wirteBoard();
+            Member member = new Member();
+            member.setId(boardFormDTO.getMemeberId());
+            board.setMember(member);
             boardRepository.save(board);
 
             if (boardFileList != null && !boardFileList.isEmpty()) {
@@ -448,11 +509,23 @@ import java.util.zip.ZipOutputStream;
                 deleteDirectory(tempFolder);
               }
             }
+
+            // memberId가 제대로 설정되었는지 확인
+            Long memberId = boardFormDTO.getMemeberId();
+            if (memberId == null) {
+                throw new IllegalArgumentException("Member ID is not set");
+            }
           }
 
       
 
-          // 게시판 타입별 검색 서드 추가
+          /**
+           * 게시판 타입별로 게시글을 검색하는 메소드
+           * @param boardType 게시판 타입
+           * @param keyword 검색어
+           * @param pageable 페이징 정보
+           * @return 페이징된 검색 결과 게시글 데이터 전송 객체 페이지
+           */
           public Page<BoardDTO> searchBoardsByType(BoardType boardType, String keyword, Pageable pageable) {
               try {
                   // 캐시 키 생성 (게시판 타입, 검색어, 페이지 정보 조합)
@@ -494,6 +567,13 @@ import java.util.zip.ZipOutputStream;
               }
           }
 
+          /**
+           * 게시글 목록을 조회하는 메소드
+           * @param page 페이지 번호
+           * @param type 게시판 타입
+           * @param keyword 검색어
+           * @return 페이징된 게시글 데이터 전송 객체 페이지
+           */
           public Page<BoardDTO> getBoardList(int page, String type, String keyword) {
             Pageable pageable = PageRequest.of(page - 1, 10, Sort.by(Sort.Direction.DESC, "regiDate"));
             Page<BoardEntity> boardEntities;

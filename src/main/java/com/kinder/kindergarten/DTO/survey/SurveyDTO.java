@@ -12,11 +12,10 @@ import java.util.List;
 @Setter
 @ToString
 public class SurveyDTO {
-    private String surveyId;
-    private String title;
-    private String description;
-    private List<QuestionDTO> questions = new ArrayList<>();
-    private LocalDateTime regiDate;
-    private LocalDateTime modifiedDate;
-    private String boardId;
+    private String surveyId;//1.PK
+    private String title;//2.제목
+    private String description;//3.설명
+    private List<QuestionDTO> questions = new ArrayList<>();//4.질문들 
+    private LocalDateTime regiDate; //5.등록일
+    private LocalDateTime modifiedDate; //6.수정일
 } 

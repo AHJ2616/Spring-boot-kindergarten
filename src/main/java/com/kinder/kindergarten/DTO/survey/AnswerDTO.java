@@ -8,9 +8,8 @@ import lombok.ToString;
 @Setter
 @ToString
 public class AnswerDTO {
-    private String answerId;
-    private String text;
-    private Integer orderNumber;
-    private boolean selected;
-    private String respondentId;
+    private String answerId;//1. PK
+    private String text;//2. 답
+    private String respondentId; //3. 설문 응답자
+    private String questionId;//4. 질문 FK
 } 

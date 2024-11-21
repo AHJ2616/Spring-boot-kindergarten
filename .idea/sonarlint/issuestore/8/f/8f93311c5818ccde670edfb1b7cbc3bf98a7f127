@@ -1,0 +1,11 @@
+
+o	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(’¤š¨
+p	java:S116"VRename this field "parent_name" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÑÚß•úÿÿÿÿ
+u	java:S116"[Rename this field "parent_birthDate" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(×ÚèÀıÿÿÿÿ
+l	java:S116"WRename this field "parent_email" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(‡„¼ª
+n	java:S116!"TRename this field "parent_pw" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(´óßÚıÿÿÿÿ
+j	java:S116%"URename this field "parent_pw2" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ºíİ‡
+k	java:S116("WRename this field "parent_phone" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(‚Šùn
+s	java:S116+"YRename this field "parent_address" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(–‘…úÿÿÿÿ
+B
+java:S1128	",Remove this unused import 'lombok.ToString'.(¹ÂÄÓ
