@@ -111,8 +111,8 @@
             <div class="guide-section">
               <h6 class="guide-subtitle">💡 시스템 설명 안내</h6>
               <p>ERP 시스템에서 직원(원장, 교사)이(가) 학부모 등록하기를 입력하는 과정이 있습니다. </p>
-              <p>앞서 작성한 약관, 동의서와 로그인 시 사용할 이메일과 각 입력하신 정보를 기반으로 등록 후 </p>
-              <p>이메일과 임시 비밀번호를 통보 후 해당 계정으로 로그인 시 비밀번호 변경 페이지로 안내해 드리고 있습니다.</p>
+              <p>앞서 작성한 <strong>약관, 동의서</strong>와 로그인 시 사용할 <strong>이메일</strong>과 <strong>입력하신 정보</strong>를 기반으로 등록 후 </p>
+              <p>이메일과 임시 비밀번호를 통보 후 해당 계정으로 최초 로그인 시 <strong>비밀번호 변경 페이지</strong>로 안내해 드리고 있습니다.</p>
             </div>
 
             <div class="guide-section">
@@ -135,10 +135,20 @@
             <div class="guide-section">
               <h6 class="guide-subtitle">🔒 개인정보 보호</h6>
               <ul>
-                <li>입력된 정보는 유치원 시스템에서만 사용되며, 안전하게 보호됩니다.</li>
-                <li>입력된 정보는 추후 학부모 전용 시스템에서 확인 가능하며, 수정할 수 있습니다.</li>
+                <li>입력된 정보는 <strong>유치원 및 어린이집 시스템에서만</strong> 사용되며, <strong>안전하게 보호됩니다.</strong></li>
+                <li>입력된 정보는 학부모 전용 시스템(개발 예정)에서 확인 가능하며, 수정할 수 있습니다.</li>
                 <li>등록 후, 학부모 전용 시스템에서 찾기 쉽도록 관리됩니다.</li>
-                <li> 개인정보 보호 및 예방 교육을 원내 직원들에게 주기적으로 교육을 진행하고 있습니다.</li>
+                <li><strong>개인정보 보호 및 예방 교육을 원내 직원들에게 주기적으로 교육을 진행하고 있습니다.</strong></li>
+              </ul>
+            </div>
+
+            <div class="guide-section">
+              <h6 class="guide-subtitle">🛡️ 개인정보 보호 및 관리 안내</h6>
+              <ul>
+                <li>개인정보 보존 기간 : 등록된 학부모의 정보는 법령에 따라 최대 5년간 보존되며, 보존 기간 종료 후 안전하게 파기 됩니다.</li>
+                <li>파기 절차 및 방법 : 개인정보는 전자 파일 형태의 경우 복구 불가능한 방법으로 삭제하며, 문서 형태는 분쇄 또는 소각 처리 합니다.</li>
+                <li>정보 수정 및 삭제 요청 : 학부모의 정보수정, 삭제를 원하시는 경우 시스템 내 [마이페이지] 또는 직원, 원장에게 문의하시면 신속히 처리가 가능합니다.</li>
+                <li>개인정보 보호 대책 : 본 시스템은 정기 보안 점검, 보안 기술 대책 강구 등 개인정보 유출 방지에 최선을 다하고 있습니다.</li>
               </ul>
             </div>
           </div>
@@ -150,14 +160,15 @@
     </div>
   </div>
 
-  <form th:action="@{/consent/register-parent}" method="post" id="parentInfoForm">
+  <form id="parentInfoForm" th:action="@{/consent/register-parent}" th:object="${parentInfo}" method="post">
     <!-- 로그인 정보 섹션 -->
     <div class="form-section">
       <h4 class="mb-4">로그인 정보</h4>
       <div class="form-group">
-        <label for="parentEmail">이메일<span class="required-mark">*</span></label>
+        <label for="email">이메일<span class="required-mark">*</span></label>
         <div class="input-group">
-          <input type="email" class="form-control" id="parentEmail" name="parentEmail" required>
+          <input type="email" class="form-control" id="email" th:field="*{email}" required>
+          <div class="alert alert-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
           <button type="button" class="btn btn-outline-primary" onclick="checkEmailDuplicate()">중복확인</button>
         </div>
         <div class="form-text" id="emailHelp">로그인 시 사용할 이메일 주소를 입력해주세요.</div>
@@ -168,12 +179,13 @@
     <div class="form-section">
       <h4 class="mb-4">학부모 개인정보</h4>
       <div class="form-group">
-        <label for="parentName">성함<span class="required-mark">*</span></label>
-        <input type="text" class="form-control" id="parentName" name="parentName" required>
+        <label for="name">성함<span class="required-mark">*</span></label>
+        <input type="text" class="form-control" id="name" th:field="*{name}" required>
+        <div class="alert alert-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
       </div>
 
       <div class="form-group">
-        <label>휴대폰 번호<span class="required-mark">*</span></label>
+        <label>연락처<span class="required-mark">*</span></label>
         <div class="input-group">
           <select class="form-select" id="phone1" style="max-width: 100px;">
             <option value="010">010</option>
@@ -187,8 +199,8 @@
           <input type="text" class="form-control" id="phone2" maxlength="4">
           <span class="input-group-text">-</span>
           <input type="text" class="form-control" id="phone3" maxlength="4">
-          <input type="hidden" name="parentPhone" id="parentPhone">
         </div>
+        <input type="hidden" th:field="*{phone}" id="phone">
       </div>
 
       <div class="form-group">
@@ -212,13 +224,14 @@
       </div>
 
       <div class="form-group">
-        <label for="parentAddress">주소<span class="required-mark">*</span></label>
+        <label>주소<span class="required-mark">*</span></label>
         <div class="input-group mb-2">
           <input type="text" class="form-control" id="postcode" placeholder="우편번호" readonly>
           <button type="button" class="btn btn-outline-primary" onclick="searchAddress()">주소 검색</button>
         </div>
-        <input type="text" class="form-control mb-2" id="parentAddress" name="parentAddress" placeholder="기본주소" readonly required>
-        <input type="text" class="form-control" id="detailAddress" name="detailAddress" placeholder="상세주소">
+        <input type="hidden" th:field="*{address}" id="address">
+        <input type="text" class="form-control mb-2" id="addressDisplay" placeholder="기본주소" readonly>
+        <input type="text" class="form-control" th:field="*{detailAddress}" placeholder="상세주소">
       </div>
     </div>
 
@@ -238,9 +251,9 @@
 <script>
   // 이메일 중복 확인
   function checkEmailDuplicate() {
-    const email = document.getElementById('parentEmail').value;
+    const email = document.getElementById('email').value;
     const emailHelp = document.getElementById('emailHelp');
-    const emailInput = document.getElementById('parentEmail');
+    const emailInput = document.getElementById('email');
 
     // 이메일 형식 검증
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -276,58 +289,65 @@
     new daum.Postcode({
       oncomplete: function(data) {
         document.getElementById('postcode').value = data.zonecode;
-        document.getElementById('parentAddress').value = data.address;
+        document.getElementById('addressDisplay').value = data.address;
+        document.getElementById('address').value = data.address;
         document.getElementById('detailAddress').focus();
       }
     }).open();
   }
 
-  // 폼 제출 처리
-  document.getElementById('parentInfoForm').addEventListener('submit', function(e) {
-    e.preventDefault();
+  // 숫자만 입력 허용
+  function onlyNumber(event) {
+    event.target.value = event.target.value.replace(/[^0-9]/g, '');
+  }
 
-    // 필수 필드 검증
-    const email = document.getElementById('parentEmail').value;
-    const name = document.getElementById('parentName').value;
+  // 폼 제출 전 유효성 검사 및 데이터 처리
+  function validateAndSubmit() {
+    // 전화번호 조합
+    const phone1 = document.getElementById('phone1').value;
     const phone2 = document.getElementById('phone2').value;
     const phone3 = document.getElementById('phone3').value;
-    const address = document.getElementById('parentAddress').value;
 
-    if (!email || !name || !phone2 || !phone3 || !address) {
-      alert('모든 필수 항목을 입력해주세요.');
+    if (!phone2 || !phone3) {
+      alert('전화번호를 입력해주세요.');
       return false;
     }
 
-    // 이메일 중복 확인 상태 검증
-    const emailHelp = document.getElementById('emailHelp');
-    if (emailHelp.className.includes('text-danger')) {
-      alert('이메일 중복 확인이 필요하거나 중복된 이메일입니다.');
+    const phoneNumber = `${phone1}-${phone2}-${phone3}`;
+    const phoneRegex = /^01(?:0|1|[6-9])-(?:\d{3}|\d{4})-\d{4}$/;
+
+    if (!phoneRegex.test(phoneNumber)) {
+      alert('올바른 전화번호 형식이 아닙니다.');
       return false;
     }
 
-    // 휴대폰 번호 조합
-    const phone1 = document.getElementById('phone1').value;
-    document.getElementById('parentPhone').value = `${phone1}-${phone2}-${phone3}`;
+    // hidden 필드에 전화번호 설정
+    document.getElementById('phone').value = phoneNumber;
 
-    // 비상연락처 조합 (선택사항)
+    // 주소 검증
+    const addressDisplay = document.getElementById('addressDisplay').value;
+    if (!addressDisplay) {
+      alert('주소를 입력해주세요.');
+      return false;
+    }
+
+    // hidden 필드에 주소 설정
+    document.getElementById('address').value = addressDisplay;
+
+    // 비상연락처 처리 (선택사항)
     const emergency1 = document.getElementById('emergency1').value;
     const emergency2 = document.getElementById('emergency2').value;
     const emergency3 = document.getElementById('emergency3').value;
+
     if (emergency2 && emergency3) {
-      document.getElementById('childrenEmergencyPhone').value =
-              `${emergency1}-${emergency2}-${emergency3}`;
+      const emergencyPhone = `${emergency1}-${emergency2}-${emergency3}`;
+      document.getElementById('childrenEmergencyPhone').value = emergencyPhone;
     }
 
-    // 로딩 표시
-    const submitBtn = document.querySelector('button[type="submit"]');
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> 처리중...';
+    return true;
+  }
 
-    // 폼 제출
-    this.submit();
-  });
-
-  // 자동 포커스 이동
+  // 자동 포커스 이동 설정
   function setupAutoFocus(input, nextId) {
     input.addEventListener('input', function() {
       if (this.value.length >= this.maxLength) {
@@ -336,12 +356,6 @@
       }
     });
   }
-
-  // 휴대폰 번호 자동 포커스
-  setupAutoFocus(document.getElementById('phone2'), 'phone3');
-
-  // 비상연락처 자동 포커스
-  setupAutoFocus(document.getElementById('emergency2'), 'emergency3');
 
   // 숫자만 입력되도록 처리
   function setupNumberOnly(inputId) {
@@ -353,18 +367,29 @@
     }
   }
 
-  // 숫자만 입력되도록 설정
-  setupNumberOnly('phone2');
-  setupNumberOnly('phone3');
-  setupNumberOnly('emergency2');
-  setupNumberOnly('emergency3');
+  // 초기 설정
+  document.addEventListener('DOMContentLoaded', function() {
+    // 전화번호 입력 필드에 숫자만 입력되도록 설정
+    const numberInputs = ['phone2', 'phone3', 'emergency2', 'emergency3'];
+    numberInputs.forEach(id => {
+      const input = document.getElementById(id);
+      if (input) {
+        input.addEventListener('input', onlyNumber);
+      }
+    });
 
-  // 이메일 입력 필드 변경 시 상태 초기화
-  document.getElementById('parentEmail').addEventListener('input', function() {
-    const emailHelp = document.getElementById('emailHelp');
-    emailHelp.textContent = '로그인 시 사용할 이메일 주소를 입력해주세요.';
-    emailHelp.className = 'form-text';
-    this.classList.remove('is-valid', 'is-invalid');
+    // 자동 포커스 이동
+    document.getElementById('phone2')?.addEventListener('input', function() {
+      if (this.value.length === 4) {
+        document.getElementById('phone3')?.focus();
+      }
+    });
+
+    document.getElementById('emergency2')?.addEventListener('input', function() {
+      if (this.value.length === 4) {
+        document.getElementById('emergency3')?.focus();
+      }
+    });
   });
 </script>
 </body>

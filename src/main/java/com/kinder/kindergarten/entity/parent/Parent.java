@@ -27,6 +27,11 @@ public class Parent extends ChildrenBaseEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long parentId; //학부모 고유 ID (PK)
 
+  @Column(name = "member_email")
+  private String memberEmail;  // Member 엔티티 참조용 이메일
+
+
+  /*
   @Column(nullable = false)
   private String parentName; // 학부모 성함
 
@@ -37,19 +42,21 @@ public class Parent extends ChildrenBaseEntity {
   private String parentPassword;   // 학부모 비밀번호
 
   @Column(nullable = false)
+  private String parentAddress;  // 학부모 주소
+
+  @Column(nullable = false)
   private String parentPhone;    // 학부모 핸드폰 번호
+
+  @Enumerated(EnumType.STRING)
+  private Children_Role childrenRole; // 권한
+
+   */
 
   @Column(name = "childrenEmergencyPhone")
   private String childrenEmergencyPhone;//	긴급 연락처	(선택사항)
 
-  @Column(nullable = false)
-  private String parentAddress;  // 학부모 주소
-
   private String detailAddress; // 상세 주소 -> 11.19 추가
 
-  /*@Enumerated(EnumType.STRING)
-  private Children_Role childrenRole; // 권한
-   */
 
   @Enumerated(EnumType.STRING)
   private ParentType parentType;    // 자녀와의 관계
@@ -76,17 +83,17 @@ public class Parent extends ChildrenBaseEntity {
   private Boolean isErpRegistered = false;  // false: 회원가입, true: ERP등록
 
 
-  // 회원가입 시에만 사용되는 필드들의 유효성을 검사하는 메서드
-  @PrePersist
-  @PreUpdate
-  public void validateFields() {
-    // ERP 등록이 아닌 경우에는 기본 필수 필드만 검증
-    if (!isErpRegistered) {
-      if (parentEmail == null || parentName == null || parentPhone == null || parentAddress == null) {
-        throw new IllegalStateException("필수 정보가 누락되었습니다.");
-      }
-    }
-  }
+//  // 회원가입 시에만 사용되는 필드들의 유효성을 검사하는 메서드
+//  @PrePersist
+//  @PreUpdate
+//  public void validateFields() {
+//    // ERP 등록이 아닌 경우에는 기본 필수 필드만 검증
+//    if (!isErpRegistered) {
+//      if (parentEmail == null || parentName == null || parentPhone == null || parentAddress == null) {
+//        throw new IllegalStateException("필수 정보가 누락되었습니다.");
+//      }
+//    }
+//  }
 
   @Enumerated(EnumType.STRING)
   @Column(name = "registration_status", nullable = false)

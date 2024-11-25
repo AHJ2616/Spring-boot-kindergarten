@@ -3,14 +3,18 @@ package com.kinder.kindergarten.service.parent;
 
 import com.kinder.kindergarten.DTO.parent.ParentConsentDTO;
 import com.kinder.kindergarten.DTO.parent.ParentInfoDTO;
+import com.kinder.kindergarten.constant.employee.Role;
 import com.kinder.kindergarten.constant.parent.RegistrationStatus;
+import com.kinder.kindergarten.entity.Member;
 import com.kinder.kindergarten.entity.parent.Parent;
 import com.kinder.kindergarten.entity.parent.ParentConsent;
+import com.kinder.kindergarten.repository.MemberRepository;
 import com.kinder.kindergarten.repository.parent.ParentConsentRepository;
 import com.kinder.kindergarten.repository.parent.ParentRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +34,11 @@ public class ParentConsentService {
     private final ParentConsentRepository parentConsentRepository;
 
     private final ParentRepository parentRepository;
+
+    private final MemberRepository memberRepository;
+
+    private final PasswordEncoder passwordEncoder;
+
 
     @Transactional
     public ParentConsentDTO createConsent(ParentConsentDTO consentDTO) {
@@ -58,8 +67,10 @@ public class ParentConsentService {
                 .emergencyInfoConsent(consentDTO.getEmergencyInfoConsent())
                 .parent(parent)
                 .build();
+        // 빌드 패턴으로 서비스, 사진, 의료, 개인정보, 커뮤니티, 비상연락망 그리고 부모 를 지정
 
         ParentConsent savedConsent = parentConsentRepository.save(consent);
+        // 지정한 데이터를 DB에 저장한다.
 
         return convertToDTO(savedConsent);
     }
@@ -107,55 +118,133 @@ public class ParentConsentService {
     }
 
     @Transactional
-    public void saveFirstStepConsent(ParentConsentDTO consentDTO) {
+    public Long saveFirstStepConsent(ParentConsentDTO consentDTO) {
         try {
-            ParentConsent consent = new ParentConsent();
-            consent.setTermsConsent(consentDTO.getTermsConsent());
-            consent.setCommunityConsent(consentDTO.getCommunityConsent());
-            consent.setPrivateConsent(consentDTO.getPrivateConsent());
+            ParentConsent consent = ParentConsent.builder()
+                    .termsConsent(consentDTO.getTermsConsent())
+                    .communityConsent(consentDTO.getCommunityConsent())
+                    .privateConsent(consentDTO.getPrivateConsent())
+                    .photoConsent(false)
+                    .medicalInfoConsent(false)
+                    .emergencyInfoConsent(false)
+                    .consentStep(1)
+                    .build();
 
-            parentConsentRepository.save(consent);
+            ParentConsent savedConsent = parentConsentRepository.save(consent);
+            log.info("1단계 동의 정보 저장 완료 - ID: {}", savedConsent.getParentConsentId());
+
+            return savedConsent.getParentConsentId(); // ID 반환
         } catch (Exception e) {
-            log.error("첫 번째 단계 동의 정보 저장 중 오류 발생: ", e);
-            throw new RuntimeException("동의 정보 저장에 실패했습니다.");
+            log.error("1단계 동의 정보 저장 중 오류 발생: ", e);
+            throw new RuntimeException("동의 정보 저장에 실패했습니다: " + e.getMessage());
         }
     }
 
     // 두 번째 단계 동의 정보 저장 메소드 추가
     @Transactional
     public void saveSecondStepConsent(ParentConsentDTO consentDTO) {
+
         try {
+            // 2단계 동의서 저장
             ParentConsent consent = new ParentConsent();
             consent.setPhotoConsent(consentDTO.getPhotoConsent());
             consent.setMedicalInfoConsent(consentDTO.getMedicalInfoConsent());
             consent.setEmergencyInfoConsent(consentDTO.getEmergencyInfoConsent());
+            consent.setConsentStep(2);
 
             parentConsentRepository.save(consent);
+            log.info("2단계 동의 정보 저장 완료");
+
         } catch (Exception e) {
-            log.error("두 번째 단계 동의 정보 저장 중 오류 발생: ", e);
-            throw new RuntimeException("동의 정보 저장에 실패했습니다.");
+            log.error("2단계 동의 정보 저장 중 오류 발생: ", e);
+            throw new RuntimeException("동의 정보 저장에 실패했습니다: " + e.getMessage());
         }
     }
 
-    // 동의 상태 검증 메소드 수정
+    public ParentConsentDTO getConsentInfo(Long parentConsentId) {
+        ParentConsent consent = parentConsentRepository.findById(parentConsentId)
+                .orElse(null);
+
+        if (consent == null) {
+            return new ParentConsentDTO();
+        }
+
+        return ParentConsentDTO.builder()
+                .parentConsentId(consent.getParentConsentId())
+                .termsConsent(consent.getTermsConsent())
+                .photoConsent(consent.getPhotoConsent())
+                .medicalInfoConsent(consent.getMedicalInfoConsent())
+                .communityConsent(consent.getCommunityConsent())
+                .privateConsent(consent.getPrivateConsent())
+                .emergencyInfoConsent(consent.getEmergencyInfoConsent())
+                .build();
+    }
+
+    @Transactional
+    public void saveParentInfo(ParentInfoDTO parentInfoDTO) {
+
+        try {
+            Member member = Member.builder()
+                    .email(parentInfoDTO.getEmail())
+                    .name(parentInfoDTO.getName())
+                    .phone(parentInfoDTO.getPhone())
+                    .address(parentInfoDTO.getAddress())
+                    .role(Role.ROLE_PARENT)
+                    .password(passwordEncoder.encode("tempPassword"))
+                    .build();
+
+            memberRepository.save(member);
+
+            Parent parent = Parent.builder()
+                    .memberEmail(member.getEmail())
+                    .childrenEmergencyPhone(parentInfoDTO.getChildrenEmergencyPhone())
+                    .registrationStatus(RegistrationStatus.PENDING)
+                    .build();
+
+            parentRepository.save(parent);
+            log.info("학부모 정보 저장 완료");
+
+        } catch (Exception e) {
+            log.error("학부모 정보 저장 중 오류 발생: ", e);
+            throw new RuntimeException("학부모 정보 저장에 실패했습니다: " + e.getMessage());
+        }
+
+    }
+
+    private boolean isAllConsented(ParentConsent consent) {
+        return consent.getTermsConsent() &&
+                consent.getPhotoConsent() &&
+                consent.getMedicalInfoConsent() &&
+                consent.getCommunityConsent() &&
+                consent.getPrivateConsent() &&
+                consent.getEmergencyInfoConsent();
+    }
+
     public boolean isAllConsented(ParentConsentDTO consentDTO) {
+        // 동의 상태 검증 메소드
+
         return (consentDTO.getTermsConsent() != null && consentDTO.getTermsConsent()) &&
                 (consentDTO.getPhotoConsent() != null && consentDTO.getPhotoConsent()) &&
                 (consentDTO.getCommunityConsent() != null && consentDTO.getCommunityConsent()) &&
                 (consentDTO.getMedicalInfoConsent() != null && consentDTO.getMedicalInfoConsent()) &&
                 (consentDTO.getPrivateConsent() != null && consentDTO.getPrivateConsent()) &&
                 (consentDTO.getEmergencyInfoConsent() != null && consentDTO.getEmergencyInfoConsent());
+        //서비스, 사진, 커뮤니티, 의료정보, 개인정보, 비상연락망의 동의 상태를 본다.
     }
 
-    // 첫 번째 단계 동의 상태만 검증하는 메소드 추가
+
     public boolean isFirstStepConsented(ParentConsentDTO consentDTO) {
+        // 첫 번째 단계 동의 상태만 검증하는 메소드
+
         return (consentDTO.getTermsConsent() != null && consentDTO.getTermsConsent()) &&
                 (consentDTO.getCommunityConsent() != null && consentDTO.getCommunityConsent()) &&
                 (consentDTO.getPrivateConsent() != null && consentDTO.getPrivateConsent());
     }
 
-    // 두 번째 단계 동의 상태만 검증하는 메소드 추가
+
     public boolean isSecondStepConsented(ParentConsentDTO consentDTO) {
+        // 두 번째 단계 동의 상태만 검증하는 메소드
+
         return (consentDTO.getPhotoConsent() != null && consentDTO.getPhotoConsent()) &&
                 (consentDTO.getMedicalInfoConsent() != null && consentDTO.getMedicalInfoConsent()) &&
                 (consentDTO.getEmergencyInfoConsent() != null && consentDTO.getEmergencyInfoConsent());
@@ -163,25 +252,61 @@ public class ParentConsentService {
 
     @Transactional
     public void saveParentInfoAndConsent(ParentInfoDTO parentInfoDTO, ParentConsentDTO consentDTO) {
-
         try {
             log.info("Starting to save parent info and consent...");
-            // Parent 엔티티 생성 및 저장 ( DB 진입 전 대기 상태)
 
-            Parent parent = Parent.builder()
-                    .parentEmail(parentInfoDTO.getParentEmail())
-                    .parentName(parentInfoDTO.getParentName())
-                    .parentPhone(parentInfoDTO.getParentPhone())
-                    .childrenEmergencyPhone(parentInfoDTO.getChildrenEmergencyPhone())
-                    .parentAddress(parentInfoDTO.getParentAddress())
-                    .detailAddress(parentInfoDTO.getDetailAddress())
-                    .registrationStatus(RegistrationStatus.PENDING)
-                    .isErpRegistered(false)
+            // email null 체크
+            if (parentInfoDTO.getEmail() == null || parentInfoDTO.getEmail().trim().isEmpty()) {
+                throw new IllegalArgumentException("이메일은 필수 입력값입니다.");
+            }
+
+            log.info("Starting to save parent info and consent with email: {}", parentInfoDTO.getEmail());
+
+            // 이메일 중복 체크
+            if (memberRepository.existsById(parentInfoDTO.getEmail())) {
+                throw new IllegalStateException("이미 존재하는 이메일입니다.");
+            }
+
+            // 필수 입력값 검증
+            if (parentInfoDTO.getName() == null || parentInfoDTO.getName().trim().isEmpty()) {
+                throw new IllegalArgumentException("이름은 필수 입력값입니다.");
+            }
+            if (parentInfoDTO.getPhone() == null || parentInfoDTO.getPhone().trim().isEmpty()) {
+                throw new IllegalArgumentException("전화번호는 필수 입력값입니다.");
+            }
+            if (parentInfoDTO.getAddress() == null || parentInfoDTO.getAddress().trim().isEmpty()) {
+                throw new IllegalArgumentException("주소는 필수 입력값입니다.");
+            }
+
+            // Member 엔티티 생성 및 저장
+            Member member = Member.builder()
+                    .email(parentInfoDTO.getEmail().trim())  // 공백 제거
+                    .name(parentInfoDTO.getName().trim())
+                    .phone(parentInfoDTO.getPhone().trim())
+                    .address(parentInfoDTO.getAddress().trim())
+                    .role(Role.ROLE_PARENT)
                     .build();
 
-            log.info("Creating new parent with status: {}", parent.getRegistrationStatus());
+            try {
+                member = memberRepository.save(member);
+                log.info("Member saved successfully with email: {}", member.getEmail());
+            } catch (Exception e) {
+                log.error("Member 저장 중 오류 발생: ", e);
+                throw new RuntimeException("회원 정보 저장에 실패했습니다.");
+            }
+
+
+            // Parent 엔티티 생성 및 저장
+            Parent parent = Parent.builder()
+                    .memberEmail(member.getEmail())
+                    .childrenEmergencyPhone(parentInfoDTO.getChildrenEmergencyPhone())
+                    .detailAddress(parentInfoDTO.getDetailAddress())
+                    .registrationStatus(RegistrationStatus.PENDING)
+                    .build();
+
             parent = parentRepository.save(parent);
-            log.info("Saved parent with ID: {} and status: {}", parent.getParentId(), parent.getRegistrationStatus());
+            // 멤버, 학부모 엔티티 저장한 값을 DB에 저장.
+            log.info("저장한 학부모ID와 동의 상태 : "+ parent.getParentId(), parent.getRegistrationStatus());
 
             // ParentConsent 엔티티 생성 및 저장
             ParentConsent consent = ParentConsent.builder()
@@ -194,21 +319,22 @@ public class ParentConsentService {
                     .parent(parent)
                     .build();
 
-            parentConsentRepository.save(consent);
-            log.info("Saved consent for parent ID: {}", parent.getParentId());
-
-            Parent savedParent = parentRepository.findById(parent.getParentId()).orElse(null);
-            if (savedParent != null) {
-                log.info("Verified saved parent status: {}", savedParent.getRegistrationStatus());
+            try {
+                parentConsentRepository.save(consent);
+                log.info("Consent saved successfully for parent ID: {}", parent.getParentId());
+            } catch (Exception e) {
+                log.error("Consent 저장 중 오류 발생: ", e);
+                throw new RuntimeException("동의 정보 저장에 실패했습니다: " + e.getMessage());
             }
+
         } catch (Exception e) {
-            log.error("학부모 정보 및 동의 정보 저장 중 오류 발생: ", e);
-            throw new RuntimeException("학부모 정보 저장에 실패했습니다.", e);
+            log.error("전체 저장 프로세스 중 오류 발생: ", e);
+            throw new RuntimeException("학부모 정보 저장에 실패했습니다: " + e.getMessage());
         }
     }
 
     public boolean isEmailDuplicate(String email) {
-        return parentRepository.existsByParentEmail(email);
+        return parentRepository.existsByMemberEmail(email);
     }
 
     private ParentConsentDTO convertToDTO(ParentConsent consent) {
@@ -228,14 +354,16 @@ public class ParentConsentService {
 
     public List<Parent> getPendingRegistrations() {
         // 동의서 페이지에서 학부모 정보를 등록한 학부모 대기 중인 목록 조회
-        log.info("Fetching pending registrations...");
+
+        log.info("ParentConsentService.getPendingRegistrations 메서드 실행 중  = = = = = =");
 
         List<Parent> pendingList = parentRepository.findByRegistrationStatus(RegistrationStatus.PENDING);
         log.info("Found {} pending registrations", pendingList.size());
         pendingList.forEach(parent ->
-                log.info("Pending parent - ID: {}, Email: {}, Status: {}",
+
+                log.info("대기중인 학부모 ID, Email, status : " +
                         parent.getParentId(),
-                        parent.getParentEmail(),
+                        parent.getMemberEmail(),
                         parent.getRegistrationStatus())
         );
         return pendingList;
@@ -244,30 +372,45 @@ public class ParentConsentService {
 
     @Transactional
     public void approveRegistration(Long parentId) {
-        // 대기 중인 학부모를 승인 처리 하는 메서드
+        // 학부모 승인하는 서비스 메서드
 
         Parent parent = parentRepository.findById(parentId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 학부모를 찾을 수 없습니다."));
 
+        Member member = memberRepository.findByEmail(parent.getMemberEmail());
+
         parent.setRegistrationStatus(RegistrationStatus.APPROVED);
         parent.setApprovedAt(LocalDateTime.now());
         parent.setApprovedBy("관리자");
+        // 승인, 승인일시, 승인자 지정
 
         parentRepository.save(parent);
-        log.info("학부모 승인 완료" + parentId);
+        // 지정한 데이터를 DB에 저장
+        log.info("학부모 승인 완료 - ID : " + parentId);
     }
 
     @Transactional
     public void rejectRegistration(Long parentId, String reason) {
-        Parent parent = parentRepository.findById(parentId).orElseThrow(()
-        -> new EntityNotFoundException("해당 학부모를 찾을 수 없습니다."));
+        // 학부모 반려하는 서비스 메서드
+
+        Parent parent = parentRepository.findById(parentId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 학부모를 찾을 수 없습니다."));
+
+        Member member = memberRepository.findByEmail(parent.getMemberEmail());
 
         parent.setRegistrationStatus(RegistrationStatus.REJECTED);
         parent.setRejectReason(reason);
+        // 반려할때 반려와 사유를 지정해주고
 
         parentRepository.save(parent);
-        log.info("학부모 반려 완료, 사유 : " + parent, reason);
+        // DB에 저장
 
+        // Member 계정도 삭제 처리
+        if (member != null) {
+            memberRepository.delete(member);
+        }
+
+        log.info("학부모 반려 완료, 사유: " + reason);
     }
 
     public Parent getParentDetails(Long parentId) {

@@ -25,16 +25,27 @@ public interface ParentRepository extends JpaRepository<Parent, Long> {
        엔티티 필드에 언더스코어 쓰지 말기(바꾸게 되면 DB까지 연관되어 있어 해당 필드에 데이터가 연관 되어 있으면 불일치로 오류가 난다.
     */
 
-    Optional<Parent> findByParentEmail(@Param("email") String email);
+    //Optional<Parent> findByParentEmail(@Param("email") String email);
     // 회원 가입 시 중복된 회원이 있는지 검사하기 위해 이메일로 회원 검사하는 메서드
 
-    Page<Parent> findByParentNameContaining(String keyword, Pageable pageable);
+   //Page<Parent> findByParentNameContaining(String keyword, Pageable pageable);
     // 학부모 성함으로 검색하는 메서드
 
-    boolean existsByParentEmail(String parentEmail);
+    // Member 엔티티의 email로 Parent 찾기
+    Optional<Parent> findByMemberEmail(String Email);
+
+    @Query("SELECT p FROM Parent p JOIN Member m ON p.memberEmail = m.email WHERE m.name LIKE %:keyword%")
+    Page<Parent> findByParentNameContaining(String keyword, Pageable pageable);
+    // 학부모 이름으로 검색 (Member 엔티티와 조인)
+
+    //boolean existsByParentEmail(String parentEmail);
     // 이메일 존재 여부 확인하는 메서드
 
-    // 상태별 학부모 목록 조회 - JPQL 쿼리로 명시적 작성
+
+    boolean existsByMemberEmail(String Email);// Member 엔티티의 email 존재 여부 확인
+
+
     @Query("SELECT p FROM Parent p WHERE p.registrationStatus = :status")
     List<Parent> findByRegistrationStatus(@Param("status") RegistrationStatus status);
+    // 상태별 학부모 목록 조회
 }

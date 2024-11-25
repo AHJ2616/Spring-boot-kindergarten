@@ -39,19 +39,11 @@ public class QParent extends EntityPathBase<Parent> {
 
     public final BooleanPath isErpRegistered = createBoolean("isErpRegistered");
 
-    public final StringPath parentAddress = createString("parentAddress");
+    public final StringPath memberEmail = createString("memberEmail");
 
     public final QParentConsent parentConsent;
 
-    public final StringPath parentEmail = createString("parentEmail");
-
     public final NumberPath<Long> parentId = createNumber("parentId", Long.class);
-
-    public final StringPath parentName = createString("parentName");
-
-    public final StringPath parentPassword = createString("parentPassword");
-
-    public final StringPath parentPhone = createString("parentPhone");
 
     public final EnumPath<com.kinder.kindergarten.constant.parent.ParentType> parentType = createEnum("parentType", com.kinder.kindergarten.constant.parent.ParentType.class);
 

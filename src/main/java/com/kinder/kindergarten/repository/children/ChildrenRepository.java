@@ -5,6 +5,8 @@ import com.kinder.kindergarten.entity.children.ClassRoom;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -23,5 +25,11 @@ public interface ChildrenRepository extends JpaRepository<Children, Long> {
 
     Page<Children> findByAssignedClass_ClassRoomNameContaining(String keyword, Pageable pageable);// 검색할 때 반 이름으로 조회 메서드
 
-    Page<Children> findByParent_ParentNameContaining(String keyword, Pageable pageable);// 검색할 때 부모의 이름으로 조회 메서드
+    // 학부모 이름으로 검색 (Member 엔티티와 조인)
+    @Query("SELECT c FROM Children c " +
+            "JOIN c.parent p " +
+            "JOIN Member m ON p.memberEmail = m.email " +
+            "WHERE m.name LIKE %:keyword%")
+    Page<Children> findByParentNameContaining(@Param("keyword") String keyword, Pageable pageable);
+    // 검색할 때 부모의 이름으로 조회 메서드
 }

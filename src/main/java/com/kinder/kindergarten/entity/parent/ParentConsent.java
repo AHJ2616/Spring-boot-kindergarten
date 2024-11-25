@@ -3,6 +3,8 @@ package com.kinder.kindergarten.entity.parent;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Setter
@@ -32,6 +34,11 @@ public class ParentConsent {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private Parent parent;  // 학부모 엔티티와의 1:1 관계 매핑
+
+    private int consentStep; // 단계별 동의 단계 -> 11.25 추가
+
+    @Column(name = "consent_complete_date")
+    private LocalDateTime consentCompleteDate; // 동의 완료 시점 -> 11.25 추가
 
     /*
 

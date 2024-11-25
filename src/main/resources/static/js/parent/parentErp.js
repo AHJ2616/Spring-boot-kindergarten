@@ -9,6 +9,7 @@ $(document).ready(function() {
         e.preventDefault();
 
 
+        // Member 정보용 연락처 조합
         const phone1 = $('input[maxlength="3"][required]').val();
         const phone2 = $('input[maxlength="4"][required]').first().val();
         const phone3 = $('input[maxlength="4"][required]').last().val();
@@ -16,9 +17,10 @@ $(document).ready(function() {
 
 
         if (phone1 && phone2 && phone3) {
-            $('[name="parentPhone"]').val(`${phone1}-${phone2}-${phone3}`);
+            $('[name="phone"]').val(`${phone1}-${phone2}-${phone3}`);
         }// 연락처가 모두 입력된 경우에만 조합하여 hidden 필드에 설정
 
+        // Parent 정보용 비상연락처 조합
         const emergency1 = $('input[placeholder="입력"]').val();
         const emergency2 = $('input[maxlength="4"]:not([required])').first().val();
         const emergency3 = $('input[maxlength="4"]:not([required])').last().val();
@@ -26,9 +28,18 @@ $(document).ready(function() {
 
 
         if (emergency1 && emergency2 && emergency3) {
-            $('[name="emergencyContact"]').val(`${emergency1}-${emergency2}-${emergency3}`);
+            const emergencyPhone = `${emergency1}-${emergency2}-${emergency3}`;
+            $('[name="childrenEmergencyPhone"]').val(emergencyPhone);
+            console.log('비상연락처 설정:', emergencyPhone);  // 로그 추가
         }// 비상연락처가 모두 입력된 경우에만 조합하여 hidden 필드에 설정
 
+
+        // 폼 데이터 검증
+        const email = $('[name="email"]').val();  // email 필드 추가
+        if (!email) {
+            alert('이메일을 입력해주세요.');
+            return;
+        }
 
         $.ajax({
             url: $(this).attr('action'),
@@ -40,6 +51,7 @@ $(document).ready(function() {
                 if (response.success) {
                     // 모달에 임시 비밀번호 표시
                     $('#tempPasswordDisplay').text(response.tempPassword);
+                    $('#emailDisplay').text(email);  // 이메일도 표시
 
                     var modal = $('#passwordModal');
                     modal.modal({
@@ -52,7 +64,14 @@ $(document).ready(function() {
 
                     $('#confirmPassword').one('click', function() {
                         modal.modal('hide');
-                        window.location.href = '/erp/children/register?parentId=' + response.parentId;
+                        // parentId가 undefined인 경우 처리
+                        const parentId = response.parentId || '';
+                        if (parentId) {
+                            window.location.href = '/erp/children/register?parentId=' + parentId;
+                        } else {
+                            alert('학부모 ID를 찾을 수 없습니다.');
+                            window.location.href = '/erp/parent/list';
+                        }
                     });// 확인 버튼 클릭 시 원아 등록페이지로 이동하면서 부모ID도 넘어간다.
 
                 } else {
@@ -112,18 +131,29 @@ $(document).ready(function() {
         location.href = '/erp/parent/list?page=' + page + (keyword ? '&keyword=' + keyword : '');
     }// window.movePage = function END
 
-    window.confirmDelete = function() {
-        if (confirm('정말 삭제하시겠습니까? 연관된 자녀 정보도 모두 삭제됩니다.')) {
-            const parentId = $('#parentId').val(); // hidden input으로 parentId를 받아와야 함
-            const form = $('<form>', {
-                'method': 'POST',
-                'action': `/erp/parent/delete/${parentId}`
-            });
+    /*<![CDATA[*/
+    // Thymeleaf를 통해 parentId를 안전하게 가져옴
+    const parentId = /*[[${parent.parentId}]]*/ null;
+    window.confirmDelete = function(parentId) {
+        console.log('ParentId:', parentId);
 
-            $(document.body).append(form);
+        if (!parentId) {
+            alert('삭제할 학부모 정보를 찾을 수 없습니다.');
+            return;
+        }
+
+        if (confirm('정말 삭제하시겠습니까? 부모 정보와 연관된 자녀 정보도 모두 삭제됩니다.')) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/erp/parent/delete/${parentId}`;
+
+            // 디버깅을 위한 로그
+            console.log('Delete URL:', form.action);
+
+            document.body.appendChild(form);
             form.submit();
         }
     }
-
+    /*]]>*/
 });// $(document).ready(function() END
 

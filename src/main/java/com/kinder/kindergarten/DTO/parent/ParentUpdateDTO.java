@@ -14,13 +14,19 @@ public class ParentUpdateDTO {
 
     private Long parentId; //학부모 고유 ID (PK)
 
-    private String parentName; // 학부모 성함
+//    private String parentName; // 학부모 성함
+//
+//    private String parentPhone;   //학부모 핸드폰 번호
+//
+//    private String parentAddress; //학부모 주소
 
-    private String parentPhone;   //학부모 핸드폰 번호
+    // Member 정보 업데이트용
+    private String address;
+    private String phone;
+    private String password;  // 비밀번호 변경 시 사용
+    private String name;
 
     private String childrenEmergencyPhone;    // 비상 연락처
-
-    private String parentAddress; //학부모 주소
 
     private ParentType parentType;  // 자녀와의 관계
 }

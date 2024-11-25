@@ -60,15 +60,11 @@
             <span class="consent-status" th:classappend="${consent.termsConsent} ? 'status-agreed' : 'status-pending'"
                   th:text="${consent.termsConsent} ? '동의완료' : '미동의'">미동의</span>
       <label>
-        <input type="checkbox" name="termsConsent" th:field="*{termsConsent}" required>
+        <input type="checkbox" th:field="*{termsConsent}" th:checked="${consent.termsConsent}" required>
         ERP 시스템 및 커뮤니티 서비스 이용 약관<span class="required">*</span>
       </label>
       <div class="d-flex align-items-center mt-2">
         <a th:href="@{/consent/terms}" class="consent-link me-3">[내용 보기]</a>
-        <div class="btn-group btn-group-sm">
-          <button type="button" class="btn btn-outline-success" onclick="agreeToItem('termsConsent')">동의함</button>
-          <button type="button" class="btn btn-outline-danger" onclick="disagreeToItem('termsConsent')">동의안함</button>
-        </div>
       </div>
     </div>
 
@@ -77,15 +73,11 @@
             <span class="consent-status" th:classappend="${consent.communityConsent} ? 'status-agreed' : 'status-pending'"
                   th:text="${consent.communityConsent} ? '동의완료' : '미동의'">미동의</span>
       <label>
-        <input type="checkbox" name="communityConsent" th:field="*{communityConsent}" required>
+        <input type="checkbox" th:field="*{communityConsent}" th:checked="${consent.communityConsent}" required>
         학부모 커뮤니티 활동 동의서<span class="required">*</span>
       </label>
       <div class="d-flex align-items-center mt-2">
         <a th:href="@{/consent/community}" class="consent-link me-3">[내용 보기]</a>
-        <div class="btn-group btn-group-sm">
-          <button type="button" class="btn btn-outline-success" onclick="agreeToItem('communityConsent')">동의함</button>
-          <button type="button" class="btn btn-outline-danger" onclick="disagreeToItem('communityConsent')">동의안함</button>
-        </div>
       </div>
     </div>
 
@@ -94,15 +86,11 @@
             <span class="consent-status" th:classappend="${consent.privateConsent} ? 'status-agreed' : 'status-pending'"
                   th:text="${consent.privateConsent} ? '동의완료' : '미동의'">미동의</span>
       <label>
-        <input type="checkbox" name="privateConsent" th:field="*{privateConsent}" required>
+        <input type="checkbox" th:field="*{privateConsent}" th:checked="${consent.privateConsent}" required>
         학부모 개인정보 및 제3자 제공 동의서<span class="required">*</span>
       </label>
       <div class="d-flex align-items-center mt-2">
         <a th:href="@{/consent/privacy}" class="consent-link me-3">[내용 보기]</a>
-        <div class="btn-group btn-group-sm">
-          <button type="button" class="btn btn-outline-success" onclick="agreeToItem('privateConsent')">동의함</button>
-          <button type="button" class="btn btn-outline-danger" onclick="disagreeToItem('privateConsent')">동의안함</button>
-        </div>
       </div>
     </div>
 

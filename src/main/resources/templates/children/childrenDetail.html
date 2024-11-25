@@ -40,7 +40,7 @@
 
             <div class="info-row">
                 <div class="info-label">생년월일</div>
-                <div class="info-content" th:text="${#temporals.format(children.childrenBirthDate, 'yyyy-MM-dd')}"></div>
+                <div class="info-content" th:text="${children.maskedBirthDate}"></div>
             </div>
 
             <div class="info-row">

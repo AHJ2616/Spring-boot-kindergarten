@@ -25,20 +25,27 @@ public class ParentErpDTO {
 
     private Long parentId; //학부모 고유 ID (PK)
 
-    @NotBlank(message = "성함은 필수 입력 값 입니다.")
-    private String parentName; // 학부모 성함
+    // Member 정보
+    private String email;
+    private String name;
+    private String address;
+    private String phone;
+    private String password;
 
-    @NotBlank(message = "이메일은 필수 입력 값 입니다.")
-    @Email(message = "이메일 형식이 올바르지 않습니다.")
-    private String parentEmail;    // 학부모 이메일(학부모 구분을 위해 유니크 설정)
-
-    private String parentPassword; //학부모 비밀번호(자동 생성용)
-
-    @NotBlank(message = "연락처는 필수 입력값입니다.")
-    private String parentPhone;   //학부모 핸드폰 번호
-
-    @NotBlank(message = "주소는 필수 입력 값 입니다.")
-    private String parentAddress; //학부모 주소
+//    @NotBlank(message = "성함은 필수 입력 값 입니다.")
+//    private String parentName; // 학부모 성함
+//
+//    @NotBlank(message = "이메일은 필수 입력 값 입니다.")
+//    @Email(message = "이메일 형식이 올바르지 않습니다.")
+//    private String parentEmail;    // 학부모 이메일(학부모 구분을 위해 유니크 설정)
+//
+//    private String parentPassword; //학부모 비밀번호(자동 생성용)
+//
+//    @NotBlank(message = "연락처는 필수 입력값입니다.")
+//    private String parentPhone;   //학부모 핸드폰 번호
+//
+//    @NotBlank(message = "주소는 필수 입력 값 입니다.")
+//    private String parentAddress; //학부모 주소
 
     private String childrenEmergencyPhone;    // 비상 연락처
 

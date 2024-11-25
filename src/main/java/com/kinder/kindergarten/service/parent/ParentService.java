@@ -3,7 +3,11 @@ package com.kinder.kindergarten.service.parent;
 import com.kinder.kindergarten.DTO.children.ChildrenErpDTO;
 import com.kinder.kindergarten.DTO.parent.ParentErpDTO;
 import com.kinder.kindergarten.DTO.parent.ParentUpdateDTO;
+import com.kinder.kindergarten.constant.employee.Role;
+import com.kinder.kindergarten.constant.parent.RegistrationStatus;
+import com.kinder.kindergarten.entity.Member;
 import com.kinder.kindergarten.entity.parent.Parent;
+import com.kinder.kindergarten.repository.MemberRepository;
 import com.kinder.kindergarten.repository.parent.ParentRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -26,100 +30,98 @@ public class ParentService {
 
     private final ParentRepository parentRepository;
 
+    private final MemberRepository memberRepository;
+
     private final PasswordEncoder passwordEncoder;
 
     private final ModelMapper modelMapper;
 
-    public Long parentRegister(ParentErpDTO parentErpDTO) {
-        // erp에서 직원이 학부모 등록하는 서비스 메서드
+    @Transactional
+    public Long parentRegister(ParentErpDTO dto) {
+        log.info("ParentService.parentRegister 메서드 실행 중  = = = = = =", dto);
 
-        String tempPassword = tempPassWordMake();
-        //  임시 비밀번호 조합을 만든 메서드를 tempPassWord에다가 넣는다.
-        log.info("Generated temporary password: {}", tempPassword);
-
-
-        parentErpDTO.setParentPassword(tempPassword);
-        // DTO에다가 임시 비밀번호를 주입한다.
-        log.info("Set temporary password to DTO: {}", parentErpDTO.getTempPassword());
-
-
-        String encodedPassword = passwordEncoder.encode(tempPassword);
-        parentErpDTO.setParentPassword(encodedPassword);
-        // 임시 비밀번호를 암호화 시킨 값을 DTO에다가 주입 한다.
-
-        // 이메일 중복 체크 (이메일이 입력된 경우에만)
-        if(parentErpDTO.getParentEmail() != null && !parentErpDTO.getParentEmail().isEmpty()) {
-
-            if(parentRepository.findByParentEmail(parentErpDTO.getParentEmail()).isPresent()) {
-                // 중복된 이메일이 입력이 될 경우 메세지를 알려준다.
+        try {
+            // 1. 이메일 중복 체크
+            if (memberRepository.existsByEmail(dto.getEmail())) {
                 throw new IllegalStateException("이미 등록된 이메일입니다.");
             }
+
+            // 2. Member 엔티티 생성 및 저장
+            String tempPassword = tempPassWordMake();
+            Member member = Member.builder()
+                    .email(dto.getEmail())
+                    .name(dto.getName())
+                    .phone(dto.getPhone())
+                    .address(dto.getAddress())
+                    .password(passwordEncoder.encode(tempPassword))
+                    .role(Role.ROLE_PARENT)
+                    .build();
+
+            memberRepository.save(member);
+            // 1번, 2번 데이터를 DB에 저장!
+
+            log.info("Member 이메일로 저장한 값 : " + member.getEmail());
+
+            // 3. Parent 엔티티 생성 및 저장
+            Parent parent = Parent.builder()
+                    .memberEmail(member.getEmail())
+                    .childrenEmergencyPhone(dto.getChildrenEmergencyPhone())
+                    .parentType(dto.getParentType())
+                    .registrationStatus(RegistrationStatus.PENDING)
+                    .build();
+
+            log.info("비상연락처 값이 넘어옵니까?!", dto.getChildrenEmergencyPhone());
+
+            Parent savedParent = parentRepository.save(parent);
+            log.info("학부모 ID + 비상연락처 데이터 확인하긔 : " + savedParent.getParentId(), savedParent.getChildrenEmergencyPhone());  // 저장된 데이터 확인 로그
+
+            // 4. 임시 비밀번호 설정
+            dto.setTempPassword(tempPassword);
+
+            return savedParent.getParentId();
+
+        } catch (Exception e) {
+            log.error("Error during parent registration: ", e);
+            throw new RuntimeException("학부모 등록 중 오류가 발생했습니다: " + e.getMessage());
         }
-
-        // DTO -> Entity 변환
-        Parent parent = Parent.builder()
-                .parentName(parentErpDTO.getParentName())
-                .parentEmail(parentErpDTO.getParentEmail())
-                .parentPhone(parentErpDTO.getParentPhone())
-                .parentAddress(parentErpDTO.getParentAddress())
-                .childrenEmergencyPhone(parentErpDTO.getChildrenEmergencyPhone())
-                .parentType(parentErpDTO.getParentType())
-                .parentPassword(encodedPassword) // 암호화된 비밀번호 저장
-                .isErpRegistered(true)  // ERP를 통한 등록임을 표시
-                .build();
-
-        Parent savedParent = parentRepository.save(parent);
-        // savedParent으로 변환한 값들을 레포지토리에 저장하고 DB로 전달
-
-
-        // 저장 후 다시 한번 임시 비밀번호 설정 (혹시 모를 초기화 방지)
-        parentErpDTO.setTempPassword(tempPassword);
-        log.info("Final check of temporary password: {}", parentErpDTO.getTempPassword());
-
-        return savedParent.getParentId();
     }
 
     private String tempPassWordMake() {
-        // 임시 비밀번호 생성하는 메서드
-
-        String upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";    //대문자
-        String lower = upper.toLowerCase(); //소문자
-        String digits = "0123456789";   // 0~9 숫자
-        String specialChars = "!@#$%^&*";   // 특수문자
-
-        String allChars = upper + lower + digits + specialChars;//
-        // 모든 사용할 문자들을 하나로 만든다.
+        // 임시 비밀번호 생성해주는 서비스 메서드(ERP의 직원이 학부모 등록하기 과정)
+        String upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String lower = upper.toLowerCase();
+        String digits = "0123456789";
+        String specialChars = "!@#$%^&*";
+        String allChars = upper + lower + digits + specialChars;
+        // 임시 비밀번호에다가 지정할 대소문자와 숫자(0~9), 특수 문자를 정해준다!
 
         SecureRandom random = new SecureRandom();
-        // 일반 랜덤보다 안전한 SecureRandom 라는 변수를 이용해서 랜덤 생성한다.
-
         StringBuilder password = new StringBuilder();
-        // 비밀번호를 담아줄 집을 생성해준다.
 
-        password.append(upper.charAt(random.nextInt(upper.length())));// 대문자 1개
-        password.append(lower.charAt(random.nextInt(lower.length())));  // 소문자 1개
-        password.append(digits.charAt(random.nextInt(digits.length())));    // 숫자 1개
-        password.append(specialChars.charAt(random.nextInt(specialChars.length()))); // 특수문자 1개
-        // 최소한 비밀번호 설정을 위해 각 문자에서 하나씩 선택하게 한다. (4자리)
+        password.append(upper.charAt(random.nextInt(upper.length())));
+        password.append(lower.charAt(random.nextInt(lower.length())));
+        password.append(digits.charAt(random.nextInt(digits.length())));
+        password.append(specialChars.charAt(random.nextInt(specialChars.length())));
+        // 대소문자, 숫자, 특수문자의 각 문자 타입에서 최소 1개씩 선택
 
-        for (int i = 0; i < 4; i++ ) {
-            // 나머지 4자리를 랜덤하게 추가한다.
-
+        // 나머지 4자리를 랜덤하게 추가
+        for (int i = 0; i < 4; i++) {
             password.append(allChars.charAt(random.nextInt(allChars.length())));
         }
 
+        // 생성된 비밀번호를 섞기
         char[] passwordArray = password.toString().toCharArray();
-        // 패스워드에 문자열 배열을 지정해준다.
-
-        for (int i = passwordArray.length -1; i > 0; i--) {
-            // 0에서 i 사이의 인덱스를 무작위로 선택하고
-
-            int j = random.nextInt(i + 1);// // 현재 위치(i)의 문자와 랜덤하게 선택된 위치(j)의 문자를 교환
+        for (int i = passwordArray.length - 1; i > 0; i--) {
+            int j = random.nextInt(i + 1);
             char temp = passwordArray[i];
-
             passwordArray[i] = passwordArray[j];
             passwordArray[j] = temp;
         }
+
+        log.info("임시 비밀번호 생성 완료");
+        return new String(passwordArray);
+        // 배열의 문자열 리턴한다.
+
         /* for문을 이용하여 Fisher-Yates 셔플 알고리즘을 사용하여 생성된 비밀번호를 무작위로 섞는다.
         섞는 이유는 : 비밀번호를 생성할 때 대문자, 소문자, 숫자, 특수문자 순서대로 추가했기 때문에 패턴이 생길 수 있기 때문에  모든 문자의 위치를 섞는다.
 
@@ -127,45 +129,71 @@ public class ParentService {
         배열, 리스트의 요소들을 무작위로 섞어주면서 공정한 무작위성을 보장하면서도 성능이 뛰어난 특징이 있다.
         주로 카드 게임 덱, 랜덤 배열 생성할 때 자주 사용된다.
          */
-
-        return new String(passwordArray);
-        // 배열의 문자열 리턴한다.
     }
 
     public Page<ParentErpDTO> getAllParents(Pageable pageable) {
-        // 등록된 부모 조회(리스트) 하는 메서드
+        // 등록된 모든 학부모의 데이터를 끌고 와서 페이징 처리 해주는 서비스 메서드
 
         Page<Parent> parentPage = parentRepository.findAll(pageable);
-        // 레포지토리에서 등록된 학부모의 모든 정보를 다 가져오고 PAGE 처리 한다.
+        // 1. DB에서 모든 정보를 끌고와서 페이지 변수 지정
 
         return parentPage.map(parent -> {
+            Member member = memberRepository.findByEmail(parent.getMemberEmail());
+            ParentErpDTO dto = modelMapper.map(parent, ParentErpDTO.class);
 
-            ParentErpDTO parentErpDTO = modelMapper.map(parent, ParentErpDTO.class);
+            // Member 정보 설정
+            if (member != null) {
+                dto.setEmail(member.getEmail());
+                dto.setName(member.getName());
+                dto.setPhone(member.getPhone());
+                dto.setAddress(member.getAddress());
+            }
 
-            parentErpDTO.setChildrenIds(parent.getChildren().stream().map(child ->
-                    modelMapper.map(child, ChildrenErpDTO.class))
+            dto.setChildrenIds(parent.getChildren().stream()
+                    .map(child -> modelMapper.map(child, ChildrenErpDTO.class))
                     .collect(Collectors.toList()));
 
-            return parentErpDTO;
+            return maskPersonalInfo(dto);
         });
-        // modelMapper 이용하여 학부모DTO, 원아DTO를 맵 + 리스트로 변환해준다.
     }
 
     public ParentErpDTO getParentDetail(Long parentId) {
-        // 학부모의 상세 보기 기능을 하는 서비스 메서드
+        // 등록된 학부모의 상세보기 서비스 메서드
 
-        Parent parent = parentRepository.findById(parentId).orElseThrow(() ->
-                new EntityNotFoundException("학부모의 정보를 찾을 수 없습니다."));
-        // 레포지토리에서 학부모의 ID를 이용하여 학부모의 정보를 가져오고 정보가 없으면 메세지를 출력한다.
+        Parent parent = parentRepository.findById(parentId)
+                .orElseThrow(() -> new EntityNotFoundException("학부모 정보를 찾을 수 없습니다."));
 
-        ParentErpDTO parentErpDTO = modelMapper.map(parent, ParentErpDTO.class);
+        Member member = memberRepository.findByEmail(parent.getMemberEmail());
 
-        parentErpDTO.setChildrenIds(parent.getChildren().stream()
+        ParentErpDTO dto = new ParentErpDTO();
+
+        // Member 정보 설정
+        if (member != null) {
+            dto.setName(member.getName());
+            dto.setEmail(member.getEmail());
+            dto.setPhone(member.getPhone());
+            dto.setAddress(member.getAddress());
+        }
+
+        // Parent 정보 설정
+        dto.setParentId(parent.getParentId());
+        dto.setChildrenEmergencyPhone(parent.getChildrenEmergencyPhone());
+        dto.setParentType(parent.getParentType());
+
+        // 날짜 정보 설정
+        if (parent.getCreatedDate() != null) {
+            dto.setParentCreateDate(parent.getCreatedDate().toLocalDate());
+        }
+        if (parent.getUpdatedDate() != null) {
+            dto.setParentModifyDate(parent.getUpdatedDate().toLocalDate());
+        }
+
+        // 자녀 정보 설정
+        dto.setChildrenIds(parent.getChildren().stream()
                 .map(child -> modelMapper.map(child, ChildrenErpDTO.class))
                 .collect(Collectors.toList()));
 
-        return parentErpDTO;
-        // modelMapper으로 맵 형식으로 학부모의 정보와 DTO를 리턴한다.
+        return maskPersonalInfo(dto);
     }
 
     public Page<ParentErpDTO> searchParents(String keyword, Pageable pageable) {
@@ -179,53 +207,127 @@ public class ParentService {
     }
 
     @Transactional
-    public void updateParent(ParentUpdateDTO parentUpdateDTO) {
-        // 학부모 정보 수정하는 서비스 메서드
+    public void updateParent(ParentUpdateDTO updateDTO) {
+        // 학부모의 정보를 수정하는 서비스 메서드
 
-        log.info("ParentService.updateParent 메서드 실행 중   - - - -" + parentUpdateDTO);
+        try {
+            // Parent 엔티티 조회
+            Parent parent = parentRepository.findById(updateDTO.getParentId())
+                    .orElseThrow(() -> new EntityNotFoundException("학부모 정보를 찾을 수 없습니다."));
 
-            Parent parent = parentRepository.findById(parentUpdateDTO.getParentId()).orElseThrow(() ->
-                    new EntityNotFoundException("학부모의 정보를 찾을 수 없습니다."));
-            // 레포지토리에 학부모의 ID를 이용해서 학부모의 정보를 찾으며 없으면 메세지를 보낸다.
+            // Member 엔티티 조회
+            Member member = memberRepository.findByEmail(parent.getMemberEmail());
+            if (member == null) {
+                throw new EntityNotFoundException("회원 정보를 찾을 수 없습니다.");
+            }
 
-        log.info("부모 객체 : " + parent);
+            // Member 정보 업데이트
+            member.setName(updateDTO.getName());
+            member.setPhone(updateDTO.getPhone());
+            member.setAddress(updateDTO.getAddress());
+            memberRepository.save(member);
+            log.info("Member 정보 업데이트 완료: {}", member.getEmail());
 
-            parent.setParentName(parentUpdateDTO.getParentName());
-            parent.setParentPhone(parentUpdateDTO.getParentPhone());
-            parent.setChildrenEmergencyPhone(parentUpdateDTO.getChildrenEmergencyPhone());
-            parent.setParentAddress(parentUpdateDTO.getParentAddress());
-            parent.setParentType(parentUpdateDTO.getParentType());
-            // Parent 엔티티의 성함, 연락처, 긴급연락처, 주소, 법정보호자인 필드를 parentUpdateDTO에다가 설정한다.
+            // Parent 정보 업데이트
+            parent.setChildrenEmergencyPhone(updateDTO.getChildrenEmergencyPhone());
+            parent.setParentType(updateDTO.getParentType());
+            parentRepository.save(parent);
+            log.info("Parent 정보 업데이트 완료: {}", parent.getParentId());
 
-        log.info("업데이트된 Parent 엔티티 : " + parent);
-
-        Parent savedParent = parentRepository.save(parent);
-        //수정한 데이터를 레포지토리를 통하여 DB로 보내고 savedParent변수에 저장한다.
-
-        log.info("저장된 Parent 엔티티 : " + savedParent);
-
+        } catch (Exception e) {
+            log.error("학부모 정보 수정 중 오류 발생: ", e);
+            throw new RuntimeException("학부모 정보 수정에 실패했습니다: " + e.getMessage());
+        }
     }
 
     @Transactional
     public void deleteParent(Long parentId) {
-        // 학부모 데이터를 삭제하는 서비스 메서드
+        // 학부모의 ID를 이용하여 삭제하는 서비스 메서드
 
-        Parent parent = parentRepository.findById(parentId)
-                .orElseThrow(() -> new EntityNotFoundException("학부모의 정보를 찾을 수 없습니다. ID :" + parentId));
-        // 레포지토리에서 부모의ID를 찾는 검사를 한다. 없으면 메세지를 보낸다.
+        try {
+            // Parent 엔티티 조회
+            Parent parent = parentRepository.findById(parentId)
+                    .orElseThrow(() -> new EntityNotFoundException("삭제할 학부모 정보를 찾을 수 없습니다. ID: " + parentId));
 
-        parentRepository.delete(parent);
-        // 삭제한 부모를 DB에 전달
+            // Member 엔티티 조회
+            Member member = memberRepository.findByEmail(parent.getMemberEmail());
+            if (member == null) {
+                throw new EntityNotFoundException("회원 정보를 찾을 수 없습니다. Email: " + parent.getMemberEmail());
+            }
+
+            log.info("학부모 삭제 시작 - ParentID: {}, MemberEmail: {}", parentId, parent.getMemberEmail());
+
+            // Parent 엔티티 삭제
+            parentRepository.delete(parent);
+            log.info("Parent 정보 삭제 완료");
+
+            // Member 엔티티 삭제
+            memberRepository.delete(member);
+            log.info("Member 정보 삭제 완료");
+
+        } catch (Exception e) {
+            log.error("학부모 정보 삭제 중 오류 발생: ", e);
+            throw new RuntimeException("학부모 정보 삭제에 실패했습니다: " + e.getMessage());
+        }
     }
 
+    public ParentErpDTO maskPersonalInfo(ParentErpDTO dto) {
+        /* 학부모 데이터의 마스킹 처리 하는 서비스 메서드
+        여기서, 마스킹(Masking) 처리란? 민감한 정보(개인정보, 금융정보 등)가 외부에 노출되지 않도록 일부 데이터를 숨기거나 가리는 기술을 의마함.
+        데이터를 완전히 가리는게 아닌, 특정 부분만 가려서 사용자가 데이터를 식별할 수 없도록 처리하는 방식
+
+       11.25 추가
+         */
+
+
+        try {
+            if (dto.getName() != null && dto.getName().length() >= 2) {
+
+                dto.setName(dto.getName().charAt(0) + "*" + dto.getName().substring(dto.getName().length() - 1));
+            }// 성함 데이터 마스킹
+
+            if (dto.getPhone() != null) {
+                String phone = dto.getPhone().replaceAll("[^0-9]", ""); // 숫자만 추출
+                if (phone.length() == 11) { // 휴대폰 번호 형식(11자리)
+                    dto.setPhone(phone.substring(0, 3) + "-****-" + phone.substring(7));
+                }
+            }// 연락처 데이터 마스킹
+
+            if (dto.getChildrenEmergencyPhone() != null) {
+                String emergencyPhone = dto.getChildrenEmergencyPhone().replaceAll("[^0-9]", "");
+                if (emergencyPhone.length() == 11) {
+                    dto.setChildrenEmergencyPhone(emergencyPhone.substring(0, 3) + "-****-" +
+                            emergencyPhone.substring(7));
+                }
+            }// 비상 연락처 마스킹
+
+            if (dto.getAddress() != null) {
+
+                String[] addressParts = dto.getAddress().split(" ");
+
+                if (addressParts.length > 2) {
+                    dto.setAddress(addressParts[0] + " " + addressParts[1] + " *****");
+                }
+            }// 주소 마스킹
+
+            return dto;
+        } catch (Exception e) {
+            log.error("마스킹 처리 중 오류 발생 !" , e);
+            return dto;
+        }
+    }
 
     private ParentErpDTO convertToDTO(Parent parent) {
+        Member member = memberRepository.findByEmail(parent.getMemberEmail());
+
         return ParentErpDTO.builder()
                 .parentId(parent.getParentId())
-                .parentName(parent.getParentName())
-                .parentEmail(parent.getParentEmail())
-                .parentPhone(parent.getParentPhone())
-                .parentAddress(parent.getParentAddress())
+                // Member 정보
+                .name(member != null ? member.getName() : null)
+                .email(member != null ? member.getEmail() : null)
+                .phone(member != null ? member.getPhone() : null)
+                .address(member != null ? member.getAddress() : null)
+                // Parent 정보
                 .childrenEmergencyPhone(parent.getChildrenEmergencyPhone())
                 .parentType(parent.getParentType())
                 .parentCreateDate(parent.getCreatedDate().toLocalDate())

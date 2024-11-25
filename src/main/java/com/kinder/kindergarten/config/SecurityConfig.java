@@ -52,12 +52,20 @@ public class SecurityConfig{
                     .requestMatchers("/teacher/**").hasRole("USER") // 사용자만 /teacher/** 경로 접근 가능
                     .requestMatchers("/employee/**").hasAnyRole("ADMIN", "MANAGER", "USER") // 직원은 모든 역할 접근 가능
                     .requestMatchers("/parent/**").hasRole("Parent")
-                    .requestMatchers("/consent", "/consent/**").permitAll()
                     .requestMatchers("/erp/**").hasAnyRole("ADMIN", "MANAGER")  // ERP 접근 권한 추가
                     .requestMatchers("/money/**").hasAnyRole("ADMIN", "MANAGER", "USER") // 2024 11 11 회계 관리 추가
                     .requestMatchers("/material/**").hasAnyRole("ADMIN", "MANAGER", "USER") // 2024 11 11 자재 관리 추가
                     .requestMatchers("/**", "/board/**", "/item/**", "/images/**").permitAll()
                     .requestMatchers("/consent/admin/**").hasRole("ADMIN")  // 관리자 권한 필요(테스트를 위해 잠시 설정 -학부모)
+
+                    .requestMatchers("/erp/parent/**").permitAll()
+                    .requestMatchers("/erp/parent/delete/**").permitAll()
+                    // 학부모 등록 승인/반려 관련 엔드포인트 허용
+                    .requestMatchers("/consent/**").permitAll()
+                    .requestMatchers("/consent/approve/**").permitAll()
+                    .requestMatchers("/consent/reject/**").permitAll()
+                    .requestMatchers("/consent/request-details/**").permitAll()
+                    .requestMatchers("/consent/admin/requests").permitAll()
                     .anyRequest().authenticated()
             )
             .formLogin(form -> form

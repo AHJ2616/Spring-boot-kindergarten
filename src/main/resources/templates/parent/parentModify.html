@@ -45,17 +45,24 @@
             <tr>
                 <th>성함</th>
                 <td>
-                    <input type="text" class="form-control" th:field="*{parentName}">
-                    <span class="error-message" th:if="${#fields.hasErrors('parentName')}"
-                          th:errors="*{parentName}"></span>
+                    <input type="text" class="form-control"
+                           th:field="*{name}"
+                           th:value="${parent.name}"
+                           name="name"
+                           id="name"
+                           required>
+                    <span class="error-message"
+                          th:if="${#fields.hasErrors('name')}"
+                          th:errors="*{name}">
+        </span>
                 </td>
             </tr>
             <tr>
                 <th>연락처</th>
                 <td>
-                    <input type="text" class="form-control" th:field="*{parentPhone}">
-                    <span class="error-message" th:if="${#fields.hasErrors('parentPhone')}"
-                          th:errors="*{parentPhone}"></span>
+                    <input type="text" class="form-control" th:field="*{phone}">
+                    <span class="error-message" th:if="${#fields.hasErrors('phone')}"
+                          th:errors="*{phone}"></span>
                 </td>
             </tr>
             <tr>
@@ -67,9 +74,9 @@
             <tr>
                 <th>주소</th>
                 <td>
-                    <input type="text" class="form-control" th:field="*{parentAddress}">
-                    <span class="error-message" th:if="${#fields.hasErrors('parentAddress')}"
-                          th:errors="*{parentAddress}"></span>
+                    <input type="text" class="form-control" th:field="*{address}">
+                    <span class="error-message" th:if="${#fields.hasErrors('address')}"
+                          th:errors="*{address}"></span>
                 </td>
             </tr>
             <tr>

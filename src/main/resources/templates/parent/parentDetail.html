@@ -58,15 +58,15 @@
 
         .children-table th {
             background-color: #f8f9fa;
-            text-align: center; !important;
+            text-align: center !important;
         }
 
         .children-table td {
-            text-align: center; !important;
+            text-align: center !important;
         }
         .children-actions {
             white-space: nowrap;
-            text-align: center; !important;
+            text-align: center !important;
         }
 
         .action-buttons {
@@ -104,11 +104,11 @@
         <tbody>
         <tr>
             <th>성함</th>
-            <td th:text="${parent.parentName}"></td>
+            <td th:text="${parent.name}"></td>
         </tr>
         <tr>
             <th>연락처</th>
-            <td th:text="${parent.parentPhone}"></td>
+            <td th:text="${parent.phone}"></td>
         </tr>
         <tr>
             <th>비상 연락처</th>
@@ -116,7 +116,7 @@
         </tr>
         <tr>
             <th>주소</th>
-            <td th:text="${parent.parentAddress}"></td>
+            <td th:text="${parent.address}"></td>
         </tr>
         <tr>
             <th>자녀와의 관계</th>
@@ -177,7 +177,8 @@
     <button type="button" class="btn btn-primary btn-sm"
             th:onclick="|location.href='@{/erp/parent/modify/{id}(id=${parent.parentId})}'|">수정</button>
     <button type="button" class="btn btn-danger btn-sm"
-            th:onclick="deleteParent([[${parent.parentId}]])">삭제</button>
+            th:attr="onclick='confirmDelete(\'' + ${parent.parentId} + '\')'"
+            th:if="${parent != null && parent.parentId != null}">삭제</button>
     <button type="button" class="btn btn-secondary btn-sm"
             onclick="location.href='/erp/parent/list'">목록으로</button>
 </div>

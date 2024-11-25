@@ -127,7 +127,7 @@
         </tr>
         <tr th:each="parent, status : ${parents.content}">
             <td th:text="${status.count + (parents.number * parents.size)}"></td>
-            <td th:text="${parent.parentName}"></td>
+            <td th:text="${parent.name}"></td>
             <td>
                         <span th:each="child, childStat : ${parent.childrenIds}">
                             <span th:text="${child.childrenName}"></span>

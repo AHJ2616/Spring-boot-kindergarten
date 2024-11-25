@@ -60,6 +60,7 @@ public class ChildrenErpDTO {
     @Builder.Default
     private LocalDate childrenModifyDate = LocalDate.now(); // 원아 수정 일자
 
+    private String maskedBirthDate;     // 마스킹 처리된 생년월일 저장 필드
 
 
 }
