@@ -62,33 +62,50 @@ function deleteBoard(boardId) {
 // 댓글 제출 함수
 function submitComment() {
     const contents = document.getElementById('contents').value;
+    const boardIdElement = document.getElementById('boardId');
+    
+    if (!boardIdElement) {
+        console.error('게시글 ID를 찾을 수 없습니다.');
+        alert('게시글 정보를 불러올 수 없습니다.');
+        return;
+    }
+    
+    const boardId = boardIdElement.value;
+    
     if (!contents.trim()) {
         alert('댓글 내용을 입력해주세요.');
         return;
     }
 
+    const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
     fetch('/api/comments/write', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+            [csrfHeader]: csrfToken
         },
         body: JSON.stringify({
             boardId: boardId,
             contents: contents
-        })
+        }),
+        credentials: 'same-origin'
     })
-        .then(response => {
-            if (response.ok) {
-                location.reload();
-            } else {
-                alert('댓글 등록에 실패했습니다.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('댓글 등록 중 오류가 발생했습니다.');
-        });
+    .then(response => {
+        if (response.ok) {
+            return response.json();
+        }
+        throw new Error('댓글 등록 실패');
+    })
+    .then(data => {
+        alert('댓글이 등록되었습니다.');
+        location.reload();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('댓글 등록 중 오류가 발생했습니다.');
+    });
 }
 
 // 댓글 삭제 함수
@@ -119,7 +136,7 @@ function editComment(commentId) {
     const commentDiv = document.querySelector(`[data-comment-id="${commentId}"]`);
     if (!commentDiv) return;
 
-    const content = commentDiv.querySelector('.comment-content').textContent;
+    const content = commentDiv.querySelector('contents').textContent;
     const textarea = document.createElement('textarea');
     textarea.value = content;
     textarea.className = 'edit-textarea';

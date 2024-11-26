@@ -50,13 +50,12 @@
                    th:errors="*{moneyContent}"></p>
             </div>
 
+
             <div class="form-group">
-                <label class="form-label">사용자</label>
-                <input type="text" th:field="*{moneyWho}" class="form-control"
-                       placeholder="사용자를 입력해주세요">
-                <p class="error-message" th:if="${#fields.hasErrors('moneyWho')}"
-                   th:errors="*{moneyWho}"></p>
+                <span class="input-group-text">작성자</span>
+                <input type="text" th:value="${moneyWriter}" name="moneyWho"  class="form-control" readonly>
             </div>
+
 
             <div class="form-group">
                 <label class="form-label">사용 업체</label>

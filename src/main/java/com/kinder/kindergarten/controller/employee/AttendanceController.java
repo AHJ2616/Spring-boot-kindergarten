@@ -1,7 +1,7 @@
 package com.kinder.kindergarten.controller.employee;
 
-import com.kinder.kindergarten.config.PrincipalDetails;
 import com.kinder.kindergarten.DTO.employee.AttendanceDTO;
+import com.kinder.kindergarten.config.PrincipalDetails;
 import com.kinder.kindergarten.service.employee.AttendanceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -74,12 +74,12 @@ public class AttendanceController {
         }
     }
 
-    @GetMapping("/my-records")
+    @GetMapping("/attendance_list")
     public String getMyAttendance(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                   Model model) {
         List<AttendanceDTO> records = attendanceService.getMonthlyAttendance(principalDetails.getMember());
         model.addAttribute("records", records);
-        return "attendance_list";
+        return "/employee/attendance_list";
     }
 
 

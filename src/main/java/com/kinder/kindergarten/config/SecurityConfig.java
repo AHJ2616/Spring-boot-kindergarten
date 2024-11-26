@@ -1,10 +1,10 @@
 package com.kinder.kindergarten.config;
 
 import com.kinder.kindergarten.service.MemberService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -26,11 +26,13 @@ import javax.sql.DataSource;
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig{
 
+  // ahj2616 2024 11 19 추가
   private final MemberService memberService;
   private final CustomAuthenticationSuccessHandler successHandler;
 
   private final DataSource dataSource;
 
+  // ahj2616 2024 11 19 추가
   public SecurityConfig(
           @Lazy MemberService memberService,
           @Lazy CustomAuthenticationSuccessHandler successHandler,
@@ -39,24 +41,31 @@ public class SecurityConfig{
     this.successHandler = successHandler;
     this.dataSource = dataSource;
   }
-
+  
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
     http
             // CSRF 보호 활성화 및 쿠키 설정
             .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
             .authorizeHttpRequests(auth -> auth
-                    // css,js,image 파일 접근 허용
-                    .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
-                    // 로그인페이지 허용
-                    .requestMatchers("/main/login").permitAll()
-
-                    // 본인 작업 경로 적어주시면 됩니다.
-                    .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자만 /admin/** 경로 접근 가능
-                    .requestMatchers("/manager/**").hasRole("MANAGER") // 매니저만 /manager/** 경로 접근 가능
-                    .requestMatchers("/teacher/**").hasRole("USER") // 사용자만 /teacher/** 경로 접근 가능
-                    .requestMatchers("/employee/**").hasAnyRole("ADMIN", "MANAGER", "USER") // 직원은 모든 역할 접근 가능
-                    .requestMatchers("/parent/**").hasRole("Parent")
+                    // 정적 리소스 접근 허용
+                    .requestMatchers("/css/**", "/js/**", "/images/**", "/image/**").permitAll()
+                    // 공개 페이지 접근 허용
+                    .requestMatchers("/", "/calendar","/events","/main/login", "/employee/new", "/error").permitAll()
+                    // 게시판 조회 허용
+                    .requestMatchers(HttpMethod.GET, "/board/get/**","/board/list/**").permitAll()
+                    
+                    // 역할별 접근 제한
+                    .requestMatchers("/admin/**").hasRole("ADMIN")
+                    .requestMatchers("/manager/**").hasRole("MANAGER")
+                    .requestMatchers("/teacher/**").hasRole("USER")
+                    .requestMatchers("/employee/**").hasAnyRole("ADMIN", "MANAGER", "USER")
+                    .requestMatchers("/parent/**").hasRole("PARENT")
+                    .requestMatchers("/erp/**").hasAnyRole("ADMIN", "MANAGER")
+                    .requestMatchers("/money/**").hasAnyRole("ADMIN", "MANAGER", "USER")
+                    .requestMatchers("/material/**").hasAnyRole("ADMIN", "MANAGER", "USER")
+                    .requestMatchers("/board/write").hasAnyRole("ADMIN", "MANAGER", "USER","PARENT")
+                    // 나머지 요청은 인증 필요
                     .anyRequest().authenticated()
             )
             .formLogin(form -> form
@@ -136,4 +145,3 @@ public class SecurityConfig{
     return new BCryptPasswordEncoder();
   }
 }
-

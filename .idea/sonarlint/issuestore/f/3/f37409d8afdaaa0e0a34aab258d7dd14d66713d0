@@ -1,10 +1,15 @@
 
 €
-java:S1192L"cDefine a constant instead of duplicating this literal "ì§ì›ì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤." 3 times.(šÙ×ã8‰û¬ó²2
-G	java:S1061"+Replace this use of System.out by a logger.(¼¡¨ò8‹ı¬ó²2
+java:S1192S"cDefine a constant instead of duplicating this literal "ì§ì›ì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤." 4 times.(šÙ×ã8º­åí´2
+s	java:S117Ù"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Çû¶‚üÿÿÿÿ8¼­åí´2
+G	java:S1062"+Replace this use of System.out by a logger.(¼¡¨ò8¸°åí´2
 9
-java:S1116L"Remove this empty statement.(šÙ×ã8•ı¬ó²2
+java:S1116S"Remove this empty statement.(šÙ×ã8»°åí´2
+H
+java:S1905W"+Remove this unnecessary cast to "Employee".(Şï´ñ8»°åí´2
 o
-java:S6204`"RReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()'(ª™¨¹8—ı¬ó²2
-^
-java:S1144B"<Remove this unused private "validateDuplicateMember" method.(‹èóŞÿÿÿÿÿ8®ı¬ó²2
+java:S6204g"RReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()'(ª™¨¹8»°åí´2
+H
+java:S1905d"+Remove this unnecessary cast to "Employee".(½ùá«8É°åí´2
+p
+java:S6204Ö"RReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()'(ª™¨¹8á°åí´2

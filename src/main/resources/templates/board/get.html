@@ -4,9 +4,7 @@
       layout:decorate="~{common/layout2}">
 <head>
   <meta charset="UTF-8">
-  <!-- CSRF 토큰을 위한 meta 태그 추가 -->
-  <meta name="_csrf" th:content="${_csrf.token}"/>
-  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+  
   <title>글 보기</title>
   <link rel="stylesheet" th:href="@{/css/board.css}">
   <link rel="stylesheet" th:href="@{/css/survey.css}">
@@ -92,6 +90,7 @@
     <div id="comments-section" class="comments-section" style="display: none;">
       <div class="comment-form">
         <h3>댓글 작성</h3>
+        <input type="hidden" id="boardId" th:value="${boardDTO.boardId}">
         <textarea id="contents" name="contents" placeholder="댓글을 입력하세요"></textarea>
         <button onclick="submitComment()" class="btn btn-primary">댓글 등록</button>
       </div>

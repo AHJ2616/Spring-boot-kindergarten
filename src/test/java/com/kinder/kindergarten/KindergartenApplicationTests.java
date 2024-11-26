@@ -35,7 +35,7 @@ class KindergartenApplicationTests {
         memberDTO.setRole("ROLE_USER");
 
         // when
-        memberService.saveMember(memberDTO);
+        memberService.saveMember2(memberDTO);
     }
 
     @Test

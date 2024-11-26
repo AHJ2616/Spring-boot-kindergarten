@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout}">
+<head>
+  <script src="/js/Employee/new.js"></script>
+  <link rel="stylesheet" href="/css/employee/new.css">
+  <meta charset="UTF-8">
+  <title>직원 수정</title>
+</head>
+<body>
+<div layout:fragment="content">
+  <div class="container">
+    <form th:action="@{/employee/edit}" th:object="${multiDTO}" method="post" onsubmit="return validateForm()">
+      <div class="form-group">
+        <label>이름</label>
+        <input type="text" th:field="*{memberDTO.name}" required>
+        <p th:if="${#fields.hasErrors('memberDTO.name')}" th:errors="*{memberDTO.name}"></p>
+      </div>
+
+      <div class="form-group">
+        <label>이메일</label>
+        <input type="email" id="email" th:field="*{memberDTO.email}" required oninput="validateEmail()">
+        <p id="emailError" style="color: red; display: none;">이메일 형식으로 입력해주세요.</p>
+        <p id="emailValid" style="color: red; display: none;"></p> <!-- 이메일 중복 메시지 -->
+        <p th:if="${#fields.hasErrors('memberDTO.email')}" th:errors="*{memberDTO.email}"></p>
+      </div>
+
+      <div class="form-group">
+        <label>비밀번호</label>
+        <input type="password" id="password" th:field="*{memberDTO.password}" required oninput="validatePassword()">
+        <p id="passwordError" style="color: red; display: none;">비밀번호는 8자 이상, 16자 이하로 입력해주세요</p>
+        <p th:if="${#fields.hasErrors('memberDTO.password')}" th:errors="*{memberDTO.password}"></p>
+      </div>
+
+      <div class="form-group">
+        <label>주소</label>
+        <input type="text" th:field="*{memberDTO.address}" required>
+        <p th:if="${#fields.hasErrors('memberDTO.address')}" th:errors="*{memberDTO.address}"></p>
+      </div>
+
+      <div class="form-group">
+        <label>전화번호</label>
+        <div style="display: flex; gap: 5px;">
+          <input type="text" id="phone1" maxlength="3" oninput="moveFocus(this, 'phone2')" placeholder="000">
+          <span>-</span>
+          <input type="text" id="phone2" maxlength="4" oninput="moveFocus(this, 'phone3')" placeholder="0000">
+          <span>-</span>
+          <input type="text" id="phone3" maxlength="4" oninput="validatePhone()" placeholder="0000">
+        </div>
+        <p id="phoneError" style="color: red; display: none;">전화번호 형식은 000-0000-0000입니다.</p>
+        <p id="phoneValid" style="color: red; display: none;"></p> <!-- 전화번호 중복 메시지 -->
+      </div>
+      <div class="form-group">
+        <label>급여</label>
+        <input type="number" th:field="*{employeeDTO.salary}" required>
+        <p th:if="${#fields.hasErrors('employeeDTO.salary')}" th:errors="*{employeeDTO.salary}"></p>
+      </div>
+
+      <div class="form-group">
+        <label>직위</label>
+        <select th:field="*{employeeDTO.position}" required>
+          <option value="">선택하세요</option>
+          <option value="사원">사원</option>
+          <option value="대리">대리</option>
+          <option value="과장">과장</option>
+          <option value="부장">부장</option>
+          <option value="임원">임원</option>
+          <option value="대표">대표</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>재직상태</label>
+        <select th:field="*{employeeDTO.status}" required>
+          <option value="">선택하세요</option>
+          <option value="재직">재직</option>
+          <option value="퇴사">퇴사</option>
+
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>부서</label>
+        <select th:field="*{employeeDTO.department}" required>
+          <option value="">선택하세요</option>
+          <option value="교육부">교육부</option>
+          <option value="행정부">행정부</option>
+          <option value="운행부">운행부</option>
+          <option value="학부모">학부모</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>입사일</label>
+        <input type="date" th:field="*{employeeDTO.hireDate}" required>
+        <p th:if="${#fields.hasErrors('employeeDTO.hireDate')}" th:errors="*{employeeDTO.hireDate}"></p>
+      </div>
+      <input type="hidden" th:field="*{memberDTO.phone}" id="phone">
+      <input type="hidden" th:field="*{employeeDTO.id}" id="id">
+      <button type="submit">등록</button>
+    </form>
+  </div>
+</div>
+</body>
+</html>

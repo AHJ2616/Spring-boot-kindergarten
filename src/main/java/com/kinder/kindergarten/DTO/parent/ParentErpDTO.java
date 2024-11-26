@@ -22,6 +22,7 @@ public class ParentErpDTO {
 
     // ERP 에서 등록하는 학부모 정보
 
+
     private Long parentId; //학부모 고유 ID (PK)
 
     @NotBlank(message = "성함은 필수 입력 값 입니다.")

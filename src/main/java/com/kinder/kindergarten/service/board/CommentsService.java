@@ -37,6 +37,7 @@ public class CommentsService {
       @Override
       protected void configure() {
         map().setBoardId(source.getBoardId().getBoardId());
+        map().setWriter(source.getMember().getName());
       }
     });
 
@@ -129,6 +130,8 @@ public class CommentsService {
   }
 
   private CommentsDTO convertToDTO(CommentsEntity entity) {
-    return modelMapper.map(entity, CommentsDTO.class);
+    CommentsDTO dto = modelMapper.map(entity, CommentsDTO.class);
+    dto.setWriter(entity.getMember().getName());
+    return dto;
   }
 }

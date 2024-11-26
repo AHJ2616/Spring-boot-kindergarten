@@ -1,11 +1,7 @@
 
 €
-java:S1192/"cDefine a constant instead of duplicating this literal "μΌμ •μ„ μ°Ύμ„ μ μ—†μµλ‹λ‹¤." 3 times.(π‘ΖΞ8ÒόΜ°2
+java:S11924"cDefine a constant instead of duplicating this literal "μΌμ •μ„ μ°Ύμ„ μ μ—†μµλ‹λ‹¤." 3 times.(π‘ΖΞ8ÒόΜ°2
 o
-java:S6204("RReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()'(ª™¨Ή8£ύΜ°2
+java:S6204)"RReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()'(ª™¨Ή8£ύΜ°2
 o
-java:S6204b"RReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()'(ª™¨Ή8ΐε‰¦²2
-U
-java:S1128"8Remove this unused import 'com.github.f4b6a3.ulid.Ulid'.(ωγξ»8Θ„™ς²2
-\
-java:S1128"?Remove this unused import 'com.github.f4b6a3.ulid.UlidCreator'.(Ηά‹8Ι„™ς²2
+java:S6204~"RReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()'(ª™¨Ή8ΐε‰¦²2

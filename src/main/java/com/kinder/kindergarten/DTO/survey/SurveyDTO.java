@@ -12,10 +12,12 @@ import java.util.List;
 @Setter
 @ToString
 public class SurveyDTO {
-    private String surveyId;//1.PK
-    private String title;//2.제목
-    private String description;//3.설명
-    private List<QuestionDTO> questions = new ArrayList<>();//4.질문들 
-    private LocalDateTime regiDate; //5.등록일
-    private LocalDateTime modifiedDate; //6.수정일
-} 
+  private String surveyId;//1.PK
+  private String title;//2.제목
+  private String description;//3.설명
+  private List<QuestionDTO> questions = new ArrayList<>();//4.질문들
+  private LocalDateTime regiDate; //5.등록일
+  private LocalDateTime modifiedDate; //6.수정일
+  private String writer; //작성자
+  private Boolean isCompleted; //작성 여부  (기본값 false)
+}

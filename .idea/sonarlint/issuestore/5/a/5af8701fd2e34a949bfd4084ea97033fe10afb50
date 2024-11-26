@@ -1,3 +1,11 @@
 
+
+java:S1192;"mDefine a constant instead of duplicating this literal "ìê²©ì¦ ì •ë³´ë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤." 3 times.(­¦¨ªşÿÿÿÿ8êÂ›í´2
+L
+java:S1066N"/Merge this if statement with the enclosing one.(úØ—¼8ëÂ›í´2
 M
-java:S1172"+Remove this unused method parameter "file".(’š§ñûÿÿÿÿ8³›“ó²2
+java:S1172"+Remove this unused method parameter "file".(’š§ñûÿÿÿÿ8³›“ó²2
+o
+java:S6204,"RReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()'(ª™¨¹8£Ã›í´2
+j
+java:S1128"MRemove this unused import 'com.kinder.kindergarten.entity.employee.Employee'.(§Æ®ü8ÃÃ›í´2

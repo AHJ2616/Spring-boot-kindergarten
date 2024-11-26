@@ -62,6 +62,9 @@ public interface BoardRepository extends JpaRepository<BoardEntity, String> {
       Pageable pageable
   );
 
-
+  @Query("SELECT b FROM BoardEntity b " +
+         "WHERE b.boardType IN ('NOTIFICATION', 'ABSOLUTE') " +
+         "ORDER BY b.regiDate DESC")
+  Page<BoardEntity> findLatestNotices(Pageable pageable);
 
 }

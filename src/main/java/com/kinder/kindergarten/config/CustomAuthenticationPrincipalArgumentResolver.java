@@ -25,20 +25,23 @@ public class CustomAuthenticationPrincipalArgumentResolver implements HandlerMet
                                   NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication == null) {
-            // Custom Exception 을 통한 예외 처리
-                return null; // 또는 적절한 예외를 던지도록 수정
+        
+        if (authentication == null || authentication.getPrincipal().equals("anonymousUser")) {
+            if (parameter.getParameterType().isPrimitive()) {
+                throw new IllegalStateException(
+                        "Cannot return null for primitive type: " + parameter.getParameterType());
             }
+            return null;
+        }
+
         Object principal = authentication.getPrincipal();
         CurrentUser annotation = findMethodAnnotation(CurrentUser.class, parameter);
-        if (principal.equals("anonymousUser")) {
-            // Custom Exception 을 통한 예외 처리
-        }
-        findMethodAnnotation(CurrentUser.class, parameter);
-        if (principal != null && !ClassUtils.isAssignable(parameter.getParameterType(), principal.getClass())) {
+
+        if (!parameter.getParameterType().isInstance(principal)) {
             if (annotation.errorOnInvalidType()) {
                 throw new ClassCastException(principal + " is not assignable to " + parameter.getParameterType());
             }
+            return null;
         }
 
         return principal;

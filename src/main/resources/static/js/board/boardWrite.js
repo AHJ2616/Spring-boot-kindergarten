@@ -89,15 +89,4 @@ function initializeFormSubmit() {
 // 페이지 로드 시 실행
 document.addEventListener('DOMContentLoaded', function() {
     const boardTypeSelect = document.getElementById('board_type');
-    const userRoleValue = userRole; // write.html에서 전달받은 userRole 값
-
-    // ROLE_ADMIN이 아닌 경우, 공지와 필독 옵션 선택 시 경고 메시지 표시
-    boardTypeSelect.addEventListener('change', function() {
-        if (userRoleValue !== 'ROLE_ADMIN') {
-            if (this.value === 'NOTIFICATION' || this.value === 'ABSOLUTE') {
-                alert('관리자만 공지/필독 게시글을 작성할 수 있습니다.');
-                this.value = 'COMMON'; // 일반 게시글로 되돌림
-            }
-        }
-    });
 });

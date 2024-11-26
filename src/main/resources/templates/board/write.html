@@ -5,8 +5,6 @@
       layout:decorate="~{common/layout2}">
 <head>
   <meta charset="UTF-8">
-  <meta name="_csrf" th:content="${_csrf.token}"/>
-  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
   <link rel="stylesheet" th:href="@{/css/board.css}">
   <link rel="stylesheet" th:href="@{/css/survey.css}">
   <!-- include libraries(jQuery, bootstrap) -->
@@ -51,9 +49,11 @@
 </head>
 <body>
 <div layout:fragment="content">
-  <script>
-    const userRole = [[${userRole}]]; // 기본값 설정
-   </script>
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+    const userRole = [[${userRole}]] //기본값 설정
+    console.log('Current user role:', userRole);
+  </script>
 <div class="write-container">
   <form th:action="@{${boardFormDTO.boardId != null} ? 
                    '/board/modify/' + ${boardFormDTO.boardId} : 

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout2}">
+<head>
+  <meta charset="UTF-8">
+  <title>설문조사</title>
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" th:href="@{/css/survey.css}">
+</head>
+<body>
+<div layout:fragment="content">
+  <div class="container">
+    <div class="survey-header">
+      <h2 th:text="${survey.title}" class="survey-title"></h2>
+    </div>
+    <p th:text="${survey.description}" class="survey-description"></p>
+    
+    <!-- 설문 응답 폼 -->
+    <div id="surveyForm" class="survey-form" style="display: block;" th:if="${!survey.isCompleted}">
+      <form>
+        <input type="hidden" name="surveyId" th:value="${survey.surveyId}">
+
+        <div th:each="question, status : ${questions}" class="question-block">
+          <h3 th:text="${status.count + '. ' + question.text}" class="question-text"></h3>
+
+          <!-- 객관식 문항 (단일/다중 선택) 처리 -->
+          <div th:if="${question.type == T(com.kinder.kindergarten.constant.board.QuestionType).SINGLE_CHOICE 
+                      || question.type == T(com.kinder.kindergarten.constant.board.QuestionType).MULTIPLE_CHOICE}"
+               class="options-container">
+            <div th:each="option, optionStat : ${question.options}" class="option">
+              <input th:if="${question.type.name() == 'SINGLE_CHOICE'}"
+                     type="radio"
+                     th:id="${'option_' + question.questionId + '_' + optionStat.index}"
+                     th:name="${'question_' + question.questionId}"
+                     th:value="${option}">
+               
+              <input th:if="${question.type.name() == 'MULTIPLE_CHOICE'}"
+                     type="checkbox"
+                     th:id="${'option_' + question.questionId + '_' + optionStat.index}"
+                     th:name="${'question_' + question.questionId}"
+                     th:value="${option}">
+               
+              <label th:for="${'option_' + question.questionId + '_' + optionStat.index}"
+                     th:text="${option}"></label>
+            </div>
+          </div>
+
+          <!-- 주관식 문항 처리 -->
+          <div th:if="${question.type == T(com.kinder.kindergarten.constant.board.QuestionType).TEXT}">
+            <textarea th:id="${'question_' + question.questionId}"
+                      th:name="${'question_' + question.questionId}"
+                      rows="4"
+                      class="form-control"></textarea>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">제출하기</button>
+      </form>
+    </div>
+    <button id="showResultsBtn" class="btn btn-primary">결과 보기</button>
+    <!-- 설문 결과 차트 -->
+    <div id="surveyResults" class="survey-results" style="display: none;">
+      <div th:each="question : ${questions}" class="result-block">
+        <h3 th:text="${question.text}" class="question-text"></h3>
+
+        <!-- 객관식 질문 결과 차트 -->
+        <div th:if="${question.type.name() != 'TEXT'}" class="chart-container">
+          <canvas th:id="${'chart_' + question.questionId}"></canvas>
+        </div>
+
+        <!-- 주관식 답변 목록 -->
+        <div th:if="${question.type.name() == 'TEXT'}" class="text-responses">
+          <ul>
+            <li th:each="answer : ${question.answers}" th:text="${answer.text}"></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<th:block layout:fragment="script">
+  <script th:inline="javascript">
+      // 설문 데이터를 JavaScript 변수로 전달
+      const surveyData = {
+          surveyId: /*[[${survey.surveyId}]]*/ null,
+          isCompleted: /*[[${survey.isCompleted}]]*/ false,
+          title: /*[[${survey.title}]]*/ ''
+      };
+  </script>
+  <script th:src="@{/js/board/surveyGet.js}" defer></script>
+</th:block>
+</body>
+</html>

@@ -34,6 +34,7 @@
                                 token: currentToken
                             })
                         })
+<<<<<<< HEAD
                         .then(response => response.text())
                         .then(data => {
                             alert('토큰 저장 응답: ' + data);
@@ -41,6 +42,15 @@
                         .catch((error) => {
                             console.error('토큰 저장 실패:', error);
                         });
+=======
+                            .then(response => response.text())
+                            .then(data => {
+                                alert('토큰 저장 응답: ' + data);
+                            })
+                            .catch((error) => {
+                                console.error('토큰 저장 실패:', error);
+                            });
+>>>>>>> origin/main
                     } else {
                         console.log('No registration token available. Request permission to generate one.');
                     }

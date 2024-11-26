@@ -98,6 +98,18 @@ public class WebMvcConfig implements WebMvcConfigurer {
     registry.addResourceHandler("/js/**")
             .addResourceLocations("classpath:/static/js/");
 
+    // Firebase 서비스 워커 파일 설정
+    registry.addResourceHandler("/firebase-messaging-sw.js")
+            .addResourceLocations("classpath:/static/")
+            .setCacheControl(CacheControl.noCache())
+            .resourceChain(true)
+            .addResolver(new PathResourceResolver());
+
+    // Firebase 클라우드 메시징 스코프 설정
+    registry.addResourceHandler("/firebase-cloud-messaging-push-scope/**")
+            .addResourceLocations("classpath:/static/")
+            .setCacheControl(CacheControl.noCache());
+
   }
 
   @Override

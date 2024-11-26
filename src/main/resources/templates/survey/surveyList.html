@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layout2}">
+<head>
+  <meta charset="UTF-8">
+  <title>설문조사 목록</title>
+  <link rel="stylesheet" th:href="@{/css/survey.css}">
+  <meta name="user-role" th:content="${#authentication.authorities[0]}">
+</head>
+<body>
+<div layout:fragment="content">
+
+  <div class="container">
+    <h2 class="mb-4">설문조사 목록</h2>
+
+    <!-- 설문 목록 테이블 -->
+    <table class="table">
+      <thead>
+      <tr>
+        <th>번호</th>
+        <th>제목</th>
+        <th>작성자</th>
+        <th>작성일</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="survey, status : ${surveys.content}">
+        <td th:text="${surveys.totalElements - (surveys.number * surveys.size) - status.index}"></td>
+        <td>
+          <a th:href="@{/survey/{id}(id=${survey.surveyId})}"
+             th:text="${survey.title}"></a>
+        </td>
+        <td th:text="${survey.writer}"></td>
+        <td th:text="${#temporals.format(survey.regiDate, 'yyyy-MM-dd')}"></td>
+      </tr>
+      </tbody>
+    </table>
+
+    <!-- 페이지네이션 -->
+    <div class="d-flex justify-content-center" th:if="${surveys.totalPages > 0}">
+      <ul class="pagination">
+        <li class="page-item" th:classappend="${surveys.first} ? 'disabled'">
+          <a class="page-link" th:href="@{/survey/list(page=${surveys.number - 1})}">이전</a>
+        </li>
+
+        <li class="page-item"
+            th:each="pageNum : ${#numbers.sequence(0, surveys.totalPages - 1)}"
+            th:if="${pageNum >= surveys.number - 2 and pageNum <= surveys.number + 2}"
+            th:classappend="${pageNum == surveys.number} ? 'active'">
+          <a class="page-link" th:href="@{/survey/list(page=${pageNum})}"
+             th:text="${pageNum + 1}"></a>
+        </li>
+
+        <li class="page-item" th:classappend="${surveys.last} ? 'disabled'">
+          <a class="page-link" th:href="@{/survey/list(page=${surveys.number + 1})}">다음</a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- 설문 작성 버튼 -->
+    <div class="text-end mt-3" id="createSurveyBtn" sec:authorize="hasRole('ROLE_ADMIN')">
+      <a th:href="@{/survey/create}" class="btn btn-primary">설문 작성</a>
+    </div>
+  </div>
+</div>
+<th:block layout:fragment="script"></th:block>
+<script th:src="@{/js/board/survey.js}" defer></script>
+</th:block>
+</body>
+</html>

@@ -7,6 +7,7 @@ import java.lang.annotation.*;
 @Documented
 public @interface CurrentUser {    
     boolean errorOnInvalidType() default true;
+    boolean nullable() default true;
 } 
 //  nullable = true 만들어 주기
 // CustomAuthenticationPrincipalArgumentResolver.java 와 연결됨

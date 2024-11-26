@@ -1,9 +1,13 @@
 package com.kinder.kindergarten.controller.money;
 
+import com.kinder.kindergarten.DTO.employee.EmployeeDTO;
 import com.kinder.kindergarten.DTO.money.MoneyFileDTO;
 import com.kinder.kindergarten.DTO.money.MoneyFormDTO;
 import com.kinder.kindergarten.DTO.money.MoneySearchDTO;
+import com.kinder.kindergarten.config.PrincipalDetails;
+import com.kinder.kindergarten.entity.employee.Employee;
 import com.kinder.kindergarten.entity.money.MoneyEntity;
+import com.kinder.kindergarten.service.employee.EmployeeService;
 import com.kinder.kindergarten.service.money.ExcelExportService;
 import com.kinder.kindergarten.service.money.MoneyChartService;
 import com.kinder.kindergarten.service.money.MoneyService;
@@ -20,6 +24,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -46,15 +51,29 @@ public class MoneyController {
     // 엑셀 형식 출력 - 테스트 진행중 2024 11 09
     private final ExcelExportService excelExportService;
 
-    public MoneyController(MoneyService moneyService, MoneyChartService moneyChartService, ExcelExportService excelExportService) { this.moneyService = moneyService;
+    public EmployeeService employeeService;
+
+    public MoneyController(MoneyService moneyService, MoneyChartService moneyChartService,
+                           ExcelExportService excelExportService, EmployeeService employeeService) {
+        this.moneyService = moneyService;
         this.moneyChartService = moneyChartService;
         this.excelExportService = excelExportService;
+        this.employeeService = employeeService;
     }
+
 
     // 회계 Create 작성 1
     @GetMapping(value = "/new")
-    public String moneyForm(Model model){
+    public String moneyForm(@AuthenticationPrincipal PrincipalDetails principalDetails,
+                            Model model){
         model.addAttribute("moneyFormDTO", new MoneyFormDTO());
+
+        // 로그인 세션값
+        Employee employee = employeeService.getEmployeeEntity(principalDetails.getEmployee().getId());
+        String moneyWriter = employee.getMember().getName();
+
+        model.addAttribute("moneyWriter", moneyWriter);  // Pass username to Thymeleaf
+
 
         return "money/moneyForm"; // moneyForm.html의 경로에 보냄
     }

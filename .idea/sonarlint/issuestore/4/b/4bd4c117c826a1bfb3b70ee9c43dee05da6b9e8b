@@ -1,13 +1,2 @@
 
-g	java:S112V"FDefine and throw a dedicated exception instead of using a generic one.(İÈ±ışÿÿÿÿ8ŒÛéĞ¯2
-b	java:S112d"FDefine and throw a dedicated exception instead of using a generic one.(ª”ì¯8ŒÛéĞ¯2
-
-java:S11929"cDefine a constant instead of duplicating this literal "íšŒì›ì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤." 3 times.(šïO8Îß˜ò²2
-W
-java:S1854R":Remove this useless assignment to local variable "member".(õ¦ĞÀ8Ìà˜ò²2
-H
-java:S1481R"+Remove this unused "member" local variable.(õ¦ĞÀ8Óà˜ò²2
-W
-java:S1854`":Remove this useless assignment to local variable "member".(õ¦ĞÀ8×à˜ò²2
-H
-java:S1481`"+Remove this unused "member" local variable.(õ¦ĞÀ8Üà˜ò²2
+b	java:S112z"FDefine and throw a dedicated exception instead of using a generic one.(ª”ì¯8ŒÛéĞ¯2

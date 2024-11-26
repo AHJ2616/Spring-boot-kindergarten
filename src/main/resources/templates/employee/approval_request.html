@@ -24,7 +24,7 @@
         <select name="approverId" required>
           <option th:each="approver : ${approvers}"
                   th:value="${approver.id}"
-                  th:text="${approver.name + ' (' + approver.position + ')'}">
+                  th:text="${approver.member.name + ' (' + approver.position + ')'}">
           </option>
         </select>
       </div>

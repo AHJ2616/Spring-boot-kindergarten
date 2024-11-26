@@ -107,8 +107,9 @@ public class BoardController {
   }
 
   @GetMapping(value="/write")
-  public String writeBoard(Model model){
-    model.addAttribute("boardFormDTO",new BoardFormDTO());
+  public String writeBoard(Model model, @CurrentUser PrincipalDetails principalDetails) {
+    model.addAttribute("boardFormDTO", new BoardFormDTO());
+    model.addAttribute("userRole", principalDetails.getMember().getRole().toString());
     return "board/write";
   }
 
@@ -165,7 +166,7 @@ public class BoardController {
     }
   }
 
-  @GetMapping("/{id}")
+  @GetMapping("/get/{id}")
   public String getBoard(@PathVariable String id, 
                     @CurrentUser PrincipalDetails principalDetails,  // Member를 PrincipalDetails로 변경
                     Model model, 

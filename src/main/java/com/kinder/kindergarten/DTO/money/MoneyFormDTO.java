@@ -3,6 +3,7 @@ package com.kinder.kindergarten.DTO.money;
 import com.kinder.kindergarten.constant.money.MoneyStatus;
 import com.kinder.kindergarten.entity.money.MoneyEntity;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.modelmapper.ModelMapper;

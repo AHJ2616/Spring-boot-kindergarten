@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
             viewEvent(info.event);
         },
 
-        // 짜 선택
+        // 날짜 선택
         select: function(info) {
             if (userRole !== 'ROLE_ADMIN') {
                 return; // 관리자가 아니면 선택 이벤트 무시

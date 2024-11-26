@@ -6,6 +6,7 @@ import com.kinder.kindergarten.config.PrincipalDetails;
 import com.kinder.kindergarten.service.board.CommentsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,12 +18,20 @@ public class CommentsRestController {
 
   private final CommentsService commentsService;
 
-  @PostMapping
+  @PostMapping(value="/write")
   public ResponseEntity<CommentsDTO> createComment(
           @RequestBody CommentsDTO commentsDTO,
           @CurrentUser PrincipalDetails principalDetails) {
     try {
-      log.info("댓글 작성 요청: {}", commentsDTO);
+      log.info("댓글 작성 요청 - 사용자: {}, 내용: {}", 
+          principalDetails.getMember().getId(), 
+          commentsDTO);
+      
+      if (principalDetails == null || principalDetails.getMember() == null) {
+        log.error("인증되지 않은 사용자의 댓글 작성 시도");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+      }
+
       CommentsDTO savedComment = commentsService.createComment(
           commentsDTO,
           principalDetails.getMember().getId()

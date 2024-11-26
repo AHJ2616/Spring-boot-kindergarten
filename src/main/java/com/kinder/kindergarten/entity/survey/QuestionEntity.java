@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -47,5 +48,12 @@ public class QuestionEntity {
     public void addAnswer(AnswerEntity answer) {
         answers.add(answer);
         answer.setQuestion(this);
+    }
+
+    public List<String> getOptionsList() {
+        if (options == null || options.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return Arrays.asList(options.split("\\|"));
     }
 }

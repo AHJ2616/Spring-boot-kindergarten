@@ -47,16 +47,25 @@ public class MaterialEntity extends TimeEntity {
     @Column(nullable = false)
     private String materialWriter; // 글작성자
 
+
+    @Column(nullable = false)
+    private String materialWriterEmail; // 글작성자 이메일
+
+
     @Enumerated(EnumType.STRING)   //enum 타입 매핑
     private MaterialStatus materialStatus; //자재 상태
 
-    // 장바구니 후처리 구현중 2024 11 13
+    // 장바구니 후처리 구현 2024 11 13
     @Enumerated(EnumType.STRING)
     private MaterialOrderStatus orderStatus; // 주문 상태 (ORDERED, CANCELED, COMPLETED)
 
 
+
+
+
     public void updateMaterial(MaterialFormDTO materialFormDTO){
 
+        this.materialWriterEmail = materialFormDTO.getMaterialWriterEmail();
         this.materialWriter = materialFormDTO.getMaterialWriter();
         this.materialName = materialFormDTO.getMaterialName();
         this.materialDetail = materialFormDTO.getMaterialDetail();

@@ -3,7 +3,6 @@ package com.kinder.kindergarten.repository.employee;
 
 import com.kinder.kindergarten.entity.Member;
 import com.kinder.kindergarten.entity.employee.Attendance;
-import com.kinder.kindergarten.entity.employee.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

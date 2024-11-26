@@ -8,7 +8,10 @@ import lombok.Setter;
 @Setter
 public class EmailFindDTO {
 
-  // 학부모 회원이 로그인 할 때 본인의 이메일 계정을 잊어버릴 경우 이메일 찾기 정보.
+  /* 학부모 회원이 로그인 할 때 본인의 이메일 계정을 잊어버릴 경우 이메일 찾기 정보.
+
+    11.18 -> 아직 로그인에 계정 찾기(이메일) 기능은 없으나 추후 추가 하실 때를 위해 남겨두었습니다.
+   */
 
   @NotEmpty(message = "성함을 입력해 주세요.")
   private String parent_name;

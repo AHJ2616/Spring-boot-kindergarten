@@ -36,4 +36,6 @@ public class MemberDTO {
     private String role;            // 권한
 
     private MultipartFile profileImage_upload; // 파일 업로드용
+
+    private String message; // 추가 정보를 담을 필드 (직위 정보 등)
 }

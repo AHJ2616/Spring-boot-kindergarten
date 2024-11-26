@@ -580,6 +580,7 @@
     justify-content: space-between;
     margin-bottom: 10px;
     color: #666;
+    border-bottom: solid 1px #ddd;
 }
 
 .comment-writer {

@@ -3,15 +3,16 @@ package com.kinder.kindergarten.entity;
 
 import com.kinder.kindergarten.constant.employee.Role;
 import com.kinder.kindergarten.entity.employee.Employee;
-import com.kinder.kindergarten.entity.employee.Member_File;
+import com.kinder.kindergarten.entity.employee.Employee_File;
 import com.kinder.kindergarten.entity.employee.Leave;
+import com.kinder.kindergarten.entity.employee.Member_File;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
-@Table(name = "member")
+@Table(name = "Member")
 @Entity
 @Getter @Setter
 @Builder
@@ -20,26 +21,26 @@ import java.util.ArrayList;
 public class Member extends TimeEntity{
 
     @Id
+    @Column(name="member_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "member_id")
     private Long id;
 
     @Column(name = "member_profile")
     private String profileImage;
 
-    @Column(name = "member_email", unique = true)
+    @Column(name = "member_email")
     private String email;
 
-    @Column(name = "member_password", nullable = false)
+    @Column(name = "member_password")
     private String password;
 
-    @Column(name = "member_name", nullable = false)
+    @Column(name = "member_name")
     private String name;
 
-    @Column(name = "member_address", nullable = false)
+    @Column(name = "member_address")
     private String address;
 
-    @Column(name = "member_phone", nullable = false)
+    @Column(name = "member_phone")
     private String phone;
 
     @Column(name = "member_role")
@@ -47,9 +48,8 @@ public class Member extends TimeEntity{
     private Role role;
 
     // member 필드 기준 연관관계
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<Employee> employees = new ArrayList<>();
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Employee employees;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
@@ -60,8 +60,5 @@ public class Member extends TimeEntity{
     @Builder.Default
     private List<Leave> leaves = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<FcmTokenEntity> fcmTokens = new ArrayList<>();
 
 }

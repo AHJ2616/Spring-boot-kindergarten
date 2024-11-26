@@ -611,4 +611,23 @@ import java.util.zip.ZipOutputStream;
           private BoardDTO convertToDTO(BoardEntity entity) {
               return modelMapper.map(entity, BoardDTO.class);
           }
+
+          /**
+           * 최신 공지사항을 조회하는 메소드
+           * @param pageable 페이징 정보
+           * @return 페이징된 공지사항 데이터 전송 객체 페이지
+           */
+          public Page<BoardDTO> getLatestNotices(Pageable pageable) {
+              Page<BoardEntity> noticePage = boardRepository.findLatestNotices(pageable);
+              
+              return noticePage.map(board -> {
+                  BoardDTO dto = modelMapper.map(board, BoardDTO.class);
+                  if (board.getMember() != null) {
+                      dto.setWriter(board.getMember().getName());
+                  } else {
+                      dto.setWriter("탈퇴한 사용자");
+                  }
+                  return dto;
+              });
+          }
         }
