@@ -51,9 +51,11 @@ public class EmployeeService implements UserDetailsService {
 
     @Override
     // 로그인 메서드
-    public UserDetails loadUserByUsername(String email){
-        // 이메일 정보를 받아 처리
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Employee employee = employeeRepository.findByEmail(email);
+        if (employee == null) {
+            throw new UsernameNotFoundException("User not found with email: " + email);
+        }
         return new PrincipalDetails(employee);
     }
 

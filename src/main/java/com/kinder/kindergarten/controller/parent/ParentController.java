@@ -13,6 +13,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -119,28 +120,34 @@ public class ParentController {
     }
 
     @GetMapping("/list")
-    public String parentList(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size,
-                             @RequestParam(required = false) String keyword, Model model) {
-        // ERP에서 등록된 학부모의 리스트의 경로 메서드
+    public String parentList(@RequestParam(required = false) String searchType,
+                             @RequestParam(required = false) String keyword,
+                             @RequestParam(defaultValue = "0") int page,
+                             Model model) {
+        try {
+            Page<ParentErpDTO> parents;
+            Pageable pageable = PageRequest.of(page, 10);
 
-        Pageable pageable = PageRequest.of(page, size);
-        Page<ParentErpDTO> parents;
-        // ParentErpDTO 의 학부모 데이터를 페이징 처리하기 위해 생성
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                if ("이름".equals(searchType)) {
+                    parents = parentService.findByNameContaining(keyword, pageable);
+                } else {
+                    parents = parentService.getAllParents(pageable);
+                }
+            } else {
+                parents = parentService.getAllParents(pageable);
+            }
 
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            parents = parentService.searchParents(keyword, pageable);
+            model.addAttribute("parents", parents);
+            model.addAttribute("searchType", searchType);
+            model.addAttribute("keyword", keyword);
 
-        }else {
-            parents = parentService.getAllParents(pageable);
+            return "parent/parentList";
+
+        } catch (Exception e) {
+            log.error("학부모 목록 조회 중 오류 발생: ", e);
+            return "redirect:/erp/parent/list";
         }
-
-        model.addAttribute("parents", parents);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPage", parents.getTotalPages());
-        model.addAttribute("keyword", keyword);
-        // 모델에다가 학부모, 현재 페이지, 모든 페이지, 키워드 정보들을 담아서 뷰로 전달한다.
-
-        return "parent/parentList";
     }
 
     @GetMapping("/detail/{parentId}")

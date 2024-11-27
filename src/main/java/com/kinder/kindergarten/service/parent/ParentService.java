@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
+import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 @Service
@@ -196,14 +197,36 @@ public class ParentService {
         return maskPersonalInfo(dto);
     }
 
-    public Page<ParentErpDTO> searchParents(String keyword, Pageable pageable) {
-        // 등록된 학부모 조회할 때 검색창에서 학부모 검색하는 서비스 메서드
+    public Page<ParentErpDTO> findByNameContaining(String keyword, Pageable pageable) {
+        try {
+            Page<Member> members = memberRepository.findByNameContainingAndRole(keyword, Role.ROLE_PARENT, pageable);
+            return members.map(member -> {
+                Parent parent = parentRepository.findByMemberEmail(member.getEmail())
+                        .orElseThrow(() -> new EntityNotFoundException("Parent not found for email: " + member.getEmail()));
 
-        Page<Parent> parentPage = parentRepository.findByParentNameContaining(keyword, pageable);
-        // 학부모의 엔티티를 Page 처리로 만들고 레포지토리에서 부모의 이름으로 검색하는 쿼리메서드를 가져온다.
+                ParentErpDTO dto = ParentErpDTO.builder()
+                        .parentId(parent.getParentId())
+                        .name(member.getName())
+                        .email(member.getEmail())
+                        .phone(member.getPhone())
+                        .address(member.getAddress())
+                        .childrenEmergencyPhone(parent.getChildrenEmergencyPhone())
+                        .parentType(parent.getParentType())
+                        .build();
 
-        return parentPage.map(parent -> modelMapper.map(parent, ParentErpDTO.class));
-        // modelMapper로 이용해서 맵형식으로 학부모의 엔티티 + DTO를 리턴한다.
+                if (parent.getCreatedDate() != null) {
+                    dto.setParentCreateDate(parent.getCreatedDate().toLocalDate());
+                }
+                if (parent.getUpdatedDate() != null) {
+                    dto.setParentModifyDate(parent.getUpdatedDate().toLocalDate());
+                }
+
+                return maskPersonalInfo(dto);
+            });
+        } catch (Exception e) {
+            log.error("이름 검색 중 오류 발생: ", e);
+            throw new RuntimeException("검색 중 오류가 발생했습니다.");
+        }
     }
 
     @Transactional
@@ -317,19 +340,116 @@ public class ParentService {
         }
     }
 
-    private ParentErpDTO convertToDTO(Parent parent) {
-        Member member = memberRepository.findByEmail(parent.getMemberEmail());
+    @Transactional
+    public void approveParent(Long parentId, String approvedBy) {
+        Parent parent = parentRepository.findById(parentId)
+                .orElseThrow(() -> new EntityNotFoundException("학부모 정보를 찾을 수 없습니다."));
+
+        parent.setRegistrationStatus(RegistrationStatus.APPROVED);
+        parent.setApprovedAt(LocalDateTime.now());
+        parent.setApprovedBy(approvedBy);
+
+        log.info("학부모 승인 완료 - ID: {}, 승인자: {}", parentId, approvedBy);
+    }
+
+    @Transactional
+    public void rejectParent(Long parentId, String rejectReason, String approvedBy) {
+        Parent parent = parentRepository.findById(parentId)
+                .orElseThrow(() -> new EntityNotFoundException("학부모 정보를 찾을 수 없습니다."));
+
+        parent.setRegistrationStatus(RegistrationStatus.REJECTED);
+        parent.setRejectReason(rejectReason);
+        parent.setApprovedAt(LocalDateTime.now());
+        parent.setApprovedBy(approvedBy);
+
+        log.info("학부모 반려 완료 - ID: {}, 사유: {}, 처리자: {}",
+                parentId, rejectReason, approvedBy);
+    }
+
+    // 대기 중인 학부모 목록 조회
+    public Page<ParentErpDTO> getPendingRegistrations(Pageable pageable) {
+        try {
+            Page<Parent> pendingParents = parentRepository.findByRegistrationStatus(
+                    RegistrationStatus.PENDING,
+                    pageable
+            );
+
+            return pendingParents.map(parent -> {
+                Member member = memberRepository.findByEmail(parent.getMemberEmail());
+                if (member == null) {
+                    log.error("Member not found for email: {}", parent.getMemberEmail());
+                    return null;
+                }
+                ParentErpDTO dto = convertToDTO(parent, member);
+                return maskPersonalInfo(dto);
+            });
+        } catch (Exception e) {
+            log.error("대기 중인 학부모 목록 조회 중 오류 발생: ", e);
+            throw new RuntimeException("목록 조회 중 오류가 발생했습니다.");
+        }
+    }
+
+    // 승인된 학부모 목록 조회
+    public Page<ParentErpDTO> getApprovedParents(Pageable pageable) {
+        try {
+            Page<Parent> approvedParents = parentRepository.findByRegistrationStatus(
+                    RegistrationStatus.APPROVED,
+                    pageable
+            );
+
+            return approvedParents.map(parent -> {
+                Member member = memberRepository.findByEmail(parent.getMemberEmail());
+                if (member == null) {
+                    log.error("Member not found for email: {}", parent.getMemberEmail());
+                    return null;
+                }
+                ParentErpDTO dto = convertToDTO(parent, member);
+                return maskPersonalInfo(dto);
+            });
+        } catch (Exception e) {
+            log.error("승인된 학부모 목록 조회 중 오류 발생: ", e);
+            throw new RuntimeException("목록 조회 중 오류가 발생했습니다.");
+        }
+    }
+
+    // 반려된 학부모 목록 조회
+    public Page<ParentErpDTO> getRejectedParents(Pageable pageable) {
+        try {
+            Page<Parent> rejectedParents = parentRepository.findByRegistrationStatus(
+                    RegistrationStatus.REJECTED,
+                    pageable
+            );
+
+            return rejectedParents.map(parent -> {
+                Member member = memberRepository.findByEmail(parent.getMemberEmail());
+                if (member == null) {
+                    log.error("Member not found for email: {}", parent.getMemberEmail());
+                    return null;
+                }
+                ParentErpDTO dto = convertToDTO(parent, member);
+                return maskPersonalInfo(dto);
+            });
+        } catch (Exception e) {
+            log.error("반려된 학부모 목록 조회 중 오류 발생: ", e);
+            throw new RuntimeException("목록 조회 중 오류가 발생했습니다.");
+        }
+    }
+
+    private ParentErpDTO convertToDTO(Parent parent, Member member) {
+        if (parent == null || member == null) return null;
 
         return ParentErpDTO.builder()
                 .parentId(parent.getParentId())
-                // Member 정보
-                .name(member != null ? member.getName() : null)
-                .email(member != null ? member.getEmail() : null)
-                .phone(member != null ? member.getPhone() : null)
-                .address(member != null ? member.getAddress() : null)
-                // Parent 정보
+                .name(member.getName())
+                .email(member.getEmail())
+                .phone(member.getPhone())
+                .address(member.getAddress())
                 .childrenEmergencyPhone(parent.getChildrenEmergencyPhone())
                 .parentType(parent.getParentType())
+                .registrationStatus(parent.getRegistrationStatus())
+                .rejectReason(parent.getRejectReason())
+                .approvedAt(parent.getApprovedAt())
+                .approvedBy(parent.getApprovedBy())
                 .parentCreateDate(parent.getCreatedDate().toLocalDate())
                 .parentModifyDate(parent.getUpdatedDate().toLocalDate())
                 .build();

@@ -35,45 +35,25 @@ public class SecurityConfig{
     http
             // CSRF 보호 활성화 및 쿠키 설정
             .csrf(csrf -> csrf
-                    .ignoringRequestMatchers("/calendar", "/events/**")  // calendar와 events 관련 엔드포인트는 CSRF 검사 제외
                     .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
 
 
             .authorizeHttpRequests(auth -> auth
-                    // css,js,image 파일 접근 허용
-                    .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
-                    // 로그인페이지 허용
-                    .requestMatchers("/main/login", "/employee/new").permitAll()
-                    .requestMatchers("/erp/**").permitAll()
-
-                    // 본인 작업 경로 적어주시면 됩니다.
-                    .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자만 /admin/** 경로 접근 가능
-                    .requestMatchers("/manager/**").hasRole("MANAGER") // 매니저만 /manager/** 경로 접근 가능
-                    .requestMatchers("/teacher/**").hasRole("USER") // 사용자만 /teacher/** 경로 접근 가능
-                    .requestMatchers("/employee/**").hasAnyRole("ADMIN", "MANAGER", "USER") // 직원은 모든 역할 접근 가능
-                    .requestMatchers("/parent/**").hasRole("Parent")
-                    .requestMatchers("/erp/**").hasAnyRole("ADMIN", "MANAGER")  // ERP 접근 권한 추가
-                    .requestMatchers("/money/**").hasAnyRole("ADMIN", "MANAGER", "USER") // 2024 11 11 회계 관리 추가
-                    .requestMatchers("/material/**").hasAnyRole("ADMIN", "MANAGER", "USER") // 2024 11 11 자재 관리 추가
-                    .requestMatchers("/**", "/board/**", "/item/**", "/images/**").permitAll()
-                    .requestMatchers("/consent/admin/**").hasRole("ADMIN")  // 관리자 권한 필요(테스트를 위해 잠시 설정 -학부모)
-
-                    .requestMatchers("/erp/parent/**").permitAll()
-                    .requestMatchers("/erp/parent/delete/**").permitAll()
-                    // 학부모 등록 승인/반려 관련 엔드포인트 허용
+                    .requestMatchers("/css/**", "/js/**", "/images/**", "/error").permitAll()
+                    .requestMatchers("/main/login", "/employee/new", "/main/login/error").permitAll()
+                    .requestMatchers("/consent/admin/**").hasRole("ADMIN")
                     .requestMatchers("/consent/**").permitAll()
-                    .requestMatchers("/consent/approve/**").permitAll()
-                    .requestMatchers("/consent/reject/**").permitAll()
-                    .requestMatchers("/consent/request-details/**").permitAll()
-                    .requestMatchers("/consent/admin/requests").permitAll()
+                    .requestMatchers("/erp/**").hasRole("ADMIN")
                     .anyRequest().authenticated()
             )
             .formLogin(form -> form
                     .loginPage("/main/login") // 로그인 페이지
+                    .loginProcessingUrl("/main/login")  // 로그인 처리 URL
                     .successHandler(successHandler) // 커스텀 로그인 성공 핸들러 설정
                     .usernameParameter("email")   // 로그인 키 값
                     .failureUrl("/login/error") // 로그인 실패시 URL
-                    .failureUrl("/parents/login/error") // 로그인 실패시 URL 학부모/원아 부분 2024 11 13
+                    .failureUrl("/main/login?error")  // 로그인 실패 시 URL 수정
+                    //.failureUrl("/parents/login/error") // 로그인 실패시 URL 학부모/원아 부분 2024 11 13
                     .permitAll()
             )
             .logout(logout -> logout

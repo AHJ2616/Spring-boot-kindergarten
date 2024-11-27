@@ -14,15 +14,11 @@ public interface MemberRepository extends JpaRepository<Member, String> {
 
     Member findByEmail (String email);
 
-    Page<Member> findByNameContaining(String keyword, Pageable pageable);
-    // 학부모 성함으로 검색하는 메서드
-
     boolean existsByEmail(String email);
     // 이메일 존재 여부 확인하는 메서드
 
-    List<Member> findByNameContainingAndRole(String name, Role role);
-    // 학부모 이름으로 검색하는 메서드
+    // 이름으로 검색 (페이징)
+    Page<Member> findByNameContainingAndRole(String name, Role role, Pageable pageable);
 
-    List<Member> findByPhoneContainingAndRole(String phone, Role role);
-    // 학부모 핸드폰 번호로 검색하는 메서드
+    Page<Member> findByRole(Role role, Pageable pageable);
 }

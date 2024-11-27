@@ -46,6 +46,23 @@ public interface ParentRepository extends JpaRepository<Parent, Long> {
 
 
     @Query("SELECT p FROM Parent p WHERE p.registrationStatus = :status")
-    List<Parent> findByRegistrationStatus(@Param("status") RegistrationStatus status);
+    Page<Parent> findByRegistrationStatus(
+            @Param("status") RegistrationStatus status,
+            Pageable pageable
+    );
     // 상태별 학부모 목록 조회
+
+    @Query("SELECT p FROM Parent p " +
+            "JOIN Member m ON p.memberEmail = m.email " +
+            "WHERE m.name LIKE %:keyword% AND p.registrationStatus = :status")
+    Page<Parent> findByNameContainingAndStatus(
+            @Param("keyword") String keyword,
+            @Param("status") RegistrationStatus status,
+            Pageable pageable
+    );
+    // 이름으로 검색 + 상태 필터링 + 페이징
+
+    @Query("SELECT COUNT(p) FROM Parent p WHERE p.registrationStatus = :status")
+    long countByRegistrationStatus(@Param("status") RegistrationStatus status);
+    // 상태별 학부모 수 카운트
 }

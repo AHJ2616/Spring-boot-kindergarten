@@ -1,21 +1,31 @@
 package com.kinder.kindergarten.controller.parent;
 
 import com.kinder.kindergarten.DTO.parent.ParentConsentDTO;
+import com.kinder.kindergarten.DTO.parent.ParentConsentDetailDTO;
 import com.kinder.kindergarten.DTO.parent.ParentInfoDTO;
+import com.kinder.kindergarten.config.PrincipalDetails;
 import com.kinder.kindergarten.entity.Member;
 import com.kinder.kindergarten.entity.parent.Parent;
 import com.kinder.kindergarten.repository.MemberRepository;
 import com.kinder.kindergarten.service.parent.ParentConsentService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 
 import java.util.HashMap;
 import java.util.List;
@@ -205,7 +215,7 @@ public class ParentConsentController {
 
         try {
             parentConsentService.saveParentInfo(parentInfoDTO);
-            return "redirect:/consent/success";
+            return "redirect:/consent/consent-success";
         } catch (Exception e) {
             log.error("학부모 정보 저장 중 오류: ", e);
             redirectAttributes.addFlashAttribute("error", e.getMessage());
@@ -234,60 +244,75 @@ public class ParentConsentController {
     }
 
     @GetMapping("/admin/requests")
-    public String listRegistrationRequests(Model model) {
-        //  ERP에서 직원이 학부모의 동의서, 약관 내용보고 승인 관리하는 페이지
+    public String listRegistrationRequests(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Model model) {
+        try {
+            Pageable pageable = PageRequest.of(page, size, Sort.by("createdDate").descending());
+            Page<Parent> pendingRequests = parentConsentService.getPendingRegistrations(pageable);
 
-        List<Parent> pendingRequests = parentConsentService.getPendingRegistrations();
-        // 승인 관리하는 페이지에서 리스트 형식으로 나오기 위해 리스트화
+            // 회원 정보 맵 생성 (마스킹 처리 포함)
+            Map<String, Map<String, String>> maskedMemberInfo = new HashMap<>();
 
-        // Member 정보를 Map으로 가져오기
-        Map<String, Member> memberMap = pendingRequests.stream()
-                .map(Parent::getMemberEmail)
-                .distinct()
-                .filter(email -> email != null)
-                .collect(Collectors.toMap(
-                        email -> email,
-                        email -> memberRepository.findByEmail(email),
-                        (existing, replacement) -> existing
-                ));
+            for (Parent parent : pendingRequests.getContent()) {
+                Member member = memberRepository.findByEmail(parent.getMemberEmail());
+                if (member != null) {
+                    Map<String, String> info = new HashMap<>();
+                    info.put("name", parentConsentService.maskName(member.getName()));
+                    info.put("email", parentConsentService.maskEmail(parent.getMemberEmail()));
+                    info.put("phone", parentConsentService.maskPhoneNumber(member.getPhone()));  // 연락처 마스킹
+                    maskedMemberInfo.put(parent.getMemberEmail(), info);
+                }
+            }
 
-        log.info("Pending requests: {}", pendingRequests);
+            model.addAttribute("requests", pendingRequests);
+            model.addAttribute("memberInfo", maskedMemberInfo);
+            model.addAttribute("currentPage", page);
 
-        model.addAttribute("requests", pendingRequests);
-        model.addAttribute("memberMap", memberMap);
-
-        return "parent/consent/registrationRequests";
+            return "parent/consent/registrationRequests";
+        } catch (Exception e) {
+            log.error("승인 대기 목록 조회 중 오류 발생: ", e);
+            return "error/500";
+        }
     }
 
     // 승인 처리
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/admin/approve/{parentId}")
     @ResponseBody
     public ResponseEntity<?> approveRegistration(@PathVariable Long parentId) {
-        // ERP에서 직원이 학부모의 동의서, 약관 내용보고 승인 처리 하는 Post 메서드
+        log.info("승인 요청 받음 - parentId: {}", parentId);
 
         try {
             parentConsentService.approveRegistration(parentId);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok()
+                    .body(Map.of("success", true, "message", "승인이 완료되었습니다."));
         } catch (Exception e) {
             log.error("승인 처리 중 오류 발생: ", e);
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(Map.of("success", false, "message", e.getMessage()));
         }
     }
 
     // 반려 처리
     @PostMapping("/admin/reject/{parentId}")
     @ResponseBody
-    public ResponseEntity<?> rejectRegistration( @PathVariable Long parentId, @RequestParam String reason) {
-        // ERP에서 직원이 학부모의 동의서, 약관 내용보고 반려 처리를 하는 Post 메서드
+    public ResponseEntity<?> rejectRegistration(
+            @PathVariable Long parentId,
+            @RequestParam String reason) {
+        log.info("반려 요청 받음 - parentId: {}, reason: {}", parentId, reason);
 
         try {
             parentConsentService.rejectRegistration(parentId, reason);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok()
+                    .body(Map.of("success", true, "message", "반려 처리가 완료되었습니다."));
         } catch (Exception e) {
             log.error("반려 처리 중 오류 발생: ", e);
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(Map.of("success", false, "message", e.getMessage()));
         }
-    }
+}
 
     // 상세 정보 조회
     @GetMapping("/admin/request-details/{parentId}")
@@ -298,10 +323,21 @@ public class ParentConsentController {
             Parent parent = parentConsentService.getParentDetails(parentId);
             Member member = memberRepository.findByEmail(parent.getMemberEmail());
 
-            model.addAttribute("parent", parent);
-            model.addAttribute("member", member);
+            // DTO 생성 및 마스킹 처리
+            ParentConsentDetailDTO dto = ParentConsentDetailDTO.from(parent, member);
 
-            return "parent/consent/requestDetails";  // HTML 페이지 반환
+            // 마스킹 처리
+            dto.setName(parentConsentService.maskName(dto.getName()));
+            dto.setEmail(parentConsentService.maskEmail(dto.getEmail()));
+            dto.setPhone(parentConsentService.maskPhoneNumber(dto.getPhone()));
+            dto.setChildrenEmergencyPhone(parentConsentService.maskPhoneNumber(dto.getChildrenEmergencyPhone()));
+            dto.setAddress(parentConsentService.maskAddress(dto.getAddress()));
+            dto.setDetailAddress("***");
+
+            model.addAttribute("detail", dto);
+            model.addAttribute("parent", parent);  // 원본 Parent 객체도 함께 전달
+
+            return "parent/consent/requestDetails";
         } catch (Exception e) {
             log.error("상세 정보 조회 중 오류 발생: ", e);
             return "redirect:/consent/admin/requests";
@@ -318,6 +354,22 @@ public class ParentConsentController {
                         email -> email,
                         email -> memberRepository.findByEmail(email),
                         (existing, replacement) -> existing
+                ));
+    }
+
+    @GetMapping("/admin/check-auth")
+    @ResponseBody
+    public ResponseEntity<?> checkAuth(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        if (principalDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "로그인이 필요합니다."));
+        }
+
+        return ResponseEntity.ok()
+                .body(Map.of(
+                        "isAuthenticated", true,
+                        "role", principalDetails.getEmployee().getRole(),
+                        "email", principalDetails.getUsername()
                 ));
     }
 }

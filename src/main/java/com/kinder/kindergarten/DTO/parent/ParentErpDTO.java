@@ -3,6 +3,7 @@ package com.kinder.kindergarten.DTO.parent;
 
 import com.kinder.kindergarten.DTO.children.ChildrenErpDTO;
 import com.kinder.kindergarten.constant.parent.ParentType;
+import com.kinder.kindergarten.constant.parent.RegistrationStatus;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Email;
@@ -11,6 +12,7 @@ import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -64,4 +66,12 @@ public class ParentErpDTO {
     private List<ChildrenErpDTO> childrenIds;    // 자녀의 ID 목록 (자녀 엔티티와 연결)
 
     private String tempPassword;// 임시 비밀번호(화면 표시용)
+
+    private RegistrationStatus registrationStatus;
+
+    private String rejectReason;
+
+    private LocalDateTime approvedAt;
+
+    private String approvedBy;
 }

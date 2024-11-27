@@ -97,17 +97,16 @@ public class Parent extends ChildrenBaseEntity {
 
   @Enumerated(EnumType.STRING)
   @Column(name = "registration_status", nullable = false)
-  @Builder.Default
-  private RegistrationStatus registrationStatus = RegistrationStatus.PENDING;
+  private RegistrationStatus registrationStatus;  //학부모 상태
 
   @Column(name = "reject_reason")
-  private String rejectReason;
+  private String rejectReason;  // 반려 사유
 
   @Column(name = "approved_at")
-  private LocalDateTime approvedAt;
+  private LocalDateTime approvedAt;// 승인 일시
 
   @Column(name = "approved_by")
-  private String approvedBy;
+  private String approvedBy;// 승인자
 
   @OneToOne(mappedBy = "parent", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   private ParentConsent parentConsent;  // ParentConsent와의 1:1 관계 추가

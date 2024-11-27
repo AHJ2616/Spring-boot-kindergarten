@@ -35,7 +35,7 @@ $(document).ready(function() {
 
 
         // 폼 데이터 검증
-        const email = $('[name="email"]').val();  // email 필드 추가
+        const email = $('[name="email"]').val();
         if (!email) {
             alert('이메일을 입력해주세요.');
             return;
@@ -99,16 +99,33 @@ $(document).ready(function() {
         });// $(this) value END
     });//  $('input[maxlength]').on('input', function() END
 
+    // 검색 기능
     window.search = function() {
-        const keyword = $('input[name="keyword"]').val();
-        location.href = '/erp/parent/list?page=0&keyword=' + encodeURIComponent(keyword);
-    };//  window.search = function END
+        const searchType = document.getElementById('searchType').value;
+        const keyword = document.getElementById('keyword').value;
 
-    // Enter 키 이벤트 처리
-    $('input[name="keyword"]').on('keypress', function(e) {
-        if (e.which === 13) {
-            e.preventDefault();
-            search();
+        if (!keyword || keyword.trim() === '') {
+            alert('검색어를 입력해주세요.');
+            return;
+        }
+
+        location.href = `/erp/parent/list?searchType=${encodeURIComponent(searchType)}&keyword=${encodeURIComponent(keyword)}`;
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const keywordInput = document.getElementById('keyword');
+        if (keywordInput) {
+            keywordInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const keyword = this.value;
+                    if (!keyword || keyword.trim() === '') {
+                        alert('검색어를 입력해주세요.');
+                        return;
+                    }
+                    search();
+                }
+            });
         }
     });//  $('input[name="keyword"]').on('keypress', function END
 
@@ -127,9 +144,12 @@ $(document).ready(function() {
             return;
         }// if - totalPages END
 
+        const searchType = $('select[name="searchType"]').val();
         const keyword = $('input[name="keyword"]').val();
-        location.href = '/erp/parent/list?page=' + page + (keyword ? '&keyword=' + keyword : '');
-    }// window.movePage = function END
+        location.href = '/erp/parent/list?page=' + page +
+            (searchType ? '&searchType=' + encodeURIComponent(searchType) : '') +
+            (keyword ? '&keyword=' + encodeURIComponent(keyword) : '');
+    };// window.movePage = function END
 
     /*<![CDATA[*/
     // Thymeleaf를 통해 parentId를 안전하게 가져옴

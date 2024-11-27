@@ -95,13 +95,22 @@
     <h2>등록된 학부모 목록</h2>
 
     <!-- 검색 폼 -->
-    <div class="search-form d-flex">
-        <input type="text" name="keyword"
-               th:value="${keyword}"
-               class="form-control me-2"
-               style="width: 200px;"
-               placeholder="학부모 성함으로 검색">
-        <button type="button" onclick="search()" class="btn btn-secondary">검색</button>
+    <div class="search-container">
+        <div class="row g-3 align-items-center">
+            <div class="col-auto">
+                <select id="searchType" name="searchType" class="form-select">
+                    <option value="이름" th:selected="${searchType == '이름'}">이름</option>
+                </select>
+            </div>
+            <div class="col-auto">
+                <input type="text" id="keyword" name="keyword" class="form-control"
+                       th:value="${param.keyword}" placeholder="검색어를 입력하세요">
+            </div>
+            <div class="col-auto">
+                <button type="button" onclick="search()" class="btn btn-primary">검색</button>
+                <a href="/erp/parent/list" class="btn btn-secondary">초기화</a>
+            </div>
+        </div>
     </div>
 
     <div class="col-md-6 text-right">

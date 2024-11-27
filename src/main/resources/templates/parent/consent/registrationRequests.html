@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+  <title>학부모 등록 승인 관리</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .request-container {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+    .status-badge {
+      padding: 5px 10px;
+      border-radius: 15px;
+      font-size: 0.8rem;
+    }
+    .status-pending {
+      background-color: #ffc107;
+      color: #000;
+    }
+    .status-approved {
+      background-color: #198754;
+      color: white;
+    }
+    .status-rejected {
+      background-color: #dc3545;
+      color: white;
+    }
+    .detail-row {
+      display: none;
+      background-color: #f8f9fa;
+      padding: 15px;
+      margin-top: 10px;
+      border-radius: 5px;
+    }
+    .consent-info {
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #e9ecef;
+      border-radius: 5px;
+    }
+    .pagination {
+      margin-bottom: 20px;
+    }
+    .page-link {
+      color: #0d6efd;
+      background-color: #fff;
+      border: 1px solid #dee2e6;
+    }
+    .page-item.active .page-link {
+      background-color: #0d6efd;
+      border-color: #0d6efd;
+      color: white;
+    }
+    .page-item.disabled .page-link {
+      color: #6c757d;
+      pointer-events: none;
+      background-color: #fff;
+      border-color: #dee2e6;
+    }
+  </style>
+</head>
+<body>
+<div class="request-container">
+  <h2 class="mb-4">학부모 등록 승인 관리</h2>
+
+  <!-- 필터 섹션 -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <select class="form-select" id="statusFilter">
+        <option value="all">전체 상태</option>
+        <option value="PENDING">대기중</option>
+        <option value="APPROVED">승인됨</option>
+        <option value="REJECTED">반려됨</option>
+      </select>
+    </div>
+    <div class="col-md-4">
+      <input type="text" class="form-control" id="searchInput" placeholder="이름 또는 이메일로 검색">
+    </div>
+  </div>
+
+  <!-- 요청 목록 테이블 -->
+  <div class="table-responsive">
+    <table class="table table-hover">
+      <thead>
+      <tr>
+        <th>신청일</th>
+        <th>이름</th>
+        <th>이메일</th>
+        <th>연락처</th>
+        <th>상태</th>
+        <th>처리일시</th>
+        <th>작업</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="parent : ${requests}">
+        <td th:text="${#temporals.format(parent.createdDate, 'yyyy-MM-dd HH:mm')}">2024-01-01</td>
+        <td th:text="${memberInfo[parent.memberEmail].name}">홍**</td>
+        <td th:text="${memberInfo[parent.memberEmail].email}">ab***@example.com</td>
+        <td th:text="${memberInfo[parent.memberEmail].phone}">010-****-5678</td>
+        <td>
+            <span class="status-badge"
+                  th:classappend="${'status-' + parent.registrationStatus.name().toLowerCase()}"
+                  th:text="${parent.registrationStatus.name()}">대기중</span>
+        </td>
+        <td th:text="${parent.approvedAt != null ? #temporals.format(parent.approvedAt, 'yyyy-MM-dd HH:mm') : '-'}">-</td>
+        <td>
+          <!-- 버튼들은 그대로 유지 -->
+          <button class="btn btn-sm btn-info"
+                  th:onclick="'location.href=\'/consent/admin/request-details/' + ${parent.parentId} + '\''">
+            상세보기
+          </button>
+          <th:block th:if="${parent.registrationStatus.name() == 'PENDING'}">
+            <button class="btn btn-sm btn-success"
+                    th:onclick="'approveRequest(' + ${parent.parentId} + ')'">승인</button>
+            <button class="btn btn-sm btn-danger"
+                    th:onclick="'showRejectForm(' + ${parent.parentId} + ')'">반려</button>
+          </th:block>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 상세 정보 행 템플릿 -->
+  <template id="detailRowTemplate">
+    <tr class="detail-row">
+      <td colspan="7">
+        <div class="row">
+          <div class="col-md-6">
+            <h5>기본 정보</h5>
+            <p><strong>주소:</strong> <span class="detail-address"></span></p>
+            <p><strong>비상연락처:</strong> <span class="detail-emergency"></span></p>
+          </div>
+          <div class="col-md-6">
+            <h5>동의 정보</h5>
+            <div class="consent-info">
+              <p><strong>이용약관:</strong> <span class="consent-terms"></span></p>
+              <p><strong>개인정보:</strong> <span class="consent-privacy"></span></p>
+              <p><strong>사진활용:</strong> <span class="consent-photo"></span></p>
+              <!-- 기타 동의 항목들 -->
+            </div>
+          </div>
+        </div>
+      </td>
+    </tr>
+  </template>
+
+  <!-- 반려 사유 입력 모달 -->
+  <div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="rejectModalLabel">반려 사유 입력</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="rejectReason" class="form-label">반려 사유</label>
+            <textarea class="form-control" id="rejectReason" rows="3" placeholder="반려 사유를 입력해주세요."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+          <button type="button" class="btn btn-primary" onclick="submitReject()">확인</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-center mt-4">
+    <nav th:if="${requests.totalPages > 0}">
+      <ul class="pagination">
+        <!-- 이전 페이지 -->
+        <li class="page-item" th:classappend="${requests.first} ? 'disabled'">
+          <a class="page-link"
+             th:href="@{/consent/admin/requests(page=${requests.number - 1},
+             size=${requests.size},
+             statusFilter=${param.statusFilter},
+             searchInput=${param.searchInput})}">
+            이전
+          </a>
+        </li>
+
+        <!-- 페이지 번호 -->
+        <li class="page-item"
+            th:each="pageNum : ${#numbers.sequence(0, requests.totalPages - 1)}"
+            th:classappend="${pageNum == requests.number} ? 'active'">
+          <a class="page-link"
+             th:href="@{/consent/admin/requests(page=${pageNum},
+             size=${requests.size},
+             statusFilter=${param.statusFilter},
+             searchInput=${param.searchInput})}"
+             th:text="${pageNum + 1}">1</a>
+        </li>
+
+        <!-- 다음 페이지 -->
+        <li class="page-item" th:classappend="${requests.last} ? 'disabled'">
+          <a class="page-link"
+             th:href="@{/consent/admin/requests(page=${requests.number + 1},
+             size=${requests.size},
+             statusFilter=${param.statusFilter},
+             searchInput=${param.searchInput})}">
+            다음
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<script th:inline="javascript">
+  let selectedRequestId = null;
+
+  function toggleDetails(button) {
+    const row = button.closest('tr');
+    const requestId = row.dataset.id;
+    const existingDetail = row.nextElementSibling;
+
+    if (existingDetail && existingDetail.classList.contains('detail-row')) {
+      existingDetail.remove();
+      return;
+    }
+
+    // API 경로 수정
+    fetch(`/consent/request-details/${requestId}`)
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('상세 정보를 불러오는데 실패했습니다.');
+              }
+              return response.json();
+            })
+            .then(data => {
+              const template = document.getElementById('detailRowTemplate');
+              const detailRow = template.content.cloneNode(true);
+
+              // Member 정보
+              const member = data.member || {};
+              detailRow.querySelector('.detail-address').textContent =
+                      `${member.address || '-'} ${data.detailAddress || ''}`;
+
+              // Parent 정보
+              detailRow.querySelector('.detail-emergency').textContent =
+                      data.childrenEmergencyPhone || '-';
+
+              // 동의 정보
+              if (data.parentConsent) {
+                detailRow.querySelector('.consent-terms').textContent =
+                        data.parentConsent.termsConsent ? '동의' : '미동의';
+                detailRow.querySelector('.consent-privacy').textContent =
+                        data.parentConsent.privateConsent ? '동의' : '미동의';
+                detailRow.querySelector('.consent-photo').textContent =
+                        data.parentConsent.photoConsent ? '동의' : '미동의';
+              }
+
+              row.parentNode.insertBefore(detailRow, row.nextSibling);
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              alert(error.message);
+            });
+  }
+
+
+  function showRejectForm(parentId) {
+    selectedRequestId = parentId;
+    const modal = new bootstrap.Modal(document.getElementById('rejectModal'));
+    modal.show();
+  }
+
+  function approveRequest(parentId) {
+    if (!confirm('이 요청을 승인하시겠습니까?')) return;
+
+    const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+    const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+    fetch(`/consent/admin/approve/${parentId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        [header]: token
+      }
+    })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('승인 처리 중 오류가 발생했습니다.');
+              }
+              return response.json();
+            })
+            .then(data => {
+              alert('승인이 완료되었습니다.');
+              window.location.reload();
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              alert(error.message);
+            });
+  }
+
+  // CSRF 토큰 가져오기
+  const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+  const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+  function submitReject() {
+    const reason = document.getElementById('rejectReason').value.trim();
+    if (!reason) {
+      alert('반려 사유를 입력해주세요.');
+      return;
+    }
+
+    fetch(`/consent/admin/reject/${selectedRequestId}?reason=${encodeURIComponent(reason)}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        [header]: token  // CSRF 토큰 추가
+      }
+    })
+            .then(response => response.json())
+            .then(data => {
+              alert(data.message);
+              if (data.success) {
+                window.location.reload();
+              }
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              alert('반려 처리 중 오류가 발생했습니다.');
+            });
+
+    const modal = bootstrap.Modal.getInstance(document.getElementById('rejectModal'));
+    modal.hide();
+  }
+
+  // 필터링 기능
+  document.getElementById('statusFilter').addEventListener('change', filterRequests);
+  document.getElementById('searchInput').addEventListener('input', filterRequests);
+
+  function filterRequests() {
+    const status = document.getElementById('statusFilter').value;
+    const search = document.getElementById('searchInput').value.toLowerCase();
+
+    // URL 파라미터 구성
+    const params = new URLSearchParams({
+      page: 0,  // 필터 변경시 첫 페이지로
+      statusFilter: status,
+      searchInput: search
+    });
+
+    // 페이지 이동
+    window.location.href = `/consent/admin/requests?${params.toString()}`;
+  }
+
+  // 디바운스 추가
+  let searchTimeout;
+  document.getElementById('searchInput').addEventListener('input', function() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(filterRequests, 300);  // 300ms 후에 검색 실행
+  });
+
+  document.getElementById('statusFilter').addEventListener('change', filterRequests);
+</script>
+</body>
+</html>

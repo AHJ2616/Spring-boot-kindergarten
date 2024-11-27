@@ -2,6 +2,7 @@
 package com.kinder.kindergarten.service.parent;
 
 import com.kinder.kindergarten.DTO.parent.ParentConsentDTO;
+import com.kinder.kindergarten.DTO.parent.ParentConsentDetailDTO;
 import com.kinder.kindergarten.DTO.parent.ParentInfoDTO;
 import com.kinder.kindergarten.constant.employee.Role;
 import com.kinder.kindergarten.constant.parent.RegistrationStatus;
@@ -14,19 +15,22 @@ import com.kinder.kindergarten.repository.parent.ParentRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Log4j2
 @Transactional(readOnly = true)
-
 public class ParentConsentService {
 
     // 학부모 동의서에 관한 서비스 로직
@@ -352,70 +356,212 @@ public class ParentConsentService {
                 .build();
     }
 
-    public List<Parent> getPendingRegistrations() {
-        // 동의서 페이지에서 학부모 정보를 등록한 학부모 대기 중인 목록 조회
+    // 대기 중인 학부모 목록 조회 (페이징 추가)
+    public Page<Parent> getPendingRegistrations(Pageable pageable) {
+        log.info("대기 중인 학부모 목록 조회 시작");
+        try {
+            Page<Parent> pendingList = parentRepository.findByRegistrationStatus(
+                    RegistrationStatus.PENDING,
+                    pageable
+            );
+            log.info("대기 중인 학부모 수: {}", pendingList.getTotalElements());
 
-        log.info("ParentConsentService.getPendingRegistrations 메서드 실행 중  = = = = = =");
+            pendingList.forEach(parent ->
+                    log.info("대기 중인 학부모 - ID: {}, Email: {}, Status: {}",
+                            parent.getParentId(),
+                            parent.getMemberEmail(),
+                            parent.getRegistrationStatus())
+            );
 
-        List<Parent> pendingList = parentRepository.findByRegistrationStatus(RegistrationStatus.PENDING);
-        log.info("Found {} pending registrations", pendingList.size());
-        pendingList.forEach(parent ->
-
-                log.info("대기중인 학부모 ID, Email, status : " +
-                        parent.getParentId(),
-                        parent.getMemberEmail(),
-                        parent.getRegistrationStatus())
-        );
-        return pendingList;
-
+            return pendingList;
+        } catch (Exception e) {
+            log.error("대기 중인 학부모 목록 조회 중 오류 발생: ", e);
+            throw new RuntimeException("목록 조회 중 오류가 발생했습니다.");
+        }
     }
 
+    // 승인된 학부모 목록 조회 (페이징 추가)
+    public Page<Parent> getApprovedRegistrations(Pageable pageable) {
+        log.info("승인된 학부모 목록 조회 시작");
+        try {
+            Page<Parent> approvedList = parentRepository.findByRegistrationStatus(
+                    RegistrationStatus.APPROVED,
+                    pageable
+            );
+            log.info("승인된 학부모 수: {}", approvedList.getTotalElements());
+            return approvedList;
+        } catch (Exception e) {
+            log.error("승인된 학부모 목록 조회 중 오류 발생: ", e);
+            throw new RuntimeException("목록 조회 중 오류가 발생했습니다.");
+        }
+    }
+
+    // 반려된 학부모 목록 조회 (페이징 추가)
+    public Page<Parent> getRejectedRegistrations(Pageable pageable) {
+        log.info("반려된 학부모 목록 조회 시작");
+        try {
+            Page<Parent> rejectedList = parentRepository.findByRegistrationStatus(
+                    RegistrationStatus.REJECTED,
+                    pageable
+            );
+            log.info("반려된 학부모 수: {}", rejectedList.getTotalElements());
+            return rejectedList;
+        } catch (Exception e) {
+            log.error("반려된 학부모 목록 조회 중 오류 발생: ", e);
+            throw new RuntimeException("목록 조회 중 오류가 발생했습니다.");
+        }
+    }
+
+    // 승인 처리 메서드 보완
     @Transactional
     public void approveRegistration(Long parentId) {
-        // 학부모 승인하는 서비스 메서드
+        try {
+            Parent parent = parentRepository.findById(parentId)
+                    .orElseThrow(() -> new EntityNotFoundException("해당 학부모를 찾을 수 없습니다."));
 
-        Parent parent = parentRepository.findById(parentId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 학부모를 찾을 수 없습니다."));
+            // 이미 처리된 요청인지 확인
+            if (parent.getRegistrationStatus() != RegistrationStatus.PENDING) {
+                throw new IllegalStateException("이미 처리된 요청입니다.");
+            }
 
-        Member member = memberRepository.findByEmail(parent.getMemberEmail());
+            parent.setRegistrationStatus(RegistrationStatus.APPROVED);
+            parent.setApprovedAt(LocalDateTime.now());
 
-        parent.setRegistrationStatus(RegistrationStatus.APPROVED);
-        parent.setApprovedAt(LocalDateTime.now());
-        parent.setApprovedBy("관리자");
-        // 승인, 승인일시, 승인자 지정
+            parentRepository.save(parent);
+            log.info("학부모 승인 완료 - ID: {}, 승인일시: {}",
+                    parentId, parent.getApprovedAt());
 
-        parentRepository.save(parent);
-        // 지정한 데이터를 DB에 저장
-        log.info("학부모 승인 완료 - ID : " + parentId);
+        } catch (Exception e) {
+            log.error("학부모 승인 처리 중 오류 발생: ", e);
+            throw new RuntimeException("승인 처리 중 오류가 발생했습니다: " + e.getMessage());
+        }
     }
 
+    // 반려 처리 메서드 보완
     @Transactional
     public void rejectRegistration(Long parentId, String reason) {
-        // 학부모 반려하는 서비스 메서드
+        try {
+            Parent parent = parentRepository.findById(parentId)
+                    .orElseThrow(() -> new EntityNotFoundException("해당 학부모를 찾을 수 없습니다."));
 
-        Parent parent = parentRepository.findById(parentId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 학부모를 찾을 수 없습니다."));
+            // 이미 처리된 요청인지 확인
+            if (parent.getRegistrationStatus() != RegistrationStatus.PENDING) {
+                throw new IllegalStateException("이미 처리된 요청입니다.");
+            }
 
-        Member member = memberRepository.findByEmail(parent.getMemberEmail());
+            // 반려 사유 검증
+            if (reason == null || reason.trim().isEmpty()) {
+                throw new IllegalArgumentException("반려 사유를 입력해주세요.");
+            }
 
-        parent.setRegistrationStatus(RegistrationStatus.REJECTED);
-        parent.setRejectReason(reason);
-        // 반려할때 반려와 사유를 지정해주고
+            parent.setRegistrationStatus(RegistrationStatus.REJECTED);
+            parent.setRejectReason(reason);
+            parent.setApprovedAt(LocalDateTime.now());
 
-        parentRepository.save(parent);
-        // DB에 저장
+            parentRepository.save(parent);
+            log.info("학부모 반려 완료 - ID: {}, 사유: {}, 처리일시: {}",
+                    parentId, reason, parent.getApprovedAt());
 
-        // Member 계정도 삭제 처리
-        if (member != null) {
-            memberRepository.delete(member);
+            // Member 계정도 삭제 처리
+            Member member = memberRepository.findByEmail(parent.getMemberEmail());
+            if (member != null) {
+                memberRepository.delete(member);
+                log.info("회원 정보 삭제 완료 - Email: {}", member.getEmail());
+            }
+
+        } catch (Exception e) {
+            log.error("학부모 반려 처리 중 오류 발생: ", e);
+            throw new RuntimeException("반려 처리 중 오류가 발생했습니다: " + e.getMessage());
         }
-
-        log.info("학부모 반려 완료, 사유: " + reason);
     }
 
     public Parent getParentDetails(Long parentId) {
 
         return parentRepository.findById(parentId)
                 .orElseThrow(() -> new EntityNotFoundException("학부모를 찾을 수 없습니다."));
+    }
+
+    public String maskName(String name) {
+        if (name == null || name.length() < 2) return name;
+        return name.substring(0, 1) + "*".repeat(name.length() - 2) +
+                name.substring(name.length() - 1);
+    }
+
+    public String maskEmail(String email) {
+        if (email == null) return email;
+        int atIndex = email.indexOf('@');
+        if (atIndex <= 2) return email;
+
+        String local = email.substring(0, atIndex);
+        String domain = email.substring(atIndex);
+        return local.substring(0, 2) + "*".repeat(local.length() - 2) + domain;
+    }
+
+    public String maskPhoneNumber(String phoneNumber) {
+        if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
+            return "-";  // null이나 빈 문자열인 경우 "-" 반환
+        }
+
+        // 전화번호 형식 정규화 (하이픈 제거)
+        String normalizedNumber = phoneNumber.replaceAll("-", "");
+
+        // 전화번호 형식 검증
+        if (!normalizedNumber.matches("\\d{10,11}")) {
+            return phoneNumber;  // 유효하지 않은 형식이면 원본 반환
+        }
+
+        // 마스킹 처리
+        return normalizedNumber.replaceAll("(\\d{3})(\\d{3,4})(\\d{4})", "$1-****-$3");
+    }
+
+    public String maskAddress(String address) {
+        if (address == null) return address;
+        String[] parts = address.split(" ");
+        if (parts.length <= 2) return address;
+
+        return parts[0] + " " + parts[1] + " ***";
+    }
+
+    // DTO에 마스킹 처리된 데이터를 담아서 반환
+    public Map<String, Object> getParentWithMaskedInfo(Parent parent) {
+        Member member = memberRepository.findByEmail(parent.getMemberEmail());
+        Map<String, Object> maskedInfo = new HashMap<>();
+
+        maskedInfo.put("parentId", parent.getParentId());
+        maskedInfo.put("name", maskName(member.getName()));
+        maskedInfo.put("email", maskEmail(parent.getMemberEmail()));
+        maskedInfo.put("phone", maskPhoneNumber(member.getPhone()));
+        maskedInfo.put("status", parent.getRegistrationStatus());
+        maskedInfo.put("createdDate", parent.getCreatedDate());
+        maskedInfo.put("approvedAt", parent.getApprovedAt());
+
+        return maskedInfo;
+    }
+
+    // 목록 조회 시 마스킹 처리
+    public Page<Map<String, Object>> getPendingRegistrationsWithMasking(Pageable pageable) {
+        Page<Parent> pendingRequests = parentRepository.findByRegistrationStatus(
+                RegistrationStatus.PENDING, pageable);
+
+        return pendingRequests.map(this::getParentWithMaskedInfo);
+    }
+
+    // 상세 정보 조회
+    public ParentConsentDetailDTO getParentDetailWithMasking(Long parentId) {
+        Parent parent = parentRepository.findById(parentId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 학부모를 찾을 수 없습니다."));
+        Member member = memberRepository.findByEmail(parent.getMemberEmail());
+
+        ParentConsentDetailDTO dto = ParentConsentDetailDTO.from(parent, member);
+
+        // 마스킹 처리
+        dto.setName(maskName(dto.getName()));
+        dto.setEmail(maskEmail(dto.getEmail()));
+        dto.setPhone(maskPhoneNumber(dto.getPhone()));
+        dto.setChildrenEmergencyPhone(maskPhoneNumber(dto.getChildrenEmergencyPhone()));
+        dto.setAddress(maskAddress(dto.getAddress()));
+        dto.setDetailAddress("***");
+
+        return dto;
     }
 }
