@@ -1,7 +1,10 @@
 package com.kinder.kindergarten.controller.children;
 
 import com.kinder.kindergarten.DTO.children.ClassRoomDTO;
+import com.kinder.kindergarten.entity.parent.Parent;
+import com.kinder.kindergarten.repository.parent.ParentRepository;
 import com.kinder.kindergarten.service.children.ClassRoomService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -20,6 +23,8 @@ import java.util.List;
 public class ClassRoomController {
 
     private final ClassRoomService classRoomService;
+
+    private final ParentRepository parentRepository;
 
     // 반 개설하기
     @GetMapping(value = "/register")
@@ -91,30 +96,22 @@ public class ClassRoomController {
 
         try {
             classRoomService.assignChildToClassRoom(childrenId, classRoomId);
-            redirectAttributes.addFlashAttribute("successMessage", "반 배정이 완료되었습니다.");
-            // 서비스에서 원아 반 배정하는 메서드 호출해서 성공하면 메세지로 알려준다.
-
 
             Long nextUnassignedChildId = classRoomService.findNextUnassignedChild(parentId);
-            // 다음 미배정 자녀 찾기
 
             if (nextUnassignedChildId != null) {
-                // 다음 미배정 자녀가 있으면 해당 자녀의 배정 페이지로 이동
-
                 return "redirect:/erp/classRoom/assign/" + parentId + "/" + nextUnassignedChildId;
             }
 
-            return "redirect:/erp/parent/list";
-            // 모든 자녀 배정이 완료되면 부모 목록으로 이동
+            // URL 파라미터로 전달
+            return "redirect:/erp/parent/registration/completion?parentId=" + parentId
+                    + "&childrenId=" + childrenId
+                    + "&classRoomId=" + classRoomId;
 
         } catch (Exception e) {
-
             log.error("반 배정 중 오류 발생: ", e);
             redirectAttributes.addFlashAttribute("errorMessage", "반 배정 중 오류가 발생했습니다.");
-            // 반 배정 중 오류가 발생하면 오류 메세지 표출
-
             return "redirect:/erp/classRoom/assign/" + parentId + "/" + childrenId;
-            // 그리고  부모id + 자녀id 와 함께 자녀의 배정 페이지로 이동
         }
     }
 }

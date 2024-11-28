@@ -3,24 +3,36 @@ package com.kinder.kindergarten.service.parent;
 import com.kinder.kindergarten.DTO.children.ChildrenErpDTO;
 import com.kinder.kindergarten.DTO.parent.ParentErpDTO;
 import com.kinder.kindergarten.DTO.parent.ParentUpdateDTO;
+import com.kinder.kindergarten.DTO.parent.RegistrationCompletionDTO;
 import com.kinder.kindergarten.constant.employee.Role;
 import com.kinder.kindergarten.constant.parent.RegistrationStatus;
 import com.kinder.kindergarten.entity.Member;
+import com.kinder.kindergarten.entity.children.Children;
+import com.kinder.kindergarten.entity.children.ClassRoom;
 import com.kinder.kindergarten.entity.parent.Parent;
 import com.kinder.kindergarten.repository.MemberRepository;
+import com.kinder.kindergarten.repository.children.ChildrenRepository;
+import com.kinder.kindergarten.repository.children.ClassRoomRepository;
 import com.kinder.kindergarten.repository.parent.ParentRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.modelmapper.ModelMapper;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,6 +44,10 @@ public class ParentService {
     private final ParentRepository parentRepository;
 
     private final MemberRepository memberRepository;
+
+    private final ChildrenRepository childrenRepository;
+
+    private final ClassRoomRepository classRoomRepository;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -433,6 +449,110 @@ public class ParentService {
             log.error("반려된 학부모 목록 조회 중 오류 발생: ", e);
             throw new RuntimeException("목록 조회 중 오류가 발생했습니다.");
         }
+    }
+
+    public RegistrationCompletionDTO getRegistrationCompletionInfo(Long parentId,
+                                                                   Long childrenId,
+                                                                   Long classRoomId) {
+
+        Parent parent = parentRepository.findById(parentId)
+                .orElseThrow(() -> new EntityNotFoundException("학부모 정보를 찾을 수 없습니다."));
+
+        Children children = childrenRepository.findById(childrenId)
+                .orElseThrow(() -> new EntityNotFoundException("원아 정보를 찾을 수 없습니다."));
+
+        ClassRoom classRoom = classRoomRepository.findById(classRoomId)
+                .orElseThrow(() -> new EntityNotFoundException("반 정보를 찾을 수 없습니다."));
+
+        Member member = memberRepository.findByEmail(parent.getMemberEmail());
+
+        return RegistrationCompletionDTO.builder()
+                .memberEmail(member.getEmail())
+                .memberName(member.getName())
+                .memberPhone(member.getPhone())
+                .memberAddress(member.getAddress())
+                .parentId(parent.getParentId())
+                .childrenEmergencyPhone(parent.getChildrenEmergencyPhone())
+                .detailAddress(parent.getDetailAddress())
+                .parentType(parent.getParentType())
+                .childrenId(children.getChildrenId())
+                .childrenName(children.getChildrenName())
+                .childrenGender(children.getChildrenGender())
+                .childrenBirthDate(children.getChildrenBirthDate())
+                .childrenAllergies(children.getChildrenAllergies())
+                .childrenMedicalHistory(children.getChildrenMedicalHistory())
+                .classRoomId(classRoom.getClassRoomId())
+                .classRoomName(classRoom.getClassRoomName())
+                .employeeName(classRoom.getEmployeeName())
+                .currentStudents(classRoom.getCurrentStudents())
+                .maxChildren(classRoom.getMaxChildren())
+                .registrationDate(LocalDateTime.now())
+                .build();
+
+    }
+
+    public ByteArrayResource generateExcelFile(Long parentId, Long childrenId) throws IOException {
+        // 데이터 조회
+        Parent parent = parentRepository.findById(parentId)
+                .orElseThrow(() -> new EntityNotFoundException("학부모 정보를 찾을 수 없습니다."));
+        Children children = childrenRepository.findById(childrenId)
+                .orElseThrow(() -> new EntityNotFoundException("원아 정보를 찾을 수 없습니다."));
+        Member member = memberRepository.findByEmail(parent.getMemberEmail());
+
+        // 엑셀 워크북 생성
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("등록 정보");
+
+            // 스타일 설정
+            CellStyle headerStyle = workbook.createCellStyle();
+            headerStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+            headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+            // 데이터 입력
+            int rowNum = 0;
+
+            // 회원 정보
+            createHeaderRow(sheet, rowNum++, "회원 정보", headerStyle);
+            rowNum = addDataRow(sheet, rowNum, "이름", member.getName());
+            rowNum = addDataRow(sheet, rowNum, "이메일", member.getEmail());
+            rowNum = addDataRow(sheet, rowNum, "연락처", member.getPhone());
+
+            // 학부모 정보
+            rowNum++;
+            createHeaderRow(sheet, rowNum++, "학부모 정보", headerStyle);
+            rowNum = addDataRow(sheet, rowNum, "긴급연락처", parent.getChildrenEmergencyPhone());
+            rowNum = addDataRow(sheet, rowNum, "관계", parent.getParentType().toString());
+
+            // 원아 정보
+            rowNum++;
+            createHeaderRow(sheet, rowNum++, "원아 정보", headerStyle);
+            rowNum = addDataRow(sheet, rowNum, "이름", children.getChildrenName());
+            rowNum = addDataRow(sheet, rowNum, "생년월일", children.getChildrenBirthDate().toString());
+            rowNum = addDataRow(sheet, rowNum, "성별", children.getChildrenGender());
+            rowNum = addDataRow(sheet, rowNum, "알레르기", children.getChildrenAllergies());
+
+            // 엑셀 파일을 바이트 배열로 변환
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            workbook.write(outputStream);
+
+            return new ByteArrayResource(outputStream.toByteArray());
+        }
+    }
+
+    // 헤더 셀 생성 헬퍼 메서드
+    private void createHeaderRow(Sheet sheet, int rowNum, String title, CellStyle style) {
+        Row row = sheet.createRow(rowNum);
+        Cell cell = row.createCell(0);
+        cell.setCellValue(title);
+        cell.setCellStyle(style);
+    }
+
+    // 데이터 행 추가 헬퍼 메서드
+    private int addDataRow(Sheet sheet, int rowNum, String label, String value) {
+        Row row = sheet.createRow(rowNum);
+        row.createCell(0).setCellValue(label);
+        row.createCell(1).setCellValue(value != null ? value : "");
+        return rowNum + 1;
     }
 
     private ParentErpDTO convertToDTO(Parent parent, Member member) {

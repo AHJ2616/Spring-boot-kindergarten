@@ -1,0 +1,170 @@
+/* 전체 페이지 스타일 */
+.completion-page {
+    max-width: 1000px;
+    margin: 3rem auto;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.1);
+}
+
+/* 축하 메시지 섹션 */
+.celebration-section {
+    background: linear-gradient(135deg, #4a90e2, #50c878);
+    padding: 3rem;
+    border-radius: 15px;
+    text-align: center;
+    margin-bottom: 3rem;
+    color: white;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.celebration-section::before {
+    content: '🎉';
+    position: absolute;
+    font-size: 8rem;
+    opacity: 0.1;
+    right: -20px;
+    top: -20px;
+    transform: rotate(15deg);
+}
+
+.celebration-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+/* 정보 카드 스타일 */
+.info-card {
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    margin-bottom: 2.5rem;
+    transition: transform 0.3s ease;
+}
+
+.info-card:hover {
+    transform: translateY(-5px);
+}
+
+.info-card .card-header {
+    background: #4a90e2;
+    color: white;
+    padding: 1.5rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    border: none;
+}
+
+.info-card .card-body {
+    padding: 2rem;
+}
+
+.info-card .table {
+    margin-bottom: 2rem;
+}
+
+.info-card .table th {
+    width: 30%;
+    background-color: #f8f9fa;
+    padding: 1rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.info-card .table td {
+    padding: 1rem;
+    color: #34495e;
+}
+
+/* 버튼 스타일 */
+.action-buttons {
+    margin-bottom: 3rem;
+}
+
+.action-buttons .btn {
+    width: 100%;
+    padding: 1.2rem;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    margin-bottom: 1rem;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.btn-parent {
+    background: #4a90e2;
+    color: white;
+}
+
+.btn-parent:hover {
+    background: #357abd;
+    transform: translateY(-2px);
+}
+
+.btn-class {
+    background: #50c878;
+    color: white;
+}
+
+.btn-class:hover {
+    background: #3cb371;
+    transform: translateY(-2px);
+}
+
+.btn-child {
+    background: #f1c40f;
+    color: white;
+}
+
+.btn-child:hover {
+    background: #f39c12;
+    transform: translateY(-2px);
+}
+
+/* 다운로드 버튼 */
+.download-section {
+    text-align: center;
+    padding: 2rem;
+}
+
+.btn-download {
+    background: #34495e;
+    color: white;
+    padding: 1rem 2.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.btn-download:hover {
+    background: #2c3e50;
+    transform: translateY(-2px);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .completion-page {
+        margin: 1rem;
+        padding: 1rem;
+    }
+
+    .celebration-section {
+        padding: 2rem;
+    }
+
+    .celebration-title {
+        font-size: 2rem;
+    }
+
+    .info-card {
+        margin-bottom: 1.5rem;
+    }
+}

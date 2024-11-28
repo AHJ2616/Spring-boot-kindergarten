@@ -33,12 +33,6 @@
     </table>
 </div>
 <div class="container mt-3">
-<div th:if="${classRooms != null and not #lists.isEmpty(classRooms)}">
-    <p>데이터 확인:</p>
-    <div th:each="room : ${classRooms}">
-        <p th:text="${'반 정보: ' + room}"></p>
-    </div>
-</div>
 <div th:if="${classRooms == null or #lists.isEmpty(classRooms)}">
     <p>등록된 반이 없습니다.</p>
 </div>

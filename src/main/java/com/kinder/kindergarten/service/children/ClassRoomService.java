@@ -3,8 +3,11 @@ package com.kinder.kindergarten.service.children;
 import com.kinder.kindergarten.DTO.children.ClassRoomDTO;
 import com.kinder.kindergarten.entity.children.Children;
 import com.kinder.kindergarten.entity.children.ClassRoom;
+import com.kinder.kindergarten.entity.parent.Parent;
 import com.kinder.kindergarten.repository.children.ChildrenRepository;
 import com.kinder.kindergarten.repository.children.ClassRoomRepository;
+import com.kinder.kindergarten.repository.parent.ParentRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -24,6 +27,8 @@ public class ClassRoomService {
     private final ClassRoomRepository classRoomRepository;
 
     private final ChildrenRepository childrenRepository;
+
+    private final ParentRepository parentRepository;
 
     public ClassRoom createClassRoom(ClassRoomDTO classRoomDTO) {
         // ClassRoom 서비스에서 반 개설하는 메서드
@@ -129,5 +134,12 @@ public class ClassRoomService {
         return classRoomRepository.findAll().stream() .map(this::convertToDTO)
                 .collect(Collectors.toList());
         // DB에 개설된 모든 반 정보를 가지고 와서 리스트로 만든다 !
+    }
+
+
+    public String getMemberEmailByParentId(Long parentId) {
+        Parent parent = parentRepository.findById(parentId)
+                .orElseThrow(() -> new EntityNotFoundException("학부모 정보를 찾을 수 없습니다."));
+        return parent.getMemberEmail();
     }
 }

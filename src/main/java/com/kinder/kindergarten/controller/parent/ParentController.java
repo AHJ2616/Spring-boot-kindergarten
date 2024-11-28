@@ -2,6 +2,7 @@ package com.kinder.kindergarten.controller.parent;
 
 import com.kinder.kindergarten.DTO.parent.ParentErpDTO;
 import com.kinder.kindergarten.DTO.parent.ParentUpdateDTO;
+import com.kinder.kindergarten.DTO.parent.RegistrationCompletionDTO;
 import com.kinder.kindergarten.constant.parent.ParentType;
 import com.kinder.kindergarten.entity.parent.Parent;
 import com.kinder.kindergarten.repository.parent.ParentRepository;
@@ -10,10 +11,14 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,6 +26,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -267,6 +274,71 @@ public class ParentController {
             redirectAttributes.addFlashAttribute("error", "시스템 오류가 발생했습니다.");
             return "redirect:/erp/parent/list";
         }
+    }
+
+    @GetMapping("/registration/completion")
+    public String showCompletionPage(@RequestParam(required = false) Long parentId,
+                                     @RequestParam(required = false) Long childrenId,
+                                     @RequestParam(required = false) Long classRoomId,
+                                     Model model) {
+        try {
+            log.info("Received parameters - parentId: {}, childrenId: {}, classRoomId: {}",
+                    parentId, childrenId, classRoomId);
+
+            RegistrationCompletionDTO completionInfo = parentService
+                    .getRegistrationCompletionInfo(parentId, childrenId, classRoomId);
+
+            log.info("CompletionInfo: {}", completionInfo);  // DTO 내용 로깅
+
+            model.addAttribute("completion", completionInfo);
+            return "parent/completion";
+        } catch (Exception e) {
+            log.error("Error occurred: ", e);  // 구체적인 에러 내용 로깅
+            return "redirect:/erp/parent/list";
+        }
+    }
+
+    @GetMapping("/registration/download-excel")
+    public ResponseEntity<Resource> downloadRegistrationData(@RequestParam Long parentId,
+                                                             @RequestParam Long childrenId) {
+        try {
+            ByteArrayResource resource = parentService.generateExcelFile(parentId, childrenId);
+
+            LocalDateTime now = LocalDateTime.now();
+            String fileName = String.format("registration_data_%s.xlsx",
+                    now.format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")));
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+                    .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, must-revalidate")
+                    .header(HttpHeaders.PRAGMA, "no-cache")
+                    .header(HttpHeaders.EXPIRES, "0")
+                    .body(resource);
+
+        } catch (Exception e) {
+            log.error("Excel file generation failed", e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/parent-management")
+    public String redirectToParentManagement() {
+        // 완료페이지에서 학부모 목록으로 가게 해주는 링크
+
+        return "redirect:/erp/parent/list";
+    }
+
+    @GetMapping("/class-list")
+    public String redirectToClassList() {
+        // 완료페이지에서 교실 목록으로 가게 해주는 링크
+        return "redirect:/erp/classroom/list";
+    }
+
+    @GetMapping("/child-management")
+    public String redirectToChildManagement() {
+        // 완료 페이지에서 원아 목록으로 가게 해주는 리스트
+        return "redirect:/erp/children/list";
     }
 
 

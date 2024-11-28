@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>등록 완료</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link th:href="@{/css/parent/registration-completion.css}" rel="stylesheet">
+</head>
+<body>
+<div class="completion-page container mt-5">
+    <!-- 축하 메시지 -->
+    <div class="celebration-section">
+        <h1 class="celebration-title">등록이 완료되었습니다</h1>
+        <p class="lead">학부모와 원아의 정보가 성공적으로 입력되고 반 배정까지 완료되었습니다.</p>
+        <p class="lead">아래의 등록 정보 요약을 확인해 주시길 바랍니다.</p>
+    </div>
+
+    <!-- 등록 정보 요약 -->
+    <div class="info-card card mb-4">
+        <div class="card-header">
+            <h2>등록 정보 요약</h2>
+        </div>
+        <div class="card-body">
+            <!-- 학부모 정보 -->
+            <h3 class="card-title">학부모 정보</h3>
+            <table class="table">
+                <tr>
+                    <th>이름</th>
+                    <td th:text="${completion.memberName}"></td>
+                </tr>
+                <tr>
+                    <th>이메일</th>
+                    <td th:text="${completion.memberEmail}"></td>
+                </tr>
+                <tr>
+                    <th>연락처</th>
+                    <td th:text="${completion.memberPhone}"></td>
+                </tr>
+                <tr>
+                    <th>관계</th>
+                    <td th:text="${completion.parentType}"></td>
+                </tr>
+                <tr>
+                    <th>긴급연락처</th>
+                    <td th:text="${completion.childrenEmergencyPhone}"></td>
+                </tr>
+            </table>
+
+            <!-- 원아 정보 -->
+            <h3 class="card-title mt-4">원아 정보</h3>
+            <table class="table">
+                <tr>
+                    <th>이름</th>
+                    <td th:text="${completion.childrenName}"></td>
+                </tr>
+                <tr>
+                    <th>생년월일</th>
+                    <td th:text="${#temporals.format(completion.childrenBirthDate, 'yyyy-MM-dd')}"></td>
+                </tr>
+                <tr>
+                    <th>성별</th>
+                    <td th:text="${completion.childrenGender}"></td>
+                </tr>
+                <tr>
+                    <th>알레르기</th>
+                    <td th:text="${completion.childrenAllergies}"></td>
+                </tr>
+            </table>
+
+            <!-- 반 배정 정보 -->
+            <h3 class="card-title mt-4">반 배정 정보</h3>
+            <table class="table">
+                <tr>
+                    <th>반 이름</th>
+                    <td th:text="${completion.classRoomName}"></td>
+                </tr>
+                <tr>
+                    <th>담당 교사</th>
+                    <td th:text="${completion.employeeName}"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- 다음 작업 안내 -->
+    <div class="action-buttons row">
+        <div class="col-md-4">
+            <a href="/erp/parent/list" class="btn btn-parent">
+                <i class="fas fa-users me-2"></i>학부모 관리 페이지
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="/erp/classRoom/list" class="btn btn-class">
+                <i class="fas fa-chalkboard-teacher me-2"></i>반별 학생 리스트
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="/erp/children/list" class="btn btn-child">
+                <i class="fas fa-child me-2"></i>원아 관리 페이지
+            </a>
+        </div>
+    </div>
+
+    <!-- 엑셀 다운로드 -->
+    <div class="download-section">
+        <a th:href="@{/erp/parent/registration/download-excel(
+                memberEmail=${completion.memberEmail},
+                parentId=${completion.parentId},
+                childrenId=${completion.childrenId})}"
+           class="btn btn-download">
+            <i class="fas fa-file-excel me-2"></i>엑셀 다운로드
+        </a>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
